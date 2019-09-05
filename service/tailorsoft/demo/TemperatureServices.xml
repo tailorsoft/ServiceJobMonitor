@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+    <service verb="get" noun="Temperature" authenticate="anonymous-all">
+    	<in-parameters>
+            <parameter name="username" />
+            <parameter name="password" />
+            <parameter name="owner" />
+            <parameter name="repo" />
+        </in-parameters>
+        <out-parameters>
+            <parameter name="value" />
+        </out-parameters>
+        <actions>
+            <script><![CDATA[
+                import org.moqui.util.RestClient
+                import org.moqui.util.RestClient.RestResponse
+
+                RestClient restClient = ec.service.rest().method(org.moqui.util.RestClient.GET)
+                        .uri("http://api.openweathermap.org/data/2.5/weather?q=Salt%20Lake%20City,%20us&APPID=33860c248f66cca0a31fe50b9ad5c489&units=metric")
+
+                RestResponse restResponse = restClient.call()
+                restResponse.checkError();
+
+                Map respMap = (Map) restResponse.jsonObject()
+                // Get the last complete day of views
+                if (respMap.main) {
+                    value = respMap.main
+
+                } else {
+                    throw new Exception("Error calling github API: " + respMap)
+                }
+                ]]></script>
+            <log message="\n===== value: ${value}"/>
+        </actions>
+    </service>
+</services>

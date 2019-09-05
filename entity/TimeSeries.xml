@@ -1,0 +1,42 @@
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/entity-definition-2.1.xsd">
+
+    <!-- ========================================================= -->
+    <!-- moqui.basic -->
+    <!-- moqui.basic.email -->
+    <!-- moqui.basic.print -->
+    <!-- ========================================================= -->
+
+    <!-- ========== DataSource ========== -->
+    <entity entity-name="Monitor" package="tailorsoft.timeseries" use="nontransactional" cache="true">
+        <field name="jobName" type="text-short" is-pk="true"/>
+        <field name="title" type="text-short"/>
+        <field name="description" type="text-long"/>
+        <field name="valuePath" type="text-medium"/>
+        <field name="indexName" type="text-medium" />
+        <relationship type="one" related="moqui.service.job.ServiceJob"/>
+    </entity>
+<!--
+
+    <entity entity-name="Timeseries" package="mantle.timeseries" use="nontransactional" cache="true">
+        <field name="timeseriesId" type="id" is-pk="true"/>
+        <field name="title" type="text-short"/>
+        <field name="query" type="text-long"/>
+        <field name="serviceName" type="text-medium"/>
+        <field name="entityName" type="text-medium"/>
+        <field name="outParamName" type="text-short"/>
+    </entity>
+
+    <entity entity-name="TimeseriesEndpoint" package="tailorsoft.monitor" use="nontransactional" cache="true">
+        <field name="jobName" type="id" is-pk="true"/>
+        <field name="monitorId" type="id" is-pk="true"/>
+        <field name="isErring" type="boolean"/>
+        <field name="thresholdLimit" ><description>The number of times the outparam can exceed the thresholds before a notification is triggered</description></field>
+
+        <relationship type="one" title="Monitor" related="moqui.basic.Enumeration" short-alias="monitor">
+            <key-map field-name="monitorId"/></relationship>
+
+        <relationship type="one" title="ServiceJob" related="moqui.basic.Enumeration" short-alias="serviceJob">
+            <key-map field-name="jobName"/></relationship>
+    </entity>
+-->
+</entities>
