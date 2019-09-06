@@ -14,14 +14,16 @@
         <field name="description" type="text-long"/>
         <field name="valuePath" type="text-medium"/>
         <field name="indexName" type="text-medium"/>
-        <relationship type="one" related="moqui.service.job.ServiceJob"/>
         <field name="algorithmEnumId" type="id"/>
         <seed-data>
             <!-- =========================== Data Source Type Data ==================== -->
             <moqui.basic.EnumerationType description="algorithm Type" enumTypeId="AlgorithmType"/>
-            <moqui.basic.Enumeration description="Simple Bounds Algorithm" enumId="ALGO_BOUNDS" enumTypeId="AlgorithmType"/>
-            <moqui.basic.Enumeration description="Standard Deviatioin Algorithm" enumId="ALGO_SDT" enumTypeId="AlgorithmType"/>
+            <moqui.basic.Enumeration description="Simple Bounds Algorithm" enumId="ALGO_BOUNDS"
+                                     enumTypeId="AlgorithmType"/>
+            <moqui.basic.Enumeration description="Standard Deviatioin Algorithm" enumId="ALGO_SDT"
+                                     enumTypeId="AlgorithmType"/>
         </seed-data>
+        <relationship type="one" related="moqui.service.job.ServiceJob"/>
     </entity>
 
 

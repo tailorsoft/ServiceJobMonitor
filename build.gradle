@@ -1,0 +1,56 @@
+/*
+ * This software is in the public domain under CC0 1.0 Universal plus a 
+ * Grant of Patent License.
+ * 
+ * To the extent possible under law, the author(s) have dedicated all
+ * copyright and related and neighboring rights to this software to the
+ * public domain worldwide. This software is distributed without any
+ * warranty.
+ * 
+ * You should have received a copy of the CC0 Public Domain Dedication
+ * along with this software (see the LICENSE.md file). If not, see
+ * <http://creativecommons.org/publicdomain/zero/1.0/>.
+ */
+
+apply plugin: 'groovy'
+
+sourceCompatibility = '1.8'
+def moquiDir = file(projectDir.absolutePath + '/../../..')
+def frameworkDir = file(moquiDir.absolutePath + '/framework')
+
+// maybe in the future: repositories { mavenCentral() }
+repositories {
+    flatDir name: 'localLib', dirs: frameworkDir.absolutePath + '/lib'
+    jcenter()
+}
+
+// Log4J has annotation processors, disable to avoid warning
+tasks.withType(JavaCompile) { options.compilerArgs << "-proc:none" }
+tasks.withType(GroovyCompile) { options.compilerArgs << "-proc:none" }
+
+dependencies {
+    compile project(':framework')
+    testCompile project(':framework').configurations.testCompile.allDependencies
+}
+
+// by default the Java plugin runs test on build, change to not do that (only run test if explicit task)
+// no longer workds as of gradle 4.8 or possibly earlier, use clear() instead: check.dependsOn.remove(test)
+check.dependsOn.clear()
+
+test {
+    dependsOn cleanTest
+    dependsOn ':runtime:component:mantle-usl:test'
+
+    systemProperty 'moqui.runtime', moquiDir.absolutePath + '/runtime'
+    systemProperty 'moqui.conf', 'conf/MoquiDevConf.xml'
+    systemProperty 'moqui.init.static', 'true'
+
+    // show standard out and standard error of the test JVM(s) on the console
+    testLogging.showStandardStreams = true; testLogging.showExceptions = true
+
+    classpath += files(sourceSets.main.output.classesDirs)
+    // filter out classpath entries that don't exist (gradle adds a bunch of these), or ElasticSearch JarHell will blow up
+    classpath = classpath.filter { it.exists() }
+
+    beforeTest { descriptor -> logger.lifecycle("Running test: ${descriptor}") }
+}

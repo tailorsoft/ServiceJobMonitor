@@ -15,6 +15,7 @@ along with this software (see the LICENSE.md file). If not, see
 <services
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+    <!--   process data point  -->
     <service verb="process" noun="Datapoint" authenticate="anonymous-all">
         <in-parameters>
             <parameter name="jobRunId" required="true"/>
@@ -29,11 +30,6 @@ along with this software (see the LICENSE.md file). If not, see
             <entity-find-one entity-name="tailorsoft.timeseries.Monitor" value-field="monitor" cache="true">
                 <field-map field-name="jobName"/>
             </entity-find-one>
-
-            <entity-find-one entity-name="tailorsoft.timeseries.MonitorBounds" value-field="monitorBounds" cache="true">
-                <field-map field-name="jobName"/>
-            </entity-find-one>
-
             <if condition="!monitor">
                 <!-- No monitor found, abort -->
                 <return/>
@@ -53,8 +49,94 @@ along with this software (see the LICENSE.md file). If not, see
             <!-- store in elasticsearch -->
             <service-call name="tailorsoft.timeseries.TimeseriesServices.save#Datapoint"
                           in-map="[date:endTime, value: doubleValue, indexName: monitor.indexName]"/>
+
+            <log message="\n ======= monitorBounds [${monitorBounds}]"/>
+
+            <if condition="monitor.algorithmEnumId == 'ALGO_BOUNDS'">
+                <service-call
+                        name="tailorsoft.timeseries.TimeseriesServices.process#DatapointBounds"
+                        in-map="[indexName: monitor.indexName, value: doubleValue, date: endDate, jobName: jobName ]" />
+            </if>
         </actions>
     </service>
+
+
+    <!--  search Elasticsearch data  -->
+    <service verb="process" noun="DatapointBounds" authenticate="anonymous-all">
+        <in-parameters>
+            <parameter name="jobName" />
+            <parameter name="indexName" />
+            <parameter name="value" />
+        </in-parameters>
+        <out-parameters>
+            <parameter name="value"/>
+        </out-parameters>
+        <actions>
+
+            <log message="\n ======= bounds ${indexName}, ${value}, ${jobName}, ${context} " />
+            <entity-find-one entity-name="tailorsoft.timeseries.MonitorBounds" value-field="monitorBounds" cache="true">
+                <field-map field-name="jobName"/>
+            </entity-find-one>
+
+            <log message="\n ======= entity bounds: ${monitorBounds}" />
+
+<!--            <if condition="doubleValue &gt; monitorBounds.lower &amp;&amp; doubleValue &lt; monitorBounds.upper" >-->
+<!--                &lt;!&ndash; nothing to see here &ndash;&gt;-->
+<!--                <return/>-->
+<!--            </if>-->
+
+            <script>
+                <![CDATA[
+                import com.tdunning.math.stats.Sort
+                import org.elasticsearch.action.get.MultiGetItemResponse
+                import org.elasticsearch.action.get.MultiGetRequestBuilder
+                import org.elasticsearch.action.search.SearchRequest
+                import org.elasticsearch.action.search.SearchRequestBuilder
+                import org.elasticsearch.index.query.QueryBuilder
+                import org.elasticsearch.index.query.QueryBuilders
+                import org.elasticsearch.search.SearchHit
+                import org.elasticsearch.search.SearchHits
+                import org.elasticsearch.search.sort.SortBuilder
+                import org.elasticsearch.search.sort.SortOrder
+                import org.elasticsearch.client.Client
+                import org.moqui.context.ExecutionContext
+                import org.moqui.elasticsearch.ElasticSearchUtil
+                import org.moqui.elasticsearch.EsClient
+                import org.elasticsearch.action.search.SearchResponse;
+                import org.elasticsearch.action.search.SearchType;
+                import org.elasticsearch.index.query.QueryBuilders.*;
+                import org.elasticsearch.search.sort.SortBuilders
+                import org.elasticsearch.search.sort.SortOrder
+
+                //create the ES client
+                ExecutionContext ec = context.ec
+                EsClient esClient = ec.getTool("ElasticSearch", EsClient.class)
+
+                try {
+                    Client client = esClient.getClient();
+
+                    SearchResponse response = client
+                            .prepareSearch((String) indexName)
+                            .addSort("@timestamp", SortOrder.DESC)
+                            .setSize(Integer.parseInt(monitorBounds.count.toString()))
+                            .get()
+
+                    //  @todo: process ES Data
+                    logger.info("\n ======== ES results")
+                    logger.info(response.toString())
+
+
+
+                } finally {
+
+                }
+                ]]>
+            </script>
+        </actions>
+
+    </service>
+
+    <!-- Save date point in elasticsearh   -->
     <service verb="save" noun="Datapoint" authenticate="anonymous-view">
         <in-parameters>
             <parameter name="indexName" required="true"/>
@@ -112,6 +194,8 @@ along with this software (see the LICENSE.md file). If not, see
             <log message="\n ====== ElasticSearch Saved:[ ${indexName}, ${date}, ${value} ]"/>
         </actions>
     </service>
+
+    <!-- poll data points    -->
     <service verb="poll" noun="Datapoint" authenticate="anonymous-view">
         <in-parameters>
             <parameter name="timeseriesId" required="true"/>
