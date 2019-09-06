@@ -30,6 +30,10 @@ along with this software (see the LICENSE.md file). If not, see
                 <field-map field-name="jobName"/>
             </entity-find-one>
 
+            <entity-find-one entity-name="tailorsoft.timeseries.MonitorBounds" value-field="monitorBounds" cache="true">
+                <field-map field-name="jobName"/>
+            </entity-find-one>
+
             <if condition="!monitor">
                 <!-- No monitor found, abort -->
                 <return/>
