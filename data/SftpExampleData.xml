@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<entity-facade-xml type="demo">
+    <tailorsoft.timeseries.Monitor jobName="poll_temperature" title="Temperature"
+                                   valuePath="value.temp" indexName="temperature"/>
+
+    <moqui.service.job.ServiceJob jobId="poll_SftpCountFiles_MuckCA" jobName="poll_SftpCountFiles_MuckCA"
+                                  description="poll file count sftp"
+                                  serviceName="tailorsoft.demo.SftpServices.count#Files"
+                                  cronExpression="* 0/5 * ? * * *"
+                                  paused="N">
+        <parameters parameterName="username" parameterValue="****"/>
+        <parameters parameterName="password" parameterValue="****"/>
+        <parameters parameterName="host" parameterValue="***"/>
+        <parameters parameterName="port" parameterValue="22"/>
+        <parameters parameterName="path" parameterValue="/outbound/"/>
+    </moqui.service.job.ServiceJob>
+
+    <tailorsoft.timeseries.Monitor
+            jobName="poll_SftpCountFiles_MuckCA"
+            title="Files"
+            valuePath="value"
+            indexName="sftfiles-mucka"
+            algorithmEnumId="ALGO_BOUNDS"
+    />
+
+    <tailorsoft.timeseries.MonitorBounds
+            jobName="poll_SftpCountFiles_MuckCA"
+            lower="0"
+            upper="10"
+            count="3"
+    />
+
+</entity-facade-xml>
