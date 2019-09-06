@@ -80,7 +80,8 @@ along with this software (see the LICENSE.md file). If not, see
                 EsClient esClient = ec.getTool("ElasticSearch", EsClient.class)
 
                 //use the default timestamp value
-                json.put("@timestamp", date)
+                // @TODO: Parse date from endTime service
+                json.put("@timestamp", new Date())
                 // value from the service
                 json.put("value", value)
 
