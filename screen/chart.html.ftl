@@ -71,7 +71,8 @@
 
         options.annotations = {};
         options.annotations.yaxis = [];
-        options.annotations.xaxis = []
+        options.annotations.xaxis = [];
+        options.annotations.points = [];
         if (chartData.bounds) {
 
 
@@ -122,7 +123,30 @@
                     },
                     text: "Alert "+type
                 }
+            });
+
+            options.annotations.points.push({
+                x: new Date(point['@timestamp']).getTime(),
+                y: point.value,
+                marker: {
+                    size: 6,
+                    fillColor: "#fff",
+                    strokeColor: "#2698FF",
+                    radius: 2
+                },
+                label: {
+                    borderColor: "#FF4560",
+                    offsetY: 0,
+                    style: {
+                        color: "#fff",
+                        background: type === 'start' ? '#FF4560' : '#00E396'
+                    },
+
+                    text: "Alert sent to daniel"
+                }
             })
+
+
         }
 
         for (let i = 0; i < chartData.data.length; i++) {
