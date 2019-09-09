@@ -55,7 +55,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="monitor.algorithmEnumId == 'ALGO_BOUNDS'">
                 <service-call
                         name="tailorsoft.timeseries.TimeseriesServices.process#DatapointBounds"
-                        in-map="[indexName: monitor.indexName, value: doubleValue, date: endDate, jobName: jobName ]" />
+                        in-map="[indexName: monitor.indexName, value: doubleValue, date: endDate, jobName: jobName ]"/>
             </if>
         </actions>
     </service>
@@ -64,30 +64,29 @@ along with this software (see the LICENSE.md file). If not, see
     <!--  search Elasticsearch data  -->
     <service verb="process" noun="DatapointBounds" authenticate="anonymous-all">
         <in-parameters>
-            <parameter name="jobName" />
-            <parameter name="indexName" />
-            <parameter name="value" />
+            <parameter name="jobName"/>
+            <parameter name="indexName"/>
+            <parameter name="value"/>
         </in-parameters>
         <out-parameters>
             <parameter name="value"/>
         </out-parameters>
         <actions>
 
-            <log message="\n ======= bounds ${indexName}, ${value}, ${jobName}, ${context} " />
+            <log message="\n ======= bounds ${indexName}, ${value}, ${jobName}, ${context} "/>
             <entity-find-one entity-name="tailorsoft.timeseries.MonitorBounds" value-field="monitorBounds" cache="true">
                 <field-map field-name="jobName"/>
             </entity-find-one>
 
-            <log message="\n ======= entity bounds: ${monitorBounds}" />
+            <log message="\n ======= entity bounds: ${monitorBounds}"/>
 
-<!--            <if condition="doubleValue &gt; monitorBounds.lower &amp;&amp; doubleValue &lt; monitorBounds.upper" >-->
-<!--                &lt;!&ndash; nothing to see here &ndash;&gt;-->
-<!--                <return/>-->
-<!--            </if>-->
+            <!--            <if condition="doubleValue &gt; monitorBounds.lower &amp;&amp; doubleValue &lt; monitorBounds.upper" >-->
+            <!--                &lt;!&ndash; nothing to see here &ndash;&gt;-->
+            <!--                <return/>-->
+            <!--            </if>-->
 
             <script>
                 <![CDATA[
-                import com.tdunning.math.stats.Sort
                 import org.elasticsearch.action.get.MultiGetItemResponse
                 import org.elasticsearch.action.get.MultiGetRequestBuilder
                 import org.elasticsearch.action.search.SearchRequest
@@ -102,11 +101,13 @@ along with this software (see the LICENSE.md file). If not, see
                 import org.moqui.context.ExecutionContext
                 import org.moqui.elasticsearch.ElasticSearchUtil
                 import org.moqui.elasticsearch.EsClient
-                import org.elasticsearch.action.search.SearchResponse;
+                import org.elasticsearch.action.search.SearchResponse
                 import org.elasticsearch.action.search.SearchType;
                 import org.elasticsearch.index.query.QueryBuilders.*;
                 import org.elasticsearch.search.sort.SortBuilders
                 import org.elasticsearch.search.sort.SortOrder
+
+                import javax.naming.directory.SearchControls
 
                 //create the ES client
                 ExecutionContext ec = context.ec
@@ -115,16 +116,46 @@ along with this software (see the LICENSE.md file). If not, see
                 try {
                     Client client = esClient.getClient();
 
+                    int alertCount = Integer.parseInt(monitorBounds.count.toString())
+
                     SearchResponse response = client
                             .prepareSearch((String) indexName)
                             .addSort("@timestamp", SortOrder.DESC)
-                            .setSize(Integer.parseInt(monitorBounds.count.toString()))
+                            .setSize(alertCount + 1)
                             .get()
 
                     //  @todo: process ES Data
                     logger.info("\n ======== ES results")
                     logger.info(response.toString())
 
+                    SearchHits hits = response.getHits()
+
+                    Boolean firstIsNormal = false;
+                    int outBoundsCount = 0
+
+                    for (int i = hits.size() - 1; i >= 0; i--) {
+                        Map hit = hits[i].getSourceAsMap()
+                        Float value = Float.parseFloat(hit.value)
+                        Float upperBound = Float.parseFloat(monitorBounds.upper.toString())
+                        Float lowerBound = Float.parseFloat(monitorBounds.lower.toString())
+
+                        logger.info(hit.toString())
+
+                        if (i == 0) {
+                            if (value < upperBound && value >= lowerBound) {
+                                firstIsNormal = true;
+                            }
+                        } else {
+                            if (value > upperBound || value < lowerBound) {
+                                outBoundsCount = outBoundsCount + 1
+                            }
+                        }
+                    }
+
+                    if (firstIsNormal && outBoundsCount === alertCount) {
+                        // @todo: mark as alert
+                        logger.info('alert here')
+                    }
 
 
                 } finally {
@@ -192,6 +223,61 @@ along with this software (see the LICENSE.md file). If not, see
                 ]]>
                     </script>
             <log message="\n ====== ElasticSearch Saved:[ ${indexName}, ${date}, ${value} ]"/>
+        </actions>
+    </service>
+
+    <!-- Get charts info   -->
+    <service verb="get" noun="Monitors" authenticate="anonymous-all">
+        <out-parameters>
+            <parameter name="value"/>
+        </out-parameters>
+        <actions>
+            <set field="res" from="[]" />
+            <entity-find entity-name="tailorsoft.timeseries.Monitor" list="monitorList"/>
+            <script>
+                 <![CDATA[
+                import org.elasticsearch.search.SearchHit
+                import org.elasticsearch.search.SearchHits
+                import org.elasticsearch.search.sort.SortOrder
+                import org.elasticsearch.client.Client
+                import org.moqui.context.ExecutionContext
+                import org.moqui.elasticsearch.ElasticSearchUtil
+                import org.moqui.elasticsearch.EsClient
+                import org.elasticsearch.action.search.SearchResponse
+
+                //create the ES client
+                ExecutionContext ec = context.ec
+                EsClient esClient = ec.getTool("ElasticSearch", EsClient.class)
+                Client client = esClient.getClient();
+
+
+                for (int i = 0; i < monitorList.size(); i++) {
+                    String indexName = monitorList[i].indexName
+                    String jobName = monitorList[i].jobName
+
+                    Map r = ec.entity.find("tailorsoft.timeseries.MonitorBounds").condition("jobName", jobName).one()
+
+                    List hitsList = []
+
+                    SearchHits hits = client
+                            .prepareSearch((String) indexName)
+                            .addSort("@timestamp", SortOrder.DESC)
+                            .setSize(100)
+                            .get()
+                            .getHits()
+
+                    for (int x = 0; x < hits.size(); x++) {
+                        hitsList.push(hits[x].getSourceAsMap())
+                    }
+
+                    res.push([indexName: indexName, data:hitsList, bounds:r])
+                }
+
+                value = res.toString()
+
+                ]]>
+            </script>
+
         </actions>
     </service>
 
