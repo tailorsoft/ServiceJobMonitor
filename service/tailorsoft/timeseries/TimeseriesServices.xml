@@ -244,6 +244,7 @@ along with this software (see the LICENSE.md file). If not, see
                 import org.moqui.elasticsearch.ElasticSearchUtil
                 import org.moqui.elasticsearch.EsClient
                 import org.elasticsearch.action.search.SearchResponse
+                import groovy.json.JsonOutput
 
                 //create the ES client
                 ExecutionContext ec = context.ec
@@ -273,7 +274,7 @@ along with this software (see the LICENSE.md file). If not, see
                     res.push([indexName: indexName, data:hitsList, bounds:r])
                 }
 
-                value = res.toString()
+                value = res
 
                 ]]>
             </script>

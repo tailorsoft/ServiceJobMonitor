@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen require-authentication="false">
+    <widgets>
+        <render-mode>
+            <text type="html,vuet"
+                  location="component://tailorsoft-timeseries/screen/chart.html.ftl"/>
+        </render-mode>
+    </widgets>
+</screen>
