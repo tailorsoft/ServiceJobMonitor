@@ -15,11 +15,13 @@
 <script type="text/javascript">
 
     fetch('/rest/s1/tailorsoft/monitors')
-        .then(function(response) {
+        .then(function (response) {
             return response.json();
         })
-        .then((data)=>{
-            data.value.map(generateGraph).forEach((chart)=>{ chart.render()})
+        .then((data) => {
+            data.value.map(generateGraph).forEach((chart) => {
+                chart.render()
+            })
         });
 
     const cont = document.getElementById('cont');
@@ -42,7 +44,7 @@
         const options = {
             chart: {
                 type: 'line',
-                height: 600
+                height: 400
             },
             stroke: {
                 show: true,
@@ -54,31 +56,24 @@
             },
             xaxis: {
                 type: "datetime",
-                labels: {
-                    datetimeFormatter: {
-                        year: 'yyyy',
-                        month: 'MMM \'yy',
-                        day: 'dd MMM',
-                        hour: 'HH:mm'
-                    }
-                }
             },
             series: [{
                 name: chartData.indexName,
                 data: chartData.data.map((point) => {
                         return [
                             new Date(point["@timestamp"]).getTime(),
-                            point.value
+                            parseFloat(point.value)
                         ]
                     }
                 )
             }],
         };
 
+        options.annotations = {};
+        options.annotations.yaxis = [];
+        options.annotations.xaxis = []
         if (chartData.bounds) {
-            options.annotations = {};
-            options.annotations.yaxis = [];
-            options.annotations.xaxis = []
+
 
             options.annotations.yaxis.push({
                 y: chartData.bounds.upper,
@@ -109,10 +104,42 @@
             }
         }
 
-        const alerts = []
+        const alerts = [];
+
+
+        function addAlert(type, point) {
+            alerts.push({type: type, point})
+
+
+            options.annotations.xaxis.push({
+                // in a datetime series, the x value should be a timestamp, just like it is generated below
+                x: new Date(point['@timestamp']).getTime(),
+                strokeDashArray: 0,
+                label: {
+                    style: {
+                        color: "#fff",
+                        background: type === 'start' ? '#FF4560' : '#00E396'
+                    },
+                    text: "Alert "+type
+                }
+            })
+        }
 
         for (let i = 0; i < chartData.data.length; i++) {
-            
+            const point = chartData.data[i];
+            const pointValue = parseFloat(point.value);
+
+            if (
+                pointValue >= chartData.bounds.upper
+                && (alerts.length === 0 || (alerts.length > 0 && alerts[alerts.length-1].type === 'end'))
+            ) {
+
+                addAlert('start', point)
+            }
+
+            if (alerts.length > 0 && alerts[alerts.length - 1].type === 'start' && pointValue < chartData.bounds.upper) {
+                addAlert('end', point)
+            }
         }
 
         return new ApexCharts(document.querySelector("#" + chartData.indexName), options)
