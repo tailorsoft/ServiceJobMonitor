@@ -35,6 +35,17 @@
         <relationship type="one" related="tailorsoft.timeseries.Monitor"/>
     </entity>
 
+
+    <entity entity-name="MonitorAlerts" package="tailorsoft.timeseries" use="nontransactional">
+        <field name="id" type="id" is-pk="true"/>
+        <field name="jobName" type="id"/>
+        <field name="timestamp" type="date-time"/>
+        <field name="value" type="number-float"/>
+        <field name="message" type="text-medium"/>
+        <field name="status" type="text-medium"/>
+        <relationship type="one" related="tailorsoft.timeseries.Monitor"/>
+    </entity>
+
     <!--
 
 
