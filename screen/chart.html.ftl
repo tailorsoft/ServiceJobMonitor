@@ -1,5 +1,4 @@
 <style>
-
     .main{
         margin: 0;
         padding: 0;
@@ -148,18 +147,18 @@
             alerts.push({type: type, point})
 
 
-            options.annotations.xaxis.push({
-                // in a datetime series, the x value should be a timestamp, just like it is generated below
-                x: new Date(point['@timestamp']).getTime(),
-                strokeDashArray: 0,
-                label: {
-                    style: {
-                        color: "#fff",
-                        background: type === 'start' ? '#FF4560' : '#00E396'
-                    },
-                    text: "Alert "+type
-                }
-            });
+            // options.annotations.xaxis.push({
+            //     // in a datetime series, the x value should be a timestamp, just like it is generated below
+            //     x: new Date(point['@timestamp']).getTime(),
+            //     strokeDashArray: 0,
+            //     label: {
+            //         style: {
+            //             color: "#fff",
+            //             background: type === 'start' ? '#FF4560' : '#00E396'
+            //         },
+            //         text: "Alert "+type
+            //     }
+            // });
 
             options.annotations.points.push({
                 x: new Date(point['@timestamp']).getTime(),
