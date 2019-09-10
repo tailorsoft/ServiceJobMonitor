@@ -39,6 +39,7 @@
     <entity entity-name="MonitorAlert" package="tailorsoft.timeseries" use="nontransactional">
         <field name="id" type="id" is-pk="true"/>
         <field name="jobName" type="id"/>
+        <field name="jobId" type="id"/>
         <field name="fromDate" type="date-time"/>
         <field name="thruDate" type="date-time"/>
         <field name="value" type="number-float"/>
