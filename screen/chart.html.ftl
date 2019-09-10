@@ -1,10 +1,22 @@
 <style>
+
+    .main{
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #f8f8f8;
+    }
+
     .cont {
         display: flex;
     }
 
-    body{
-        padding: 10px;
+    .title{
+        font-size: 30px;
+        font-weight: bold;
+        padding-left: 10px;
+        padding-top: 10px;
     }
 
     .chartItem {
@@ -16,13 +28,15 @@
         margin: 1rem;
         position: relative;
         width: 300px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
         padding: 10px;
+        border-style: solid;
+        border-color: #d6d6d6;
+        border-width: 1px;
     }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<div>
-    <h1>Current Monitors</h1>
+<div class="main">
+    <div class="title">Current Monitors</div>
     <div class="cont" id="cont">
     </div>
 </div>
