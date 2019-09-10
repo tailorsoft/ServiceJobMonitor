@@ -228,14 +228,20 @@ along with this software (see the LICENSE.md file). If not, see
 
     <!-- Get charts info   -->
     <service verb="get" noun="Monitors" authenticate="anonymous-all">
+        <in-parameters>
+            <parameter name="fromDate"/>
+            <parameter name="thruDate"/>
+        </in-parameters>
         <out-parameters>
             <parameter name="value"/>
         </out-parameters>
         <actions>
-            <set field="res" from="[]" />
+            <set field="res" from="[]"/>
             <entity-find entity-name="tailorsoft.timeseries.Monitor" list="monitorList"/>
             <script>
                  <![CDATA[
+                import org.apache.lucene.util.QueryBuilder
+                import org.elasticsearch.index.query.QueryBuilders
                 import org.elasticsearch.search.SearchHit
                 import org.elasticsearch.search.SearchHits
                 import org.elasticsearch.search.sort.SortOrder
@@ -245,11 +251,22 @@ along with this software (see the LICENSE.md file). If not, see
                 import org.moqui.elasticsearch.EsClient
                 import org.elasticsearch.action.search.SearchResponse
                 import groovy.json.JsonOutput
+                import java.text.SimpleDateFormat;
 
                 //create the ES client
                 ExecutionContext ec = context.ec
                 EsClient esClient = ec.getTool("ElasticSearch", EsClient.class)
                 Client client = esClient.getClient();
+
+                logger.info("=================")
+                logger.info(fromDate)
+                logger.info(thruDate)
+
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+
+                Date fromDateObject = formatter.parse(fromDate)
+                Date thruDateObject = formatter.parse(thruDate)
 
 
                 for (int i = 0; i < monitorList.size(); i++) {
@@ -262,8 +279,9 @@ along with this software (see the LICENSE.md file). If not, see
 
                     SearchHits hits = client
                             .prepareSearch((String) indexName)
+                            .setQuery(QueryBuilders.rangeQuery("@timestamp").from(fromDate).to(thruDate))
                             .addSort("@timestamp", SortOrder.DESC)
-                            .setSize(150)
+                            .setSize(9999)
                             .get()
                             .getHits()
 
@@ -271,11 +289,10 @@ along with this software (see the LICENSE.md file). If not, see
                         hitsList.push(hits[x].getSourceAsMap())
                     }
 
-                    res.push([indexName: indexName, data:hitsList, bounds:r])
+                    res.push([indexName: indexName, data: hitsList, bounds: r, fromDate: fromDateObject, thruDate: thruDateObject])
                 }
 
                 value = res
-
                 ]]>
             </script>
 
@@ -307,6 +324,7 @@ along with this software (see the LICENSE.md file). If not, see
                 import groovy.json.JsonBuilder
                 import org.moqui.util.RestClient
                 import org.moqui.util.RestClient.RestResponse
+                import java.text.SimpleDateFormat
 
                 if (!lastRunTime) {
                     CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ)
@@ -408,12 +426,14 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <set field="result" from="[:]"/>
             <script><![CDATA[
+                import groovy.text.GStringTemplateEngine
+
                 import java.sql.Connection
                 import java.sql.ResultSet
                 import java.sql.SQLWarning
                 import org.moqui.context.ExecutionContext
 
-                String sql = new groovy.text.GStringTemplateEngine().createTemplate(query).make(parameters)
+                String sql = new GStringTemplateEngine().createTemplate(query).make(parameters)
                 Connection con = ec.entity.getConnection()
                 try {
                     stmt = con.createStatement()

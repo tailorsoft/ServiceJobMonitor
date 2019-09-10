@@ -3,18 +3,40 @@
         display: flex;
     }
 
+    body{
+        padding: 10px;
+    }
+
     .chartItem {
         flex: 1;
         height: 400px;
+        background: #fff;
+        border-radius: 2px;
+        display: inline-block;
+        margin: 1rem;
+        position: relative;
+        width: 300px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        padding: 10px;
     }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<div class="cont" id="cont">
+<div>
+    <h1>Current Monitors</h1>
+    <div class="cont" id="cont">
+    </div>
 </div>
 
 <script type="text/javascript">
 
-    fetch('/rest/s1/tailorsoft/monitors')
+    function parseDate(date){
+        // return date.getFullYear() +"-"+(date.getMonth()+1)+"-"+date.getDate()
+        return date.toISOString()
+    }
+
+    const DaysOld = new Date(Date.now()-(1000*60*60*24*3));
+
+    fetch('/rest/s1/tailorsoft/monitors?fromDate='+parseDate(DaysOld)+"&thruDate="+parseDate(new Date()))
         .then(function (response) {
             return response.json();
         })
