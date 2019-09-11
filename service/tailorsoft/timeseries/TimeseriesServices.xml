@@ -16,7 +16,7 @@ along with this software (see the LICENSE.md file). If not, see
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
     <!--   process data point  -->
-    <service verb="process" noun="Datapoint" authenticate="anonymous-all">
+    <service verb="process" noun="JobRunResults" authenticate="anonymous-all">
         <in-parameters>
             <parameter name="jobRunId" required="true"/>
             <parameter name="endTime" required="true"/>
