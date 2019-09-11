@@ -188,8 +188,7 @@
             const point = chartData.data[i];
             const pointValue = parseFloat(point.value);
 
-            if (
-                pointValue >= chartData.bounds.upper
+            if (chartData.bounds && pointValue >= chartData.bounds.upper
                 && (alerts.length === 0 || (alerts.length > 0 && alerts[alerts.length-1].type === 'end'))
             ) {
 

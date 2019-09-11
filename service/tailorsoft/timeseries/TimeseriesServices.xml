@@ -28,38 +28,97 @@ along with this software (see the LICENSE.md file). If not, see
         </out-parameters>
         <actions>
             <entity-find-one entity-name="tailorsoft.timeseries.Monitor" value-field="monitor" cache="true">
-                <field-map field-name="jobName"/>
-            </entity-find-one>
+                <field-map field-name="jobName"/></entity-find-one>
             <if condition="!monitor">
                 <!-- No monitor found, abort -->
                 <return/>
             </if>
-
             <set field="jsonResults" from="new groovy.json.JsonSlurper().parseText(results)"/>
-            <set field="path" from="monitor.valuePath.split('\\.')"/>
-            <set field="tempValue" from="jsonResults"/>
-            <script>
-                <![CDATA[
-                for (int i = 0; i < path.size(); i++) {
-                    tempValue = tempValue[path[i]]
-                }
-                ]]>
-            </script>
-            <set field="doubleValue" from="Float.parseFloat(tempValue.toString())"/>
+
+            <!-- TODO, switch to JsonPath: https://github.com/json-path/JsonPath -->
+            <set field="pathParts" from="monitor.valuePath.split('\\.')"/>
+            <iterate list="pathParts" entry="part">
+                <if condition="!jsonResults[part]">
+                    <return error="true" message="No value found in ${results} at ${monitor.valuePath}" />
+                </if>
+                <set field="jsonResults" from="jsonResults[part]" />
+            </iterate>
+
+            <set field="doubleValue" from="Float.parseFloat(jsonResults.toString())"/>
+            <if condition="doubleValue == null">
+                <return error="true" message="No double value found at path: ${monitor.valuePath} in ${results} "/>
+            </if>
+            
             <!-- store in elasticsearch -->
             <service-call name="tailorsoft.timeseries.TimeseriesServices.save#Datapoint"
-                          in-map="[date:endTime, value: doubleValue, indexName: monitor.indexName]"/>
-
-            <log message="\n ======= monitorBounds [${monitorBounds}]"/>
+                          in-map="[date:endTime, value:doubleValue, indexName:monitor.indexName]"/>
 
             <if condition="monitor.algorithmEnumId == 'ALGO_BOUNDS'">
                 <service-call
                         name="tailorsoft.timeseries.TimeseriesServices.process#DatapointBounds"
-                        in-map="[indexName: monitor.indexName, value: doubleValue, date: endDate, jobName: jobName ]"/>
+                        in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, jobName:jobName ]"/>
             </if>
         </actions>
     </service>
 
+    <!-- Save date point in elasticsearh   -->
+    <service verb="save" noun="Datapoint" authenticate="anonymous-view">
+        <in-parameters>
+            <parameter name="indexName" required="true"/>
+            <parameter name="date" required="true"/>
+            <parameter name="value" required="true"/>
+        </in-parameters>
+        <actions>
+            <set field="json" from="[:]"/>
+            <script>
+                <![CDATA[
+                import org.elasticsearch.action.get.MultiGetItemResponse
+                import org.elasticsearch.action.get.MultiGetRequestBuilder
+                import org.elasticsearch.action.search.SearchRequest
+                import org.elasticsearch.action.search.SearchRequestBuilder
+                import org.elasticsearch.index.query.QueryBuilder
+                import org.elasticsearch.index.query.QueryBuilders
+                import org.elasticsearch.search.SearchHit
+                import org.elasticsearch.search.SearchHits
+                import org.elasticsearch.search.sort.SortOrder
+                import org.elasticsearch.client.Client
+                import org.moqui.context.ExecutionContext
+                import org.moqui.elasticsearch.ElasticSearchUtil
+                import org.moqui.elasticsearch.EsClient
+
+                //create the ES client
+                ExecutionContext ec = context.ec
+                EsClient esClient = ec.getTool("ElasticSearch", EsClient.class)
+
+                //use the default timestamp value
+                // @TODO: Parse date from endTime service
+                json.put("@timestamp", new Date())
+                // value from the service
+                json.put("value", value)
+
+                try {
+                    Client client = esClient.getClient();
+
+                    if (!esClient.checkIndexExists(indexName)) {
+                        client
+                                .admin()
+                                .indices()
+                                .prepareCreate(indexName)
+                                .addMapping("_doc", "@timestamp", "type=date", "value", "type=float")
+                                .get()
+
+                        logger.info("\n ====== ElasticSearch index created: ${indexName}")
+                    }
+
+                    client.prepareIndex(indexName, "_doc").setSource(json).get()
+                } finally {
+
+                }
+                ]]>
+                    </script>
+            <log message="\n ====== ElasticSearch Saved:[ ${indexName}, ${date}, ${value} ]"/>
+        </actions>
+    </service>
 
     <!--  search Elasticsearch data  -->
     <service verb="process" noun="DatapointBounds" authenticate="anonymous-all">
@@ -72,18 +131,12 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="value"/>
         </out-parameters>
         <actions>
-
             <log message="\n ======= bounds ${indexName}, ${value}, ${jobName}, ${context} "/>
             <entity-find-one entity-name="tailorsoft.timeseries.MonitorBounds" value-field="monitorBounds" cache="true">
                 <field-map field-name="jobName"/>
             </entity-find-one>
 
             <log message="\n ======= entity bounds: ${monitorBounds}"/>
-
-            <!--            <if condition="doubleValue &gt; monitorBounds.lower &amp;&amp; doubleValue &lt; monitorBounds.upper" >-->
-            <!--                &lt;!&ndash; nothing to see here &ndash;&gt;-->
-            <!--                <return/>-->
-            <!--            </if>-->
 
             <script>
                 <![CDATA[
@@ -159,70 +212,10 @@ along with this software (see the LICENSE.md file). If not, see
 
 
                 } finally {
-
+                    // TODO close client?
                 }
                 ]]>
             </script>
-        </actions>
-
-    </service>
-
-    <!-- Save date point in elasticsearh   -->
-    <service verb="save" noun="Datapoint" authenticate="anonymous-view">
-        <in-parameters>
-            <parameter name="indexName" required="true"/>
-            <parameter name="date" required="true"/>
-            <parameter name="value" required="true"/>
-        </in-parameters>
-        <actions>
-            <set field="json" from="[:]"/>
-            <script>
-                <![CDATA[
-                import org.elasticsearch.action.get.MultiGetItemResponse
-                import org.elasticsearch.action.get.MultiGetRequestBuilder
-                import org.elasticsearch.action.search.SearchRequest
-                import org.elasticsearch.action.search.SearchRequestBuilder
-                import org.elasticsearch.index.query.QueryBuilder
-                import org.elasticsearch.index.query.QueryBuilders
-                import org.elasticsearch.search.SearchHit
-                import org.elasticsearch.search.SearchHits
-                import org.elasticsearch.search.sort.SortOrder
-                import org.elasticsearch.client.Client
-                import org.moqui.context.ExecutionContext
-                import org.moqui.elasticsearch.ElasticSearchUtil
-                import org.moqui.elasticsearch.EsClient
-
-                //create the ES client
-                ExecutionContext ec = context.ec
-                EsClient esClient = ec.getTool("ElasticSearch", EsClient.class)
-
-                //use the default timestamp value
-                // @TODO: Parse date from endTime service
-                json.put("@timestamp", new Date())
-                // value from the service
-                json.put("value", value)
-
-                try {
-                    Client client = esClient.getClient();
-
-                    if (!esClient.checkIndexExists(indexName)) {
-                        client
-                                .admin()
-                                .indices()
-                                .prepareCreate(indexName)
-                                .addMapping("_doc", "@timestamp", "type=date", "value", "type=float")
-                                .get()
-
-                        logger.info("\n ====== ElasticSearch index created: ${indexName}")
-                    }
-
-                    client.prepareIndex(indexName, "_doc").setSource(json).get()
-                } finally {
-
-                }
-                ]]>
-                    </script>
-            <log message="\n ====== ElasticSearch Saved:[ ${indexName}, ${date}, ${value} ]"/>
         </actions>
     </service>
 
@@ -237,6 +230,7 @@ along with this software (see the LICENSE.md file). If not, see
         </out-parameters>
         <actions>
             <set field="res" from="[]"/>
+            <!-- TODO restrict by Org -->
             <entity-find entity-name="tailorsoft.timeseries.Monitor" list="monitorList"/>
             <script>
                  <![CDATA[
@@ -295,180 +289,6 @@ along with this software (see the LICENSE.md file). If not, see
                 value = res
                 ]]>
             </script>
-
         </actions>
     </service>
-
-    <!-- poll data points    -->
-    <service verb="poll" noun="Datapoint" authenticate="anonymous-view">
-        <in-parameters>
-            <parameter name="timeseriesId" required="true"/>
-            <parameter name="lastRunTime" type="Timestamp"/>
-            <parameter name="parameterMap"/>
-            <parameter name="jobRunId"/>
-        </in-parameters>
-        <out-parameters>
-            <parameter name="value"/>
-        </out-parameters>
-        <actions>
-            <log message="run#Monitor lastRunTime: ${lastRunTime} jobRunId: ${jobRunId}"/>
-            <entity-find-one entity-name="tailorsoft.monitor.Monitor" value-field="monitor"/>
-            <script><![CDATA[
-                import com.cronutils.model.Cron
-                import com.cronutils.model.CronType
-                import com.cronutils.model.definition.CronDefinition
-                import com.cronutils.model.definition.CronDefinitionBuilder
-                import com.cronutils.model.time.ExecutionTime
-                import com.cronutils.parser.CronParser
-                import java.time.ZonedDateTime
-                import groovy.json.JsonBuilder
-                import org.moqui.util.RestClient
-                import org.moqui.util.RestClient.RestResponse
-                import java.text.SimpleDateFormat
-
-                if (!lastRunTime) {
-                    CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ)
-                    CronParser parser = new CronParser(cronDefinition)
-                    Cron cron = parser.parse("0 0 2 * * ?")
-                    ExecutionTime executionTime = ExecutionTime.forCron(cron)
-                    ZonedDateTime now = ZonedDateTime.now()
-                    lastRunTime = executionTime.lastExecution(now).get()
-                }
-
-                def params = [:]
-                if (parameterMap) {
-                    params = ec.resource.expression(parameterMap, null)
-                }
-                params.fromDate = lastRunTime
-                params.thruDate = ec.user.nowTimestamp
-
-
-                RestClient restClient = ec.service.rest().method(org.moqui.util.RestClient.GET)
-                        .basicAuth("danieltaylor-nz", "hpaiO9s30i")
-                        .uri("https://api.github.com/repos/moqui/moqui-framework/traffic/views")
-
-                RestResponse restResponse = restClient.call()
-                Map respMap = (Map) restResponse.jsonObject()
-
-                def value = respMap.views[13].count
-
-
-                System.out.println("respMap: " + value)
-                ]]></script>
-            <return/>
-
-            <if condition="monitor.query">
-                <service-call name="tailorsoft.monitor.MonitorServices.run#MonitorSql" out-map="context"
-                              in-map="[query:monitor.query, parameters:params]"/>
-                <log message="run#Monitor result: ${result}"/>
-                <set field="value" from="result[monitor.outParamName]"/>
-            </if>
-            <if condition="monitor.serviceName">
-                <service-call name="${monitor.serviceName}" in-map="params" out-map="response"/>
-                <set field="value" from="response[monitor.outParamName]"/>
-            </if>
-
-
-            <if condition="monitor.entityName">
-                <entity-find-one entity-name="${monitor.entityName}" value-field="et" auto-field-map="params"/>
-                <set field="value" from="et[monitor.outParamName]"/>
-
-                <log message="run#Monitor value: ${value}"/>
-            </if>
-
-            <set field="limit" from="monitor.thresholdLimit"/>
-
-            <!-- find the job we are currently running -->
-            <entity-find-one entity-name="moqui.service.job.ServiceJobRun" value-field="job"/>
-
-            <!-- iterate the previous jobs up to the thresholdLimit -->
-            <entity-find entity-name="moqui.service.job.ServiceJobRun" list="jobList" limit="limit">
-                <econdition field-name="jobName" from="job.jobName"/>
-                <order-by field-name="-startTime"/>
-            </entity-find>
-
-            <set field="exceedMaxThresholds" value="[]"/>
-            <set field="exceedMinThresholds" value="[]"/>
-            <iterate list="jobList" entry="job">
-                <script><![CDATA[
-                    if (job.results) {
-                        if (job.messages) {
-                            // if we have notified, we dont include it in the count
-                            continue
-                        }
-
-                        def results = ec.resource.expression(job.results, null)
-                        if (results.value > monitor.maxThresold) {
-                            exceedMaxThresholds.push(job)
-                        } else if (results.value < monitor.minThresold) {
-                            exceedMinThresholds.push(job)
-                        }
-                    }
-                    ]]></script>
-            </iterate>
-
-            <if condition="value &gt; monitor.maxThresold &amp;&amp; exceedingThresholds.size() &lt;= limit">
-                <!-- we have exceded the threshold the last x times in a row... notify -->
-            </if>
-            <if condition="value &gt; monitor.minThresold &amp;&amp; exceedMinThresholds.size() &lt;= limit">
-                <!-- we have exceded the min threshold the last x times in a row... notify -->
-            </if>
-        </actions>
-    </service>
-    <service verb="run" noun="MonitorSql">
-        <in-parameters>
-            <parameter name="query" required="true"/>
-            <parameter name="parameters" type="Map"/>
-        </in-parameters>
-        <out-parameters>
-            <parameter name="result" type="Map"/>
-        </out-parameters>
-        <actions>
-            <set field="result" from="[:]"/>
-            <script><![CDATA[
-                import groovy.text.GStringTemplateEngine
-
-                import java.sql.Connection
-                import java.sql.ResultSet
-                import java.sql.SQLWarning
-                import org.moqui.context.ExecutionContext
-
-                String sql = new GStringTemplateEngine().createTemplate(query).make(parameters)
-                Connection con = ec.entity.getConnection()
-                try {
-                    stmt = con.createStatement()
-                    boolean isResultSet = stmt.execute(sql)
-                    if (isResultSet) {
-                        rs = stmt.getResultSet()
-
-                        if (rs != null) {
-                            rsmd = rs.getMetaData()
-                            columnCount = rsmd.getColumnCount()
-                            if (rs.next()) {
-                                for (i = 1; i <= columnCount; i++) {
-                                    result[rsmd.getColumnName(i)] = rs.getObject(i)
-                                }
-                            }
-                            rs.close()
-                        }
-
-                    }
-                } finally {
-                    if (stmt != null) {
-                        try {
-                            stmt.close()
-                        } catch (Exception e) { /* Ignore */
-                        }
-                    }
-                    if (con != null) {
-                        try {
-                            con.close()
-                        } catch (Exception e) { /* Ignore */
-                        }
-                    }
-                }
-                ]]></script>
-        </actions>
-    </service>
-
 </services>
