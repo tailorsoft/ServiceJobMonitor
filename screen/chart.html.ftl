@@ -1,5 +1,5 @@
 <style>
-    .main{
+    .main {
         margin: 0;
         padding: 0;
         width: 100%;
@@ -11,7 +11,7 @@
         display: flex;
     }
 
-    .title{
+    .title {
         font-size: 30px;
         font-weight: bold;
         padding-left: 10px;
@@ -42,14 +42,14 @@
 
 <script type="text/javascript">
 
-    function parseDate(date){
+    function parseDate(date) {
         // return date.getFullYear() +"-"+(date.getMonth()+1)+"-"+date.getDate()
         return date.toISOString()
     }
 
-    const DaysOld = new Date(Date.now()-(1000*60*60*24*3));
+    const DaysOld = new Date(Date.now() - (1000 * 60 * 60 * 24 * 3));
 
-    fetch('/rest/s1/tailorsoft/monitors?fromDate='+parseDate(DaysOld)+"&thruDate="+parseDate(new Date()))
+    fetch('/rest/s1/tailorsoft/monitors?fromDate=' + parseDate(DaysOld) + "&thruDate=" + parseDate(new Date()))
         .then(function (response) {
             return response.json();
         })
@@ -189,7 +189,7 @@
             const pointValue = parseFloat(point.value);
 
             if (chartData.bounds && pointValue >= chartData.bounds.upper
-                && (alerts.length === 0 || (alerts.length > 0 && alerts[alerts.length-1].type === 'end'))
+                && (alerts.length === 0 || (alerts.length > 0 && alerts[alerts.length - 1].type === 'end'))
             ) {
 
                 addAlert('start', point)
