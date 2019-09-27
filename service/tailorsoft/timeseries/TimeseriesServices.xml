@@ -28,7 +28,8 @@ along with this software (see the LICENSE.md file). If not, see
         </out-parameters>
         <actions>
             <entity-find-one entity-name="tailorsoft.timeseries.Monitor" value-field="monitor" cache="true">
-                <field-map field-name="jobName"/></entity-find-one>
+                <field-map field-name="jobName"/>
+            </entity-find-one>
             <if condition="!monitor">
                 <!-- No monitor found, abort -->
                 <return/>
@@ -39,16 +40,16 @@ along with this software (see the LICENSE.md file). If not, see
             <set field="pathParts" from="monitor.valuePath.split('\\.')"/>
             <iterate list="pathParts" entry="part">
                 <if condition="!jsonResults[part]">
-                    <return error="true" message="No value found in ${results} at ${monitor.valuePath}" />
+                    <return error="true" message="No value found in ${results} at ${monitor.valuePath}"/>
                 </if>
-                <set field="jsonResults" from="jsonResults[part]" />
+                <set field="jsonResults" from="jsonResults[part]"/>
             </iterate>
 
             <set field="doubleValue" from="Float.parseFloat(jsonResults.toString())"/>
             <if condition="doubleValue == null">
                 <return error="true" message="No double value found at path: ${monitor.valuePath} in ${results} "/>
             </if>
-            
+
             <!-- store in elasticsearch -->
             <service-call name="tailorsoft.timeseries.TimeseriesServices.save#Datapoint"
                           in-map="[date:endTime, value:doubleValue, indexName:monitor.indexName]"/>
@@ -132,6 +133,7 @@ along with this software (see the LICENSE.md file). If not, see
         </out-parameters>
         <actions>
             <log message="\n ======= bounds ${indexName}, ${value}, ${jobName}, ${context} "/>
+            <set field="messageData" from="[:]"/>
             <entity-find-one entity-name="tailorsoft.timeseries.MonitorBounds" value-field="monitorBounds" cache="true">
                 <field-map field-name="jobName"/>
             </entity-find-one>
@@ -177,38 +179,92 @@ along with this software (see the LICENSE.md file). If not, see
                             .setSize(alertCount + 1)
                             .get()
 
-                    //  @todo: process ES Data
                     logger.info("\n ======== ES results")
                     logger.info(response.toString())
 
+                    // hits from elasticsearch
                     SearchHits hits = response.getHits()
 
-                    Boolean firstIsNormal = false;
-                    int outBoundsCount = 0
+                    Float upperBound = Float.parseFloat(monitorBounds.upper.toString())
+                    Float lowerBound = Float.parseFloat(monitorBounds.lower.toString())
+                    int boundsCount = Integer.parseInt(monitorBounds.count.toString());
 
-                    for (int i = hits.size() - 1; i >= 0; i--) {
-                        Map hit = hits[i].getSourceAsMap()
-                        Float value = Float.parseFloat(hit.value)
-                        Float upperBound = Float.parseFloat(monitorBounds.upper.toString())
-                        Float lowerBound = Float.parseFloat(monitorBounds.lower.toString())
+                    Map firstPoint = hits[hits.size() - 1].getSourceAsMap()
+                    Float firstPointValue = Float.parseFloat(firstPoint.value.toString());
+                    Map currentPoint = hits[0].getSourceAsMap();
+                    Float currentPointValue = Float.parseFloat(currentPoint.value.toString());
+                    int size = hits.size();
 
-                        logger.info(hit.toString())
+                    if (
+                    size > boundsCount &&
+                            currentPointValue >= upperBound &&
+                            firstPointValue < upperBound
+                    ) {
+                        /*
+                            the last item in the list is the first in chronological order
+                            the last element has already been evaluated so it is omitted
+                            size - 1 - 1 = size - 2
+                        */
+                        Boolean allPointValid = true;
 
-                        if (i == 0) {
-                            if (value < upperBound && value >= lowerBound) {
-                                firstIsNormal = true;
-                            }
-                        } else {
-                            if (value > upperBound || value < lowerBound) {
-                                outBoundsCount = outBoundsCount + 1
+                        for (int i = hits.size() - 2; i >= 0; i--) {
+                            Map hit = hits[i].getSourceAsMap()
+                            Float value = Float.parseFloat(hit.value.toString())
+
+                            if (value < upperBound) {
+                                allPointValid = false;
                             }
                         }
+
+                        if(allPointValid){
+                            // @TODO: send alerts here
+                        }
+
+                        logger.info('====== all point valid?')
+                        logger.info(allPointValid)
+                    } else {
+                        logger.info('============= no point valid')
+                        logger.info(firstPoint.toString())
+                        logger.info(currentPoint.toString())
+                        logger.info(size.toString())
+                        logger.info(monitorBounds.toString())
+
                     }
 
-                    if (firstIsNormal && outBoundsCount === alertCount) {
-                        // @todo: mark as alert
-                        logger.info('alert here')
-                    }
+                    /* for (int i = hits.size() - 1; i >= 0; i--) {
+                         Map hit = hits[i].getSourceAsMap()
+                         Float value = Float.parseFloat(hit.value)
+
+
+                         logger.info(hit.toString())
+
+                         if (i == 0) {
+                             if (value < upperBound && value >= lowerBound) {
+                                 firstIsNormal = true;
+                             }
+                         } else {
+                             if (value > upperBound || value < lowerBound) {
+                                 outBoundsCount = outBoundsCount + 1
+                             }
+                         }
+                     }
+
+                     if (firstIsNormal && outBoundsCount == alertCount) {
+                         // @todo: mark as alert
+                         logger.info('alert here')
+                         messageData.put('jobId', jobId)
+                         messageData.put('jobName', jobName)
+
+                         value = ec
+                                 .makeNotificationMessage()
+                                 .topic("TestNotification")
+                                 .type("danger")
+                                 .title("Alert message")
+                                 .message(messageData)
+                                 .userGroupId("ALL_USERS")
+                                 .send()
+                                 .getNotificationMessageId()
+                     }*/
 
 
                 } finally {
@@ -287,6 +343,38 @@ along with this software (see the LICENSE.md file). If not, see
                 }
 
                 value = res
+                ]]>
+            </script>
+        </actions>
+    </service>
+
+    <service verb="test" noun="Test" authenticate="anonymous-all">
+        <in-parameters>
+            <parameter name="jobId"/>
+            <parameter name="jobName"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="value"/>
+        </out-parameters>
+
+        <actions>
+            <log message="========== test service "/>
+            <script>
+
+                <![CDATA[
+                import org.moqui.context.ExecutionContext
+
+                Map<String, Object> json = [:]
+                ExecutionContext ec = context.ec
+
+                json.put('jobId', jobId)
+                json.put('jobName', jobName)
+
+                value = ec.makeNotificationMessage().topic("TestNotification").type("danger").title("Test notification message")
+                        .message(json).userGroupId("ALL_USERS").send().getNotificationMessageId()
+
+
+                logger.info('no return')
                 ]]>
             </script>
         </actions>
