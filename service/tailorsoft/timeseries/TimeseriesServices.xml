@@ -57,7 +57,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="monitor.algorithmEnumId == 'ALGO_BOUNDS'">
                 <service-call
                         name="tailorsoft.timeseries.TimeseriesServices.process#DatapointBounds"
-                        in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, jobName:jobName ]"/>
+                        in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, jobName:jobName, jobRunId: jobRunId ]"/>
             </if>
         </actions>
     </service>
@@ -125,6 +125,7 @@ along with this software (see the LICENSE.md file). If not, see
     <service verb="process" noun="DatapointBounds" authenticate="anonymous-all">
         <in-parameters>
             <parameter name="jobName"/>
+            <parameter name="jobRunId"/>
             <parameter name="indexName"/>
             <parameter name="value"/>
         </in-parameters>
@@ -216,12 +217,52 @@ along with this software (see the LICENSE.md file). If not, see
                             }
                         }
 
-                        if(allPointValid){
+                        if (allPointValid) {
                             // @TODO: send alerts here
+
+                            // @TODO: merge notification data, and monitor alert data in a single Map
+                            Map notificationData = [
+                                    id              : jobRunId,
+                                    jobName         : jobName,
+                                    jobRunId        : jobRunId,
+                                    fromDate        : new Date(),
+                                    value           : currentPointValue,
+                                    status          : 'open',
+                                    lastUpdatedStamp: new Date(),
+                                    from: 'cristyan.sv@gmail.com'
+                            ]
+
+                            notificationId = ec
+                                    .makeNotificationMessage()
+                                    .topic("MonitorAlertNotification")
+                                    .type("danger")
+                                    .title("Alert Bounds")
+                                    .message(notificationData)
+                                    .userGroupId("ALL_USERS")
+                                    .send()
+                                    .getNotificationMessageId()
+
+
+                            ec.service.sync()
+                                    .name("create#tailorsoft.timeseries.MonitorAlert")
+                                    .parameters([
+                                            id              : jobRunId,
+                                            jobName         : jobName,
+                                            jobRunId        : jobRunId,
+                                            fromDate        : new Date(),
+                                            value           : currentPointValue,
+                                            status          : 'open',
+                                            notification     : notificationId,
+                                            lastUpdatedStamp: new Date(),
+                                    ])
+                                    .call()
                         }
 
                         logger.info('====== all point valid?')
                         logger.info(allPointValid)
+
+
+
                     } else {
                         logger.info('============= no point valid')
                         logger.info(firstPoint.toString())
@@ -230,42 +271,6 @@ along with this software (see the LICENSE.md file). If not, see
                         logger.info(monitorBounds.toString())
 
                     }
-
-                    /* for (int i = hits.size() - 1; i >= 0; i--) {
-                         Map hit = hits[i].getSourceAsMap()
-                         Float value = Float.parseFloat(hit.value)
-
-
-                         logger.info(hit.toString())
-
-                         if (i == 0) {
-                             if (value < upperBound && value >= lowerBound) {
-                                 firstIsNormal = true;
-                             }
-                         } else {
-                             if (value > upperBound || value < lowerBound) {
-                                 outBoundsCount = outBoundsCount + 1
-                             }
-                         }
-                     }
-
-                     if (firstIsNormal && outBoundsCount == alertCount) {
-                         // @todo: mark as alert
-                         logger.info('alert here')
-                         messageData.put('jobId', jobId)
-                         messageData.put('jobName', jobName)
-
-                         value = ec
-                                 .makeNotificationMessage()
-                                 .topic("TestNotification")
-                                 .type("danger")
-                                 .title("Alert message")
-                                 .message(messageData)
-                                 .userGroupId("ALL_USERS")
-                                 .send()
-                                 .getNotificationMessageId()
-                     }*/
-
 
                 } finally {
                     // TODO close client?
