@@ -3,7 +3,7 @@
     <widgets>
         <render-mode>
             <text type="html,vuet"
-                  location="component://tailorsoft-timeseries/screen/chart.html.ftl"/>
+                  location="component://tailorsoft-timeseries/screen/MonitorAdmin/chart.html.ftl"/>
         </render-mode>
     </widgets>
 </screen>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen require-authentication="false">
-    <subscreens default-item="List"/>
+    <subscreens default-item="Chart"/>
     <widgets>
         <subscreens-panel id="my-account-panel" type="popup"/>
     </widgets>

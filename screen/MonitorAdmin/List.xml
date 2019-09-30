@@ -33,6 +33,9 @@
 
         <form-list name="ListTutorials" list="monitorList" transition="findTutorial" multi="true" header-dialog="true">
             <auto-fields-entity entity-name="tailorsoft.timeseries.Monitor" field-type="find-display"/>
+            <field name="detail"><default-field>
+                <link url="detail" text="Detail" link-type="anchor" parameter-map="[selectedEntity:fullEntityName]"/>
+            </default-field></field>
         </form-list>
 
 
