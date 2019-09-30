@@ -54,6 +54,7 @@
             return response.json();
         })
         .then((data) => {
+            console.log(data)
             data.value.map(generateGraph).forEach((chart) => {
                 chart.render()
             })
@@ -184,21 +185,33 @@
 
         }
 
-        for (let i = 0; i < chartData.data.length; i++) {
-            const point = chartData.data[i];
-            const pointValue = parseFloat(point.value);
-
-            if (chartData.bounds && pointValue >= chartData.bounds.upper
-                && (alerts.length === 0 || (alerts.length > 0 && alerts[alerts.length - 1].type === 'end'))
+        chartData.data.filter((point, i) => {
+            if (
+                point.value >= chartData.bounds.upper &&
+                chartData.data.length > i + 1 &&
+                i > chartData.bounds.count &&
+                chartData.data[(i - chartData.bounds.count) - 1].value < chartData.bounds.upper
             ) {
+                let validPoint = true;
 
+                const subSet = chartData.data.slice(i - chartData.bounds.count, i);
+
+                console.log(subSet)
+
+                subSet.forEach((p) => {
+                    if (p.value < chartData.bounds.upper) {
+                        validPoint = false;
+                    }
+                });
+
+                return validPoint;
+            }
+
+            return false;
+        })
+            .forEach((point) => {
                 addAlert('start', point)
-            }
-
-            if (alerts.length > 0 && alerts[alerts.length - 1].type === 'start' && pointValue < chartData.bounds.upper) {
-                addAlert('end', point)
-            }
-        }
+            });
 
         return new ApexCharts(document.querySelector("#" + chartData.indexName), options)
     }

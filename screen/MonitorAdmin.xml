@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen require-authentication="false">
+    <subscreens default-item="List"/>
+    <widgets>
+        <subscreens-panel id="my-account-panel" type="popup"/>
+    </widgets>
+</screen>

@@ -196,6 +196,12 @@ along with this software (see the LICENSE.md file). If not, see
                     Float currentPointValue = Float.parseFloat(currentPoint.value.toString());
                     int size = hits.size();
 
+                    logger.info('====== points to evaluate');
+                    logger.info(firstPoint.toString())
+                    logger.info(currentPoint.toString())
+                    logger.info(size.toString())
+                    logger.info(monitorBounds.toString())
+
                     if (
                     size > boundsCount &&
                             currentPointValue >= upperBound &&
@@ -259,17 +265,12 @@ along with this software (see the LICENSE.md file). If not, see
                         }
 
                         logger.info('====== all point valid?')
-                        logger.info(allPointValid)
+                        logger.info(allPointValid.toString())
 
 
 
                     } else {
-                        logger.info('============= no point valid')
-                        logger.info(firstPoint.toString())
-                        logger.info(currentPoint.toString())
-                        logger.info(size.toString())
-                        logger.info(monitorBounds.toString())
-
+                        logger.info('============= first and last point not valid')
                     }
 
                 } finally {
