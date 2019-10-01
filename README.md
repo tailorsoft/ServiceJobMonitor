@@ -14,18 +14,24 @@ example
 </moqui.service.job.ServiceJob>
 ```
 
-then add monitor
+### Service monitoring
+monitoring services requires two entities (`Monitor`, `MonitorBounds`), these will control which service to listen to, and when to launch alerts based on their bounds.
+
+#### tailorsoft.timeseries.Monitor
 ```xml
 <tailorsoft.timeseries.Monitor jobName="poll_temperature" title="Temperature"
                                    valuePath="value.temp" indexName="temperature"/>
 ```
 
-params
--
+#### tailorsoft.timeseries.MonitorBounds
 
-- `jobName`  : job to monitor
-- `valuePath`: value path from the results
--  `indexName`: Elasticsearch index name
-
+ ```xml
+ <tailorsoft.timeseries.MonitorBounds
+             jobName="poll_SftpCountFiles_MuckCA"
+             lower="0"
+             upper="10"
+             count="3"
+     />
+ ```
 
 
