@@ -2,8 +2,27 @@
 <screen require-authentication="anonymous-all" default-menu-title="Chart Detail" default-menu-index="1">
     <parameter name="selectedMonitor" required="true"/>
     <parameter name="refresh" required="false"/>
+
+    <transition name="findMonitorBounds">
+        <default-response url="."/>
+    </transition>
+
+    <actions>
+        <entity-find-one entity-name="tailorsoft.timeseries.MonitorBounds" value-field="monitorBounds">
+            <field-map field-name="jobName" from="selectedMonitor"/>
+        </entity-find-one>
+    </actions>
+
     <widgets>
         <label type="h1" text="Monitor ${selectedMonitor} Chart"/>
+        <render-mode>
+            <text type="html,vuet"
+                  location="component://tailorsoft-timeseries/screen/MonitorAdmin/Chart/chartDetail.html.ftl"/>
+        </render-mode>
+        <label type="h2" text="Monitor Bounds"/>
+        <form-single name="ListMonitorBounds" map="monitorBounds" transition="findMonitorBounds" multi="true" header-dialog="true">
+            <auto-fields-entity entity-name="tailorsoft.timeseries.MonitorBounds" field-type="find-display"/>
+        </form-single>
 
     </widgets>
 </screen>

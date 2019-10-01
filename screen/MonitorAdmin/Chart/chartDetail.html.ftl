@@ -1,38 +1,3 @@
-<style>
-    .main {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #f8f8f8;
-    }
-
-    .cont {
-        display: flex;
-    }
-
-    .title {
-        font-size: 30px;
-        font-weight: bold;
-        padding-left: 10px;
-        padding-top: 10px;
-    }
-
-    .chartItem {
-        flex: 1;
-        height: 400px;
-        background: #fff;
-        border-radius: 2px;
-        display: inline-block;
-        margin: 1rem;
-        position: relative;
-        width: 300px;
-        padding: 10px;
-        border-style: solid;
-        border-color: #d6d6d6;
-        border-width: 1px;
-    }
-</style>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <div class="main">
     <div class="cont" id="cont">
@@ -40,7 +5,6 @@
 </div>
 
 <script type="text/javascript">
-
     function parseDate(date) {
         // return date.getFullYear() +"-"+(date.getMonth()+1)+"-"+date.getDate()
         return date.toISOString()
@@ -48,7 +12,7 @@
 
     const DaysOld = new Date(Date.now() - (1000 * 60 * 60 * 24 * 3));
 
-    fetch('/rest/s1/tailorsoft/monitors?fromDate=' + parseDate(DaysOld) + "&thruDate=" + parseDate(new Date()))
+    fetch('/rest/s1/tailorsoft/monitors?fromDate=' + parseDate(DaysOld) + "&thruDate=" + parseDate(new Date()) + "&jobName="+ "${selectedMonitor}")
         .then(function (response) {
             return response.json();
         })
@@ -74,13 +38,9 @@
         const newDoc = document.createElement('div');
         const newLink = document.createElement('a');
 
-        newLink.href = './ChartDetail?selectedMonitor='+chartData.jobName;
-        newLink.innerText = chartData.jobName;
-
         newDoc.className = 'chartItem';
         newDoc.id = chartData.indexName;
 
-        newDoc.appendChild(newLink);
         cont.appendChild(newDoc);
 
         const options = {
