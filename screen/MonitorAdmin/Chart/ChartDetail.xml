@@ -7,10 +7,19 @@
         <default-response url="."/>
     </transition>
 
+    <transition name="findMonitorAlert">
+        <default-response url="."/>
+    </transition>
+
     <actions>
         <entity-find-one entity-name="tailorsoft.timeseries.MonitorBounds" value-field="monitorBounds">
             <field-map field-name="jobName" from="selectedMonitor"/>
         </entity-find-one>
+
+        <entity-find entity-name="tailorsoft.timeseries.MonitorAlert" list="monitorAlerts">
+            <econdition field-name="jobName" from="selectedMonitor" />
+            <search-form-inputs/>
+        </entity-find>
     </actions>
 
     <widgets>
@@ -19,10 +28,17 @@
             <text type="html,vuet"
                   location="component://tailorsoft-timeseries/screen/MonitorAdmin/Chart/chartDetail.html.ftl"/>
         </render-mode>
+
         <label type="h2" text="Monitor Bounds"/>
         <form-single name="ListMonitorBounds" map="monitorBounds" transition="findMonitorBounds" multi="true" header-dialog="true">
             <auto-fields-entity entity-name="tailorsoft.timeseries.MonitorBounds" field-type="find-display"/>
         </form-single>
+
+
+        <label type="h2" text="Monitor Alerts"/>
+        <form-list name="ListMonitorAlert" list="monitorAlerts" transition="findMonitorAlert" multi="true" header-dialog="true">
+            <auto-fields-entity entity-name="tailorsoft.timeseries.MonitorAlert" field-type="find-display"/>
+        </form-list>
 
     </widgets>
 </screen>
