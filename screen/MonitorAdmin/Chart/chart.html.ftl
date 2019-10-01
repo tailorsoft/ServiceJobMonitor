@@ -74,8 +74,8 @@
         const newDoc = document.createElement('div');
         const newLink = document.createElement('a');
 
-        newLink.href = 'ChartDetail?selectedMonitor='+chartData.indexName;
-        newLink.innerText = chartData.indexName
+        newLink.href = './Chart/ChartDetail?selectedMonitor='+chartData.jobName;
+        newLink.innerText = chartData.jobName;
 
         newDoc.className = 'chartItem';
         newDoc.id = chartData.indexName;
@@ -91,10 +91,6 @@
             stroke: {
                 show: true,
                 width: 2,
-            },
-            title: {
-                text: chartData.indexName,
-                align: "left"
             },
             xaxis: {
                 type: "datetime",
