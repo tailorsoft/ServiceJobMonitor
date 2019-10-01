@@ -235,7 +235,7 @@ along with this software (see the LICENSE.md file). If not, see
                                     value           : currentPointValue,
                                     status          : 'open',
                                     lastUpdatedStamp: new Date(),
-                                    from: 'cristyan.sv@gmail.com'
+                                    from            : 'cristyan.sv@gmail.com'
                             ]
 
                             notificationId = ec
@@ -258,7 +258,7 @@ along with this software (see the LICENSE.md file). If not, see
                                             fromDate        : new Date(),
                                             value           : currentPointValue,
                                             status          : 'open',
-                                            notification     : notificationId,
+                                            notification    : notificationId,
                                             lastUpdatedStamp: new Date(),
                                     ])
                                     .call()
@@ -266,7 +266,6 @@ along with this software (see the LICENSE.md file). If not, see
 
                         logger.info('====== all point valid?')
                         logger.info(allPointValid.toString())
-
 
 
                     } else {
@@ -286,6 +285,7 @@ along with this software (see the LICENSE.md file). If not, see
         <in-parameters>
             <parameter name="fromDate"/>
             <parameter name="thruDate"/>
+            <parameter name="jobName"/>
         </in-parameters>
         <out-parameters>
             <parameter name="value"/>
@@ -324,13 +324,8 @@ along with this software (see the LICENSE.md file). If not, see
                 Date fromDateObject = formatter.parse(fromDate)
                 Date thruDateObject = formatter.parse(thruDate)
 
-
-                for (int i = 0; i < monitorList.size(); i++) {
-                    String indexName = monitorList[i].indexName
-                    String jobName = monitorList[i].jobName
-
-                    Map r = ec.entity.find("tailorsoft.timeseries.MonitorBounds").condition("jobName", jobName).one()
-
+                // get ES data by index
+                static List getIndexData(indexName, client, fromDate, thruDate) {
                     List hitsList = []
 
                     SearchHits hits = client
@@ -345,7 +340,29 @@ along with this software (see the LICENSE.md file). If not, see
                         hitsList.push(hits[x].getSourceAsMap())
                     }
 
-                    res.push([indexName: indexName, data: hitsList, bounds: r, fromDate: fromDateObject, thruDate: thruDateObject])
+                    return hitsList
+                }
+                
+                if (jobName) {
+                    Map monitorEntity = ec.entity.find("tailorsoft.timeseries.Monitor").condition("jobName", jobName).one()
+                    Map monitorBoundsEntity = ec.entity.find("tailorsoft.timeseries.MonitorBounds").condition("jobName", jobName).one()
+                    String indexName = monitorEntity.indexName
+
+                    hitsList = getIndexData(indexName, client, fromDate, thruDate)
+
+                    res.push([jobName: jobName, indexName: indexName, data: hitsList, bounds: monitorBoundsEntity, fromDate: fromDateObject, thruDate: thruDateObject])
+
+                } else {
+                    for (int i = 0; i < monitorList.size(); i++) {
+                        String indexName = monitorList[i].indexName
+                        String jobNameStr = monitorList[i].jobName
+
+                        Map r = ec.entity.find("tailorsoft.timeseries.MonitorBounds").condition("jobName", jobNameStr).one()
+
+                        hitsList = getIndexData(indexName, client, fromDate, thruDate)
+
+                        res.push([jobName: jobNameStr, indexName: indexName, data: hitsList, bounds: r, fromDate: fromDateObject, thruDate: thruDateObject])
+                    }
                 }
 
                 value = res
