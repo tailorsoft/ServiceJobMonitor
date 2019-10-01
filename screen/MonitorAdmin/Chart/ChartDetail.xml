@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen require-authentication="anonymous-all" default-menu-title="Chart Detail" default-menu-index="1">
+    <parameter name="selectedMonitor" required="true"/>
+    <parameter name="refresh" required="false"/>
+    <widgets>
+        <label type="h1" text="Monitor ${selectedMonitor} Chart"/>
+
+    </widgets>
+</screen>

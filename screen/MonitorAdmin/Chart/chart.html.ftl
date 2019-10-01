@@ -35,7 +35,6 @@
 </style>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <div class="main">
-    <div class="title">Current Monitors</div>
     <div class="cont" id="cont">
     </div>
 </div>
@@ -73,8 +72,15 @@
      */
     function generateGraph(chartData) {
         const newDoc = document.createElement('div');
+        const newLink = document.createElement('a');
+
+        newLink.href = 'ChartDetail?selectedMonitor='+chartData.indexName;
+        newLink.innerText = chartData.indexName
+
         newDoc.className = 'chartItem';
         newDoc.id = chartData.indexName;
+
+        newDoc.appendChild(newLink);
         cont.appendChild(newDoc);
 
         const options = {
