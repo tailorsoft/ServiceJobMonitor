@@ -12,7 +12,7 @@
 
     const DaysOld = new Date(Date.now() - (1000 * 60 * 60 * 24 * 3));
 
-    fetch('/rest/s1/tailorsoft/monitors?fromDate=' + parseDate(DaysOld) + "&thruDate=" + parseDate(new Date()) + "&jobName="+ "${selectedMonitor}")
+    fetch('/rest/s1/tailorsoft/monitors?fromDate=' + parseDate(DaysOld) + "&thruDate=" + parseDate(new Date()) + "&jobName="+ "${jobName}")
         .then(function (response) {
             return response.json();
         })

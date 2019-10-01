@@ -74,7 +74,7 @@
         const newDoc = document.createElement('div');
         const newLink = document.createElement('a');
 
-        newLink.href = './ChartDetail?selectedMonitor='+chartData.jobName;
+        newLink.href = './ChartDetail?jobName='+chartData.jobName;
         newLink.innerText = chartData.jobName;
 
         newDoc.className = 'chartItem';

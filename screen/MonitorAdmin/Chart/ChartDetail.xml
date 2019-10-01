@@ -1,42 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen require-authentication="anonymous-all" default-menu-title="Chart Detail" default-menu-index="1">
-    <parameter name="selectedMonitor" required="true"/>
+    <parameter name="jobName" required="true"/>
     <parameter name="refresh" required="false"/>
-
-    <transition name="findMonitorBounds">
-        <default-response url="."/>
-    </transition>
 
     <transition name="findMonitorAlert">
         <default-response url="."/>
     </transition>
 
+
+    <transition name="updateMonitor">
+        <actions>
+            <service-call name="update#tailorsoft.timeseries.Monitor" in-map="true"/>
+        </actions>
+        <default-response url="."
+                          parameter-map="[jobName:jobName]"/>
+    </transition>
+
+    <transition name="updateMonitorBounds">
+        <actions>
+            <service-call name="update#tailorsoft.timeseries.MonitorBounds" in-map="true"/>
+        </actions>
+        <default-response url="."
+                          parameter-map="[jobName:jobName]"/>
+    </transition>
+
     <actions>
         <entity-find-one entity-name="tailorsoft.timeseries.MonitorBounds" value-field="monitorBounds">
-            <field-map field-name="jobName" from="selectedMonitor"/>
+            <field-map field-name="jobName" from="jobName"/>
+        </entity-find-one>
+
+        <entity-find-one entity-name="tailorsoft.timeseries.Monitor" value-field="monitor">
+            <field-map field-name="jobName" from="jobName"/>
         </entity-find-one>
 
         <entity-find entity-name="tailorsoft.timeseries.MonitorAlert" list="monitorAlerts">
-            <econdition field-name="jobName" from="selectedMonitor" />
+            <econdition field-name="jobName" from="jobName"/>
             <search-form-inputs/>
         </entity-find>
     </actions>
 
     <widgets>
-        <label type="h1" text="Monitor ${selectedMonitor} Chart"/>
+        <label type="h1" text="Monitor ${jobName} Chart"/>
         <render-mode>
             <text type="html,vuet"
                   location="component://tailorsoft-timeseries/screen/MonitorAdmin/Chart/chartDetail.html.ftl"/>
         </render-mode>
 
+        <label type="h2" text="Monitor"/>
+        <form-single name="ListMonitor" map="monitor" transition="updateMonitor" dynamic="true">
+            <auto-fields-entity entity-name="tailorsoft.timeseries.Monitor" include="pk" field-type="display"/>
+            <auto-fields-entity entity-name="tailorsoft.timeseries.Monitor" include="nonpk" field-type="edit"/>
+            <field name="submitButton">
+                <default-field title="Update">
+                    <submit/>
+                </default-field>
+            </field>
+        </form-single>
+
         <label type="h2" text="Monitor Bounds"/>
-        <form-single name="ListMonitorBounds" map="monitorBounds" transition="findMonitorBounds" multi="true" header-dialog="true">
-            <auto-fields-entity entity-name="tailorsoft.timeseries.MonitorBounds" field-type="find-display"/>
+        <form-single name="ListMonitorBounds" map="monitorBounds" transition="updateMonitorBounds" dynamic="true">
+            <auto-fields-entity entity-name="tailorsoft.timeseries.MonitorBounds" include="pk" field-type="display"/>
+            <auto-fields-entity entity-name="tailorsoft.timeseries.MonitorBounds" include="nonpk" field-type="edit"/>
+            <field name="submitButton">
+                <default-field title="Update">
+                    <submit/>
+                </default-field>
+            </field>
         </form-single>
 
 
         <label type="h2" text="Monitor Alerts"/>
-        <form-list name="ListMonitorAlert" list="monitorAlerts" transition="findMonitorAlert" multi="true" header-dialog="true">
+        <form-list name="ListMonitorAlert" list="monitorAlerts" transition="findMonitorAlert" multi="true"
+                   header-dialog="true">
             <auto-fields-entity entity-name="tailorsoft.timeseries.MonitorAlert" field-type="find-display"/>
         </form-list>
 
