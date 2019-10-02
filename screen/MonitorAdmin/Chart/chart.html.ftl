@@ -71,13 +71,21 @@
      * @param {int} chartData.bound.lower
      */
     function generateGraph(chartData) {
-        const newDoc = document.createElement('div');
+        const chartDiv = document.createElement('div');
         const newLink = document.createElement('a');
 
-        newDoc.className = 'chartItem';
-        newDoc.id = chartData.indexName;
+        newLink.innerText = chartData.jobName;
+        newLink.href = '/vapps/monitor/Chart/ChartDetail?jobName='+chartData.jobName;
 
-        cont.appendChild(newDoc);
+        chartDiv.className = 'chartItem';
+        chartDiv.id = chartData.indexName;
+
+        const chartContainer = document.createElement('div');
+        chartContainer.innerHTML = "";
+        chartContainer.append(newLink);
+        chartContainer.append(chartDiv);
+
+        cont.appendChild(chartContainer);
 
         const options = {
             chart: {
