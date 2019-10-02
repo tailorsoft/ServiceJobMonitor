@@ -1,5 +1,9 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <div class="main">
+    <div class="dateControl">
+        <input id="startDateInput" type="date" class="dateInput" />
+        <input id="endDateInput" type="date" class="dateInput" />
+    </div>
     <div class="cont" id="cont">
     </div>
 </div>
@@ -12,16 +16,48 @@
 
     const DaysOld = new Date(Date.now() - (1000 * 60 * 60 * 24 * 3));
 
-    fetch('/rest/s1/tailorsoft/monitors?fromDate=' + parseDate(DaysOld) + "&thruDate=" + parseDate(new Date()) + "&jobName="+ "${jobName}")
-        .then(function (response) {
-            return response.json();
-        })
-        .then((data) => {
-            console.log(data)
-            data.value.map(generateGraph).forEach((chart) => {
-                chart.render()
+    const startDateInput = document.getElementById('startDateInput');
+    const endDateInput = document.getElementById('endDateInput');
+
+    startDateInput.onchange = changeDate;
+    endDateInput.onchange = changeDate;
+
+    function changeDate() {
+        const startDate = new Date(startDateInput.value)
+        const endDate = new Date(endDateInput.value);
+
+        fetchData(startDate, endDate)
+    }
+
+    function setDates(startDate, endDate) {
+        startDateInput.value = startDate.toISOString().slice(0,10);
+        endDateInput.value = endDate.toISOString().slice(0,10);
+    }
+
+    let charts = null;
+
+    function fetchData(startDate, endDate) {
+        setDates(startDate, endDate);
+
+        fetch('/rest/s1/tailorsoft/monitors?fromDate=' + parseDate(startDate) + "&thruDate=" + parseDate(endDate) + "&jobName=" + "${jobName}")
+            .then(function (response) {
+                return response.json();
             })
-        });
+            .then((data) => {
+                if(charts){
+                    charts.forEach((chart)=>{
+                        chart.destroy();
+                    })
+                }
+
+                charts = data.value.map(generateGraph);
+                charts.forEach((chart) => {
+                    chart.render()
+                })
+            });
+    }
+
+    fetchData(DaysOld, new Date());
 
     const cont = document.getElementById('cont');
 
@@ -157,9 +193,6 @@
                 let validPoint = true;
 
                 const subSet = chartData.data.slice(i - chartData.bounds.count, i);
-
-                console.log(subSet)
-
                 subSet.forEach((p) => {
                     if (p.value < chartData.bounds.upper) {
                         validPoint = false;

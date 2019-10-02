@@ -1,46 +1,14 @@
-<style>
-    .main {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #f8f8f8;
-    }
-
-    .cont {
-        display: flex;
-    }
-
-    .title {
-        font-size: 30px;
-        font-weight: bold;
-        padding-left: 10px;
-        padding-top: 10px;
-    }
-
-    .chartItem {
-        flex: 1;
-        height: 400px;
-        background: #fff;
-        border-radius: 2px;
-        display: inline-block;
-        margin: 1rem;
-        position: relative;
-        width: 300px;
-        padding: 10px;
-        border-style: solid;
-        border-color: #d6d6d6;
-        border-width: 1px;
-    }
-</style>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <div class="main">
+    <div class="dateControl">
+        <input id="startDateInput" type="date" class="dateInput" />
+        <input id="endDateInput" type="date" class="dateInput" />
+    </div>
     <div class="cont" id="cont">
     </div>
 </div>
 
 <script type="text/javascript">
-
     function parseDate(date) {
         // return date.getFullYear() +"-"+(date.getMonth()+1)+"-"+date.getDate()
         return date.toISOString()
@@ -48,16 +16,48 @@
 
     const DaysOld = new Date(Date.now() - (1000 * 60 * 60 * 24 * 3));
 
-    fetch('/rest/s1/tailorsoft/monitors?fromDate=' + parseDate(DaysOld) + "&thruDate=" + parseDate(new Date()))
-        .then(function (response) {
-            return response.json();
-        })
-        .then((data) => {
-            console.log(data)
-            data.value.map(generateGraph).forEach((chart) => {
-                chart.render()
+    const startDateInput = document.getElementById('startDateInput');
+    const endDateInput = document.getElementById('endDateInput');
+
+    startDateInput.onchange = changeDate;
+    endDateInput.onchange = changeDate;
+
+    function changeDate() {
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
+
+        fetchData(startDate, endDate)
+    }
+
+    function setDates(startDate, endDate) {
+        startDateInput.value = startDate.toISOString().slice(0,10);
+        endDateInput.value = endDate.toISOString().slice(0,10);
+    }
+
+    let charts = null;
+
+    function fetchData(startDate, endDate) {
+        setDates(startDate, endDate);
+
+        fetch('/rest/s1/tailorsoft/monitors?fromDate=' + parseDate(startDate) + "&thruDate=" + parseDate(endDate))
+            .then(function (response) {
+                return response.json();
             })
-        });
+            .then((data) => {
+                if(charts){
+                    charts.forEach((chart)=>{
+                        chart.destroy();
+                    })
+                }
+
+                charts = data.value.map(generateGraph);
+                charts.forEach((chart) => {
+                    chart.render()
+                })
+            });
+    }
+
+    fetchData(DaysOld, new Date());
 
     const cont = document.getElementById('cont');
 
@@ -74,13 +74,9 @@
         const newDoc = document.createElement('div');
         const newLink = document.createElement('a');
 
-        newLink.href = './ChartDetail?jobName='+chartData.jobName;
-        newLink.innerText = chartData.jobName;
-
         newDoc.className = 'chartItem';
         newDoc.id = chartData.indexName;
 
-        newDoc.appendChild(newLink);
         cont.appendChild(newDoc);
 
         const options = {
@@ -197,9 +193,6 @@
                 let validPoint = true;
 
                 const subSet = chartData.data.slice(i - chartData.bounds.count, i);
-
-                console.log(subSet)
-
                 subSet.forEach((p) => {
                     if (p.value < chartData.bounds.upper) {
                         validPoint = false;
