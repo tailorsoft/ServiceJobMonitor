@@ -86,12 +86,23 @@
             },
             stroke: {
                 show: true,
-                width: 2,
+                width: 1.2,
+                color: 'steelblue'
             },
             xaxis: {
                 type: "datetime",
             },
+            grid: {
+                show: true,
+                yaxis: {
+                    lines: {
+                        show: false
+                    }
+                }
+            },
+            colors: ["#4682b4"],
             series: [{
+                color: 'steelblue',
                 name: chartData.indexName,
                 data: chartData.data.map((point) => {
                         return [
@@ -168,16 +179,6 @@
                     strokeColor: "#2698FF",
                     radius: 2
                 },
-                label: {
-                    borderColor: "#FF4560",
-                    offsetY: 0,
-                    style: {
-                        color: "#fff",
-                        background: type === 'start' ? '#FF4560' : '#00E396'
-                    },
-
-                    text: "Alert sent to daniel"
-                }
             })
 
 

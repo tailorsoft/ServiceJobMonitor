@@ -1,8 +1,8 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <div class="main">
     <div class="dateControl">
-        <input id="startDateInput" type="date" class="dateInput" />
-        <input id="endDateInput" type="date" class="dateInput" />
+        <input id="startDateInput" type="date" class="dateInput"/>
+        <input id="endDateInput" type="date" class="dateInput"/>
     </div>
     <div class="cont" id="cont">
     </div>
@@ -30,8 +30,8 @@
     }
 
     function setDates(startDate, endDate) {
-        startDateInput.value = startDate.toISOString().slice(0,10);
-        endDateInput.value = endDate.toISOString().slice(0,10);
+        startDateInput.value = startDate.toISOString().slice(0, 10);
+        endDateInput.value = endDate.toISOString().slice(0, 10);
     }
 
     let charts = null;
@@ -44,12 +44,13 @@
                 return response.json();
             })
             .then((data) => {
-                if(charts){
-                    charts.forEach((chart)=>{
+                if (charts) {
+                    charts.forEach((chart) => {
                         chart.destroy();
                     })
                 }
 
+                cont.innerHTML = "";
                 charts = data.value.map(generateGraph);
                 charts.forEach((chart) => {
                     chart.render()
@@ -75,13 +76,12 @@
         const newLink = document.createElement('a');
 
         newLink.innerText = chartData.jobName;
-        newLink.href = '/vapps/monitor/Chart/ChartDetail?jobName='+chartData.jobName;
+        newLink.href = '/vapps/monitor/Chart/ChartDetail?jobName=' + chartData.jobName;
 
         chartDiv.className = 'chartItem';
         chartDiv.id = chartData.indexName;
 
         const chartContainer = document.createElement('div');
-        chartContainer.innerHTML = "";
         chartContainer.append(newLink);
         chartContainer.append(chartDiv);
 
@@ -94,12 +94,23 @@
             },
             stroke: {
                 show: true,
-                width: 2,
+                width: 1.2,
+                color: 'steelblue'
             },
             xaxis: {
                 type: "datetime",
             },
+            grid: {
+                show: true,
+                yaxis: {
+                    lines: {
+                        show: false
+                    }
+                }
+            },
+            colors: ["#4682b4"],
             series: [{
+                color: 'steelblue',
                 name: chartData.indexName,
                 data: chartData.data.map((point) => {
                         return [
@@ -147,73 +158,70 @@
             }
         }
 
-        const alerts = [];
-
-
         function addAlert(type, point) {
-            alerts.push({type: type, point})
-
-
-            // options.annotations.xaxis.push({
-            //     // in a datetime series, the x value should be a timestamp, just like it is generated below
-            //     x: new Date(point['@timestamp']).getTime(),
-            //     strokeDashArray: 0,
-            //     label: {
-            //         style: {
-            //             color: "#fff",
-            //             background: type === 'start' ? '#FF4560' : '#00E396'
-            //         },
-            //         text: "Alert "+type
-            //     }
-            // });
+            const color = type === 'open' ? "#FF4560" : "#008000"
 
             options.annotations.points.push({
                 x: new Date(point['@timestamp']).getTime(),
                 y: point.value,
                 marker: {
-                    size: 6,
-                    fillColor: "#fff",
-                    strokeColor: "#2698FF",
+                    size: 2.5,
+                    fillColor: color,
+                    strokeColor: color,
                     radius: 2
                 },
-                label: {
-                    borderColor: "#FF4560",
-                    offsetY: 0,
-                    style: {
-                        color: "#fff",
-                        background: type === 'start' ? '#FF4560' : '#00E396'
-                    },
-
-                    text: "Alert sent to daniel"
-                }
             })
 
 
         }
 
-        chartData.data.filter((point, i) => {
+        const reducer = (acc, point, i) => {
             if (
+                i > chartData.bounds.count + 1 &&
                 point.value >= chartData.bounds.upper &&
-                chartData.data.length > i + 1 &&
-                i > chartData.bounds.count &&
-                chartData.data[(i - chartData.bounds.count) - 1].value < chartData.bounds.upper
+                chartData.data[i - chartData.bounds.count].value < chartData.bounds.upper &&
+                (acc.length === 0 || acc[acc.length - 1].status !== 'open')
             ) {
-                let validPoint = true;
+                const subSet = chartData.data.slice(i - (chartData.bounds.count - 1), i + 1);
 
-                const subSet = chartData.data.slice(i - chartData.bounds.count, i);
-                subSet.forEach((p) => {
+                let allPointsValid = true;
+
+                subSet.forEach(p => {
                     if (p.value < chartData.bounds.upper) {
-                        validPoint = false;
+                        allPointsValid = false;
                     }
                 });
 
-                return validPoint;
+                allPointsValid ? acc.push({ status: 'open', point: subSet[0] }) : false;
             }
 
-            return false;
-        })
+            if (
+                acc.length > 0 &&
+                acc[acc.length - 1].status === 'open' &&
+                point.value < chartData.bounds.upper
+            ) {
+                const subSet = chartData.data.slice(i - (chartData.bounds.count - 1), i + 1);
+                let allPointsValid = true;
+
+                subSet.forEach(p => {
+                    if (p.value >= chartData.bounds.upper) {
+                        allPointsValid = false;
+                    }
+                });
+
+                allPointsValid
+                    ? acc.push({
+                        status: 'closed',
+                        point: subSet[0]
+                    })
+                    : false;
+            }
+            return acc;
+        };
+
+        chartData.data.reduce(reducer, [])
             .forEach((point) => {
-                addAlert('start', point)
+                addAlert(point.status, point.point)
             });
 
         return new ApexCharts(document.querySelector("#" + chartData.indexName), options)
