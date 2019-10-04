@@ -171,8 +171,6 @@
                     radius: 2
                 },
             })
-
-
         }
 
         const reducer = (acc, point, i) => {
@@ -219,10 +217,34 @@
             return acc;
         };
 
-        chartData.data.reduce(reducer, [])
-            .forEach((point) => {
-                addAlert(point.status, point.point)
-            });
+        const alerts = chartData.data.reduce(reducer, []);
+
+        alerts.forEach((point) => {
+            addAlert(point.status, point.point)
+        });
+
+        for (let i = 0; i < alerts.length; i++) {
+            const alert = alerts[i];
+            if (alert.status === 'open' && i < alerts.length - 1) {
+
+                options.annotations.xaxis.push({
+                    x: new Date(alert.point["@timestamp"]).getTime(),
+                    x2: new Date(alerts[i+1].point["@timestamp"]).getTime(),
+                    strokeDashArray: 0,
+                    fillColor: '#ffe4de',
+                    label: {
+                        borderColor: '#775DD0',
+                        style: {
+                            color: '#fff',
+                            background: '#775DD0',
+                        },
+                        text: '     ',
+                    }
+                });
+
+                i++;
+            }
+        }
 
         return new ApexCharts(document.querySelector("#" + chartData.indexName), options)
     }
