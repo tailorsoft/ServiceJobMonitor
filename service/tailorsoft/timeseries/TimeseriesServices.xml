@@ -371,35 +371,4 @@ along with this software (see the LICENSE.md file). If not, see
         </actions>
     </service>
 
-    <service verb="test" noun="Test" authenticate="anonymous-all">
-        <in-parameters>
-            <parameter name="jobId"/>
-            <parameter name="jobName"/>
-        </in-parameters>
-        <out-parameters>
-            <parameter name="value"/>
-        </out-parameters>
-
-        <actions>
-            <log message="========== test service "/>
-            <script>
-
-                <![CDATA[
-                import org.moqui.context.ExecutionContext
-
-                Map<String, Object> json = [:]
-                ExecutionContext ec = context.ec
-
-                json.put('jobId', jobId)
-                json.put('jobName', jobName)
-
-                value = ec.makeNotificationMessage().topic("TestNotification").type("danger").title("Test notification message")
-                        .message(json).userGroupId("ALL_USERS").send().getNotificationMessageId()
-
-
-                logger.info('no return')
-                ]]>
-            </script>
-        </actions>
-    </service>
 </services>
