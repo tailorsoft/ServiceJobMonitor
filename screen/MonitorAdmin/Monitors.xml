@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen require-authentication="anonymous-all" default-menu-title="Monitors" default-menu-index="2">
+    <transition name="listMonitors">
+        <default-response url="."/>
+    </transition>
+
+    <transition name="createMonitor">
+        <actions>
+            <service-call name="create#tailorsoft.timeseries.Monitor" in-map="true"/>
+        </actions>
+        <default-response url="."/>
+    </transition>
+
+    <transition name="find">
+        <default-response url="../Monitor"/>
+    </transition>
+
+    <actions>
+        <entity-find entity-name="tailorsoft.timeseries.Monitor" list="monitorList">
+            <search-form-inputs/>
+        </entity-find>
+    </actions>
+
+    <widgets>
+        <form-list name="ListMonitors" list="monitorList" transition="listMonitors" multi="false" dinamic="true" header-dialog="true">
+            <auto-fields-entity entity-name="tailorsoft.timeseries.Monitor" field-type="find-display"/>
+            <field name="monitorId">
+                <default-field>
+                    <link url="find" text="${monitorId}" link-type="anchor" parameter-map="[monitorId:monitorId]"/>
+                </default-field>
+            </field>
+        </form-list>
+
+
+
+    </widgets>
+</screen>

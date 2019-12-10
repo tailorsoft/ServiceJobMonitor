@@ -1,0 +1,57 @@
+<div >
+    <form-list name="alerts" rows="/rest/s1/tailorsoft/alerts" action="asdsd">
+        <template slot="header" >
+            <th>
+                Notification Id
+            </th>
+            <th>
+                Monitor Id
+            </th>
+            <th>
+                Job Name
+            </th>
+            <th>
+                From Date
+            </th>
+            <th>
+                Thru Date
+            </th>
+            <th>
+                Value
+            </th>
+            <th>
+                Notification Id
+            </th>
+            <th>
+                Status
+            </th>
+        </template>
+        <template slot="row" slot-scope="props">
+            <td>
+                {{props.fields.id}}
+            </td>
+            <td>
+                {{props.fields.monitorId}}
+            </td>
+            <td>
+                {{props.fields.jobName}}
+            </td>
+            <td>
+                {{props.fields.fromDate}}
+            </td>
+            <td>
+                {{props.fields.thruDate}}
+            </td>
+            <td>
+                {{props.fields.value}}
+            </td>
+            <td>
+                {{props.fields.notification}}
+            </td>
+            <td>
+                {{props.fields.status}}
+            </td>
+        </template>
+    </form-list>
+
+</div>

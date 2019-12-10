@@ -18,7 +18,7 @@ along with this software (see the LICENSE.md file). If not, see
     <!--   process data point  -->
     <service verb="process" noun="JobRunResults" authenticate="anonymous-all">
         <in-parameters>
-            <parameter name="jobRunId" required="true"/>
+            <parameter name="jobName" required="true"/>
             <parameter name="endTime" required="true"/>
             <parameter name="jobName" required="true"/>
             <parameter name="results" required="true"/>
@@ -39,8 +39,8 @@ along with this software (see the LICENSE.md file). If not, see
             <!-- TODO, switch to JsonPath: https://github.com/json-path/JsonPath -->
             <set field="pathParts" from="monitor.valuePath.split('\\.')"/>
             <iterate list="pathParts" entry="part">
-                <if condition="!jsonResults[part]">
-                    <return error="true" message="No value found in ${results} at ${monitor.valuePath}"/>
+                <if condition="!jsonResults[part].toString()">
+                    <return error="true" message="No value found in ${results} at ${monitor.valuePath} value ${jsonResults[part]}"/>
                 </if>
                 <set field="jsonResults" from="jsonResults[part]"/>
             </iterate>
@@ -57,7 +57,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="monitor.algorithmEnumId == 'ALGO_BOUNDS'">
                 <service-call
                         name="tailorsoft.timeseries.TimeseriesServices.process#DatapointBounds"
-                        in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, jobName:jobName, jobRunId: jobRunId ]"/>
+                        in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, jobName:jobName, jobRunId: jobRunId, monitorId: monitor.monitorId, ]"/>
             </if>
         </actions>
     </service>
@@ -125,6 +125,7 @@ along with this software (see the LICENSE.md file). If not, see
     <service verb="process" noun="DatapointBounds" authenticate="anonymous-all">
         <in-parameters>
             <parameter name="jobName"/>
+            <parameter name="monitorId"/>
             <parameter name="jobRunId"/>
             <parameter name="indexName"/>
             <parameter name="value"/>
@@ -133,10 +134,10 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="value"/>
         </out-parameters>
         <actions>
-            <log message="\n ======= bounds ${indexName}, ${value}, ${jobName}, ${context} "/>
+            <log message="\n ======= bounds ${indexName}, ${value}, ${jobName}, ${context} ${monitorId} "/>
             <set field="messageData" from="[:]"/>
             <entity-find-one entity-name="tailorsoft.timeseries.MonitorBounds" value-field="monitorBounds" cache="true">
-                <field-map field-name="jobName"/>
+                <field-map field-name="monitorId"/>
             </entity-find-one>
 
             <log message="\n ======= entity bounds: ${monitorBounds}"/>
@@ -203,7 +204,7 @@ along with this software (see the LICENSE.md file). If not, see
                     logger.info(monitorBounds.toString())
 
                     if (
-                    size > boundsCount &&
+                    size >= boundsCount + 1 &&
                             currentPointValue >= upperBound &&
                             firstPointValue < upperBound
                     ) {
@@ -253,6 +254,7 @@ along with this software (see the LICENSE.md file). If not, see
                                     .name("create#tailorsoft.timeseries.MonitorAlert")
                                     .parameters([
                                             id              : jobRunId,
+                                            monitorId       : monitorId,
                                             jobName         : jobName,
                                             jobRunId        : jobRunId,
                                             fromDate        : new Date(),
@@ -285,7 +287,7 @@ along with this software (see the LICENSE.md file). If not, see
         <in-parameters>
             <parameter name="fromDate"/>
             <parameter name="thruDate"/>
-            <parameter name="jobName"/>
+            <parameter name="monitorId"/>
         </in-parameters>
         <out-parameters>
             <parameter name="value"/>
@@ -294,6 +296,26 @@ along with this software (see the LICENSE.md file). If not, see
             <set field="res" from="[]"/>
             <!-- TODO restrict by Org -->
             <entity-find entity-name="tailorsoft.timeseries.Monitor" list="monitorList"/>
+
+            <set field="fromDateFormated" from="[]"/>
+            <set field="thruDateFormated" from="[]"/>
+            <script>
+                import java.text.SimpleDateFormat
+
+                dateFormat = new SimpleDateFormat("yyyy-MM-dd")
+                fromDateFormated = dateFormat.parse(fromDate)
+                thruDateFormated = dateFormat.parse(thruDate)
+            </script>
+
+            <entity-find entity-name="tailorsoft.timeseries.MonitorAlert" list="alertsList">
+                <econdition field-name="monitorId" value="poll_temperature"/>
+                <econdition field-name="fromDate" operator="greater" from="fromDateFormated"/>
+                <econdition field-name="fromDate" operator="less" from="thruDateFormated"/>
+            </entity-find>
+
+
+            <log message="============================== ${alertsList} ${fromDate} ${thruDate}"/>
+
             <script>
                  <![CDATA[
                 import org.apache.lucene.util.QueryBuilder
@@ -325,7 +347,18 @@ along with this software (see the LICENSE.md file). If not, see
                 Date thruDateObject = formatter.parse(thruDate)
 
                 // get ES data by index
-                static List getIndexData(indexName, client, fromDate, thruDate) {
+                static List getIndexData(indexName, client, fromDate, thruDate, esClient) {
+
+                    if (!esClient.checkIndexExists(indexName)) {
+                        client
+                                .admin()
+                                .indices()
+                                .prepareCreate(indexName)
+                                .addMapping("_doc", "@timestamp", "type=date", "value", "type=float")
+                                .get()
+                    }
+
+
                     List hitsList = []
 
                     SearchHits hits = client
@@ -343,31 +376,73 @@ along with this software (see the LICENSE.md file). If not, see
                     return hitsList
                 }
 
-                if (jobName) {
-                    Map monitorEntity = ec.entity.find("tailorsoft.timeseries.Monitor").condition("jobName", jobName).one()
-                    Map monitorBoundsEntity = ec.entity.find("tailorsoft.timeseries.MonitorBounds").condition("jobName", jobName).one()
+                if (monitorId) {
+                    Map monitorEntity = ec.entity.find("tailorsoft.timeseries.Monitor").condition("monitorId", monitorId).one()
+                    Map monitorBoundsEntity = ec.entity.find("tailorsoft.timeseries.MonitorBounds").condition("monitorId", monitorId).one()
                     String indexName = monitorEntity.indexName
 
-                    hitsList = getIndexData(indexName, client, fromDate, thruDate)
+                    hitsList = getIndexData(indexName, client, fromDate, thruDate, esClient)
 
-                    res.push([jobName: jobName, indexName: indexName, data: hitsList, bounds: monitorBoundsEntity, fromDate: fromDateObject, thruDate: thruDateObject])
+                    alertsList_xafind = ec.entity.find("tailorsoft.timeseries.MonitorAlert")
+                            .condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("monitorId", "equals", monitorId, monitorId, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "greater", fromDateFormated, null, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "less", thruDateFormated, null, null, false, false, false, "false"))
+                    alertsList = alertsList_xafind.list()
+
+                    res.push([jobName: monitorId, monitorId: monitorId,indexName: indexName, data: hitsList, bounds: monitorBoundsEntity, fromDate: fromDateObject, thruDate: thruDateObject, 'alerts': alertsList])
 
                 } else {
                     for (int i = 0; i < monitorList.size(); i++) {
                         String indexName = monitorList[i].indexName
-                        String jobNameStr = monitorList[i].jobName
+                        String monitorIdStr = monitorList[i].monitorId
 
-                        Map r = ec.entity.find("tailorsoft.timeseries.MonitorBounds").condition("jobName", jobNameStr).one()
+                        Map bounds = ec.entity.find("tailorsoft.timeseries.MonitorBounds").condition("monitorId", monitorIdStr).one()
 
-                        hitsList = getIndexData(indexName, client, fromDate, thruDate)
+                        hitsList = getIndexData(indexName, client, fromDate, thruDate, esClient)
 
-                        res.push([jobName: jobNameStr, indexName: indexName, data: hitsList, bounds: r, fromDate: fromDateObject, thruDate: thruDateObject])
+                        alertsList_xafind = ec.entity.find("tailorsoft.timeseries.MonitorAlert")
+                                .condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("monitorId", "equals", monitorId, monitorIdStr, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "greater", fromDateFormated, null, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "less", thruDateFormated, null, null, false, false, false, "false"))
+                        alertsList = alertsList_xafind.list()
+
+                        res.push([jobName: monitorIdStr, monitorId: monitorIdStr, indexName: indexName, data: hitsList, bounds: bounds, fromDate: fromDateObject, thruDate: thruDateObject, 'alerts': alertsList])
                     }
                 }
 
                 value = res
                 ]]>
             </script>
+        </actions>
+    </service>
+
+    <!-- process single Datapoint   -->
+    <service verb="process" noun="DataPoint" authenticate="anonymous-view">
+        <in-parameters>
+            <parameter name="monitorId" required="true"/>
+            <parameter name="pointValue" required="true"/>
+        </in-parameters>
+        <actions>
+            <log message="==== ${monitorId} ${value}"/>
+
+            <entity-find-one entity-name="tailorsoft.timeseries.Monitor" value-field="monitor" cache="true">
+                <field-map field-name="monitorId"/>
+            </entity-find-one>
+            <if condition="!monitor">
+                <log message="no monitor '${monitorId}' found, abort"/>
+                <!-- No monitor found, abort -->
+                <return/>
+            </if>
+
+            <set field="doubleValue" from="Float.parseFloat(pointValue)"/>
+            <set field="endDate" from="new Date()"/>
+
+            <!-- store in elasticsearch -->
+            <service-call name="tailorsoft.timeseries.TimeseriesServices.save#Datapoint"
+                          in-map="[date: endDate, value:doubleValue, indexName:monitor.indexName]"/>
+
+            <if condition="monitor.algorithmEnumId == 'ALGO_BOUNDS'">
+                <service-call
+                        name="tailorsoft.timeseries.TimeseriesServices.process#DatapointBounds"
+                        in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, monitorId: monitor.monitorId, ]"/>
+            </if>
+
         </actions>
     </service>
 

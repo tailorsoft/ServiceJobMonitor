@@ -9,11 +9,18 @@
 
     <!-- ========== DataSource ========== -->
     <entity entity-name="Monitor" package="tailorsoft.timeseries" use="nontransactional" cache="true">
-        <field name="jobName" type="text-short" is-pk="true"/>
+        <field name="monitorId" type="id" is-pk="true"/>
+        <field name="jobName" type="text-short"/>
         <field name="title" type="text-short"/>
         <field name="description" type="text-long"/>
         <field name="valuePath" type="text-medium"/>
         <field name="indexName" type="text-medium"/>
+        <field name="status" type="id" default="STATUS_ACTIVE" />
+        <seed-data>
+            <moqui.basic.EnumerationType description="algorithm Type" enumTypeId="MonitorStatus"/>
+            <moqui.basic.Enumeration enumId="STATUS_ACTIVE" enumTypeId="MonitorStatus" description="Active status - default value"/>
+            <moqui.basic.Enumeration  enumId="STATUS_PAUSED" enumTypeId="MonitorStatus" description="monitor paused"/>
+        </seed-data>
         <field name="algorithmEnumId" type="id"/>
         <seed-data>
             <!-- =========================== Data Source Type Data ==================== -->
@@ -26,11 +33,10 @@
         <relationship type="one" related="moqui.service.job.ServiceJob"/>
     </entity>
 
-
     <entity entity-name="MonitorBounds" package="tailorsoft.timeseries" use="nontransactional" cache="true">
-        <field name="jobName" type="id" is-pk="true"/>
-        <field name="lower" type="number-integer"/>
-        <field name="upper" type="number-integer"/>
+        <field name="monitorId" type="id" is-pk="true"/>
+        <field name="lower" type="number-float"/>
+        <field name="upper" type="number-float"/>
         <field name="count" type="number-integer"/>
         <relationship type="one" related="tailorsoft.timeseries.Monitor"/>
     </entity>
@@ -38,6 +44,7 @@
 
     <entity entity-name="MonitorAlert" package="tailorsoft.timeseries" use="nontransactional">
         <field name="id" type="id" is-pk="true"/>
+        <field name="monitorId" type="id"/>
         <field name="jobName" type="id"/>
         <field name="jobRunId" type="id"/>
         <field name="fromDate" type="date-time"/>
@@ -45,6 +52,8 @@
         <field name="value" type="number-float"/>
         <field name="notification" type="text-medium"/>
         <field name="status" type="text-medium"/>
+        <relationship type="many" related="tailorsoft.timeseries.Monitor"/>
+        responsable = partyid
     </entity>
 
 </entities>

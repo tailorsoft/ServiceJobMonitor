@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<!--<entity-facade-xml type="demo">
+
+    <moqui.service.job.ServiceJob jobId="poll_temperature" jobName="poll_temperature"
+                                  description="get temperature salt lake city"
+                                  serviceName="tailorsoft.demo.TemperatureServices.get#Temperature"
+                                  cronExpression="* 0/5 * ? * * *"
+                                  paused="N">
+    </moqui.service.job.ServiceJob>
+
+    <tailorsoft.timeseries.Monitor jobName="poll_temperature" title="Temperature"
+                                   valuePath="value.temp" indexName="temperature" algorithmEnumId="ALGO_BOUNDS"/>
+
+    <tailorsoft.timeseries.MonitorBounds
+            jobName="poll_temperature"
+            lower="18"
+            upper="25"
+            count="3"
+    />
+
+
+    <moqui.service.job.ServiceJob jobId="poll_SftpCountFiles_MuckCA" jobName="poll_SftpCountFiles_MuckCA"
+                                  description="poll file count sftp"
+                                  serviceName="tailorsoft.demo.SftpServices.count#Files"
+                                  cronExpression="* 0/5 * ? * * *"
+                                  paused="N">
+        <parameters parameterName="username" parameterValue="honeywellemea_ca_prod"/>
+        <parameters parameterName="password" parameterValue="mUcgDZMLC5X9"/>
+        <parameters parameterName="host" parameterValue="secureftp.brandedonline.com"/>
+        <parameters parameterName="port" parameterValue="2222"/>
+        <parameters parameterName="path" parameterValue="/outbound/"/>
+    </moqui.service.job.ServiceJob>
+
+    <tailorsoft.timeseries.Monitor
+            jobName="poll_SftpCountFiles_MuckCA"
+            title="Files"
+            valuePath="value"
+            indexName="sftfiles-mucka"
+            algorithmEnumId="ALGO_BOUNDS"
+    />
+
+    <tailorsoft.timeseries.MonitorBounds
+            jobName="poll_SftpCountFiles_MuckCA"
+            lower="0"
+            upper="10"
+            count="3"
+    />
+
+
+    <moqui.service.job.ServiceJob jobId="poll_SftpCountFiles_frye" jobName="poll_SftpCountFiles_frye"
+                                  description="poll file count sftp"
+                                  serviceName="tailorsoft.demo.SftpServices.count#Files"
+                                  cronExpression="* 0/5 * ? * * *"
+                                  paused="N">
+        <parameters parameterName="host" parameterValue="secureftp.brandedonline.com"/>
+        <parameters parameterName="port" parameterValue="2222"/>
+        <parameters parameterName="username" parameterValue="frye_edi_prod"/>
+        <parameters parameterName="password" parameterValue="kZJGURl92zHX"/>
+        <parameters parameterName="path" parameterValue="/outbound/"/>
+    </moqui.service.job.ServiceJob>
+
+    <tailorsoft.timeseries.Monitor jobName="poll_SftpCountFiles_frye" title="Files"
+                                   valuePath="value" indexName="sftfiles-frye" algorithmEnumId="ALGO_BOUNDS"/>
+
+    <tailorsoft.timeseries.MonitorBounds
+            jobName="poll_SftpCountFiles_frye"
+            lower="0"
+            upper="10"
+            count="3"
+    />
+
+    <tailorsoft.timeseries.SimpleMonitor id="0" title="Monitor no job"
+                                         valuePath="value.temp" indexName="simpleTest" algorithmEnumId="ALGO_BOUNDS"/>-->
+
+
+    <!--    <moqui.service.job.ServiceJob jobId="poll_github_job" jobName="poll_github_job"-->
+    <!--                                  description="Get Views of the moqui-framework in github"-->
+    <!--                                  serviceName="tailorsoft.demo.DemoService.get#GithubViews" cronExpression="* 0/5 * ? * * *"-->
+    <!--                                  paused="N">-->
+    <!--        <parameters parameterName="username" parameterValue="danieltaylor-nz"/>-->
+    <!--        <parameters parameterName="password" parameterValue="hpaiO9s30i"/>-->
+    <!--        <parameters parameterName="owner" parameterValue="moqui"/>-->
+    <!--        <parameters parameterName="repo" parameterValue="moqui-framework"/>-->
+    <!--    </moqui.service.job.ServiceJob>-->
+
+    <!--    <tailorsoft.timeseries.Timeseries timeseriesId="poll_slc_temp" jobName="poll_slc_temp" title="Github Views"-->
+    <!--                                      description="Polling views on Github" valuePath="value.temperature" />-->
+
+
+    <!--
+
+
+
+        <mantle.timeseries.Timeseries timeseriesId="DEMO_MONITOR1" title="Demo Monitor" description="This query will monitor something" outParamName="NUM">
+            <query><![CDATA[
+                SELECT RAND()*${multiplier} AS NUM
+            ]]></query>
+        </mantle.timeseries.Monitor>
+
+        <moqui.service.job.ServiceJob jobId="demo_monitor1_job1" jobName="demo_monitor1_job1" description="Indexing order counts for store1" serviceName="mantle.timeseries.Services.run#Monitor" cronExpression="0 0 2 * * ?" paused="N">
+            <parameters parameterName="monitorId" parameterValue="DEMO_MONITOR" />
+            <parameters parameterName="parameterMap" parameterValue="[multiplier:'100']" />
+        </moqui.service.job.ServiceJob>
+
+        <moqui.service.job.ServiceJob jobId="demo_monitor1_job2" jobName="demo_monitor1_job2" description="Indexing order counts for store1" serviceName="mantle.timeseries.Services.run#Monitor" cronExpression="0 0 2 * * ?" paused="N">
+            <parameters parameterName="monitorId" parameterValue="DEMO_MONITOR" />
+            <parameters parameterName="parameterMap" parameterValue="[multiplier:'200']" />
+        </moqui.service.job.ServiceJob>
+
+
+        <mantle.timeseries.Timeseries timeseriesId="DEMO_MONITOR2" title="Demo Monitor2" description="This will look up an entity" entityName="mantle.product.Product" outParamName="productName" />
+
+        <moqui.service.job.ServiceJob jobId="demo_monitor2_job1" jobName="demo_monitor2_job1" description="Indexing order counts for store2" serviceName="mantle.timeseries.Services.run#Monitor" cronExpression="0 0 2 * * ?" paused="N">
+            <parameters parameterName="monitorId" parameterValue="DEMO_MONITOR2" />
+            <parameters parameterName="parameterMap" parameterValue="[productId:'DEMO_USB32G']" />
+        </moqui.service.job.ServiceJob>
+
+
+        <mantle.timeseries.Timeseries timeseriesId="DEMO_MONITOR3" title="Demo Monitor2" description="Polling views on Github" serviceName="mantle.demo.DemoService.get#GithubViews" />
+    -->
+
+
+</entity-facade-xml>

@@ -1,0 +1,68 @@
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        require-authentication="anonymous-all"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Monutor Settings" default-menu-index="4">
+
+    <parameter name="monitorId" required="true"/>
+
+    <transition name="monitorMain">
+        <default-response url="../Monitor"/>
+    </transition>
+
+    <transition name="monitorSettings">
+        <default-response url="../MonitorSettings"/>
+    </transition>
+
+    <transition name="monitors">
+        <default-response url="../Charts"/>
+    </transition>
+
+    <transition name="listAlerts">
+        <default-response url="."/>
+    </transition>
+
+    <actions>
+        <entity-find-one entity-name="tailorsoft.timeseries.Monitor" value-field="monitor"/>
+
+        <entity-find entity-name="tailorsoft.timeseries.MonitorAlert" list="alertsList">
+            <search-form-inputs/>
+        </entity-find>
+
+        <log message="********* ${alertsList}" />
+    </actions>
+
+
+    <widgets>
+        <render-mode>
+            <text type="html,vuet"
+                  location="component://tailorsoft-timeseries/screen/MonitorAdmin/MonitorTopBar.html.ftl"/>
+        </render-mode>
+
+        <container style="ts-container monitorTitle">
+            <link url="monitors" style="fas fa-arrow-left" text=" " link-type="anchor"/>
+            <label text="${monitor.monitorId}"/>
+        </container>
+
+        <container style="tabMenu ts-container">
+            <container style="tabMenuItem">
+                <link url="monitorMain" text="Chart" link-type="anchor"
+                      parameter-map="[monitorId:monitorId]"/>
+            </container>
+            <container style="tabMenuItem active">
+                <link url="monitorAlerts" text="Alerts" link-type="anchor"
+                      parameter-map="[monitorId:monitorId]"/>
+            </container>
+            <container style="tabMenuItem">
+                <link url="monitorSettings" text="Settings" link-type="anchor"
+                      parameter-map="[monitorId:monitorId]"/>
+            </container>
+        </container>
+
+        <container>
+            <form-list name="ListAlerts" list="alertsList" transition="listAlerts" multi="false" header-dialog="true">
+                <auto-fields-entity entity-name="tailorsoft.timeseries.MonitorAlert" field-type="find-display"/>
+            </form-list>
+        </container>
+
+    </widgets>
+</screen>

@@ -4,8 +4,7 @@
             xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/moqui-conf-2.1.xsd">
     <screen-facade>
         <screen location="component://webroot/screen/webroot.xml">
-            <subscreens-item name="chart" menu-title="Charts" menu-include="false"
-                             location="component://tailorsoft-timeseries/screen/chart.xml"/>
+            <subscreens-item name="tsstatic" menu-include="false" location="component://tailorsoft-timeseries/screen/tsstatic.xml"/>
         </screen>
         <screen location="component://webroot/screen/webroot/apps.xml">
             <subscreens-item name="monitor" menu-title="Monitor Timeseries" menu-index="15"

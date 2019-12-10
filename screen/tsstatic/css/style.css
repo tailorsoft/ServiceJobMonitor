@@ -1,0 +1,243 @@
+/* main view style*/
+
+.ts-container {
+    margin-right: 59px;
+    margin-left: 59px;
+    margin-top: 16px;
+}
+
+.topBar {
+    border-bottom: 1px solid #DDDDDD;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.tabMenu {
+    height: 37px;
+    display: flex;
+}
+
+.tabMenuItem {
+    height: 39px;
+    margin-right: 10px;
+    text-transform: uppercase;
+    padding-bottom: 12px;
+    padding-left: 24px;
+    padding-right: 24px;
+    font-size: 16px;
+    color: #555555;
+    cursor: pointer;
+}
+
+.tabMenuItem.active {
+    color: #337AB7;
+    border-bottom: 3px solid #337AB7
+}
+
+/* charts panels style */
+
+#chartsContainer {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.chartBox {
+    width: 440px;
+    height: 380px;
+    /*border: 1px solid #DDDDDD;*/
+    border-radius: 4px;
+    margin-bottom: 15px;
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    margin-right: 15px;
+}
+
+.chartBox:not(:last-child) {
+    /*margin-right: 16px;*/
+}
+
+.chartBoxHeader {
+    border-radius: 4px 4px 0px 0px;
+    height: 41px;
+    font-size: 14px;
+    line-height: 41px;
+    padding-left: 16px;
+    border: 1px solid #DDDDDD;
+    display: flex;
+    justify-content: space-between;
+}
+
+.chartBoxBody {
+    height: 339px;
+    border-radius: 0px 0px 4px 4px;
+    border: 1px solid #DDDDDD;
+    border-top: none;
+    padding: 10px;
+}
+
+.chartBoxHeader.alertChart {
+    background-color: #D9534F;
+    color: #FFFFFF;
+    border: none;
+}
+
+
+.chartBoxHeaderOpen {
+    margin-right: 15px;
+    color: #337AB7;
+    cursor: pointer;
+}
+
+.chartBoxHeaderOpen.alertChart a, .chartBoxHeader.alertChart a {
+    color: #FFFFFF;
+}
+.chartBoxHeaderOpen.alertChart, .chartBoxHeaderTitle.alertChart {
+    color: #FFFFFF;
+}
+
+.dateSelector {
+    border: 1px solid #CCCCCC;
+    border-radius: 2px;
+    height: 26px;
+    line-height: 26px;
+    font-size: 14px;
+    padding-left: 8px;
+}
+
+.chartCanvas {
+    width: 100%;
+    height: 307px;
+}
+
+.table-scroll-wrapper {
+    width: calc(100% - 118px);
+    margin-left: 59px;
+}
+
+#ListMonitors_table {
+    text-align: left;
+    font-size: 14px;
+    font-family: sans-serif;
+    letter-spacing: 0;
+}
+
+#ListMonitors_table th, #ListMonitors_table td {
+    padding-bottom: 16px;
+    padding-top: 16px;
+    padding-left: 0px;
+}
+
+#CreateMonitorDialog-button {
+    margin-bottom: -90px;
+    margin-left: 59px;
+}
+
+.form-list-nav {
+    display: flex;
+    justify-content: flex-end;
+}
+
+#ListAlerts_table .form-list-nav {
+    display: flex;
+    justify-content: space-between !important;
+    margin-bottom: 20px;
+}
+
+.barLink, .barLink:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.monitorTitle {
+    font-size: 24px;
+    color: #222222;
+    margin-bottom: 24px;
+}
+
+.monitorTitle a {
+    color: #337AB7;
+    margin-right: 10px;
+}
+
+.monitorContainer {
+    display: flex;
+}
+
+.monitorSidebar {
+    width: 220px;
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    border: 1px solid #DDDDDD;
+    border-radius: 4px;
+    margin-right: 16px;
+}
+
+.monitorChart {
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    border: 1px solid #DDDDDD;
+    border-radius: 4px;
+    flex: 1;
+}
+
+.chartHeader {
+    border-bottom: 1px solid #DDDDDD;
+    padding-left: 16px;
+    height: 51px;
+    line-height: 51px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.chartBody {
+    height: 400px;
+    max-width: 100%;
+}
+
+
+#content, body {
+    background: #FAFAFA 0% 0% no-repeat padding-box;
+}
+
+.sidebarHeader{
+    padding-left: 15px;
+    height: 51px;
+    line-height: 51px;
+    color: #FFFFFF;
+    background-color: #D9534F;
+    border-radius: 4px 4px 0px 0px;
+}
+
+.sidebarHeader span {
+    /*font-size: 24px;*/
+}
+
+.settingsContainer {
+    margin-left: 44px; margin-top: 24px; margin-right: 44px;
+}
+
+.settingMenuItem {
+    height: 64px;
+    padding-left: 32px;
+    line-height: 64px;
+    font-size: 16px;
+    border-left: 2px solid RGBA(0,0,0,0);
+}
+
+.settingMenuItem a, .tabMenuItem a {
+    color: inherit;
+}
+
+.settingMenuItem.active {
+    border-left: 2px solid #337AB7;
+}
+
+#UpdateMonitor .form-horizontal {
+    border-left: 1px solid #DDDDDD;
+}
+
+#ListAlerts_table th {
+    padding: 0;
+}
+
+#dateSelectors {
+    display: none;
+}

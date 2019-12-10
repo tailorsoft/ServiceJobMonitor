@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen require-authentication="anonymous-all" default-menu-title="Charts" default-menu-index="1">
+    <widgets>
+        <render-mode>
+            <text type="html,vuet"
+                  location="component://tailorsoft-timeseries/screen/MonitorAdmin/test.html.ftl"/>
+        </render-mode>
+    </widgets>
+</screen>
