@@ -1,6 +1,6 @@
-<div >
+<div>
     <form-list name="alerts" rows="/rest/s1/tailorsoft/alerts" action="asdsd">
-        <template slot="header" >
+        <template slot="header">
             <th>
                 Notification Id
             </th>

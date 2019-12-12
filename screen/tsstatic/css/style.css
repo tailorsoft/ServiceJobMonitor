@@ -186,6 +186,11 @@
     line-height: 51px;
     font-weight: bold;
     font-size: 14px;
+    display: flex;
+}
+
+.chartHeader div {
+    margin-right: 5px;
 }
 
 .chartBody {

@@ -9,7 +9,14 @@
             </div>
         </div>
         <div class="monitorChart">
-            <div class="chartHeader">Show From</div>
+            <div class="chartHeader">
+                <div>Show From</div>
+                <div>
+                    <input type="Date" v-model="displayFromDate" @change="setDates">
+                    To:
+                    <input type="Date" v-model="displayThruDate" @change="setDates">
+                </div>
+            </div>
             <div id="chartjsContainer" class="chartBody">
 
             </div>
