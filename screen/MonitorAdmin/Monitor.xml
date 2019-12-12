@@ -1,65 +1,9 @@
-<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        require-authentication="anonymous-all"
-        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
-        default-menu-title="Edit" default-menu-index="3" standalone="true">
-
-    <parameter name="monitorId" required="true"/>
-
-    <transition name="update">
-        <actions>
-            <service-call name="update#tailorsoft.timeseries.Monitor" in-map="true"/>
-        </actions>
-        <default-response url="."
-                          parameter-map="ec.entity.getEntityDefinition(selectedEntity).getPrimaryKeys(context)"/>
-    </transition>
-
-
-    <transition name="monitorSettings">
-        <default-response url="../MonitorSettings"/>
-    </transition>
-
-    <transition name="monitors">
-        <default-response url="../Charts"/>
-    </transition>
-
-    <transition name="monitorAlerts">
-        <default-response url="../MonitorAlert"/>
-    </transition>
-
-
-    <actions>
-        <entity-find-one entity-name="tailorsoft.timeseries.Monitor" value-field="monitor"/>
-    </actions>
-
+<?xml version="1.0" encoding="UTF-8"?>
+<screen require-authentication="anonymous-all" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd" menu-image="glyphicon glyphicon-log-in" menu-image-type="icon" default-menu-index="5" render-modes="js,vuet" server-static="js,vuet" >
     <widgets>
         <render-mode>
-            <text type="html,vuet"
-                  location="component://tailorsoft-timeseries/screen/MonitorAdmin/MonitorTopBar.html.ftl"/>
-        </render-mode>
-
-        <container style="ts-container monitorTitle">
-            <link url="monitors" style="fas fa-arrow-left" text=" " link-type="anchor" />
-            <label text="${monitor.monitorId}" />
-        </container>
-
-        <container style="tabMenu ts-container">
-            <container style="tabMenuItem active">
-                <link url="monitorMain" text="Chart" link-type="anchor"
-                      parameter-map="[monitorId:monitorId]"/>
-            </container>
-            <container style="tabMenuItem">
-                <link url="monitorAlerts" text="Alerts" link-type="anchor"
-                      parameter-map="[monitorId:monitorId]"/>
-            </container>
-            <container style="tabMenuItem">
-                <link url="monitorSettings" text="Settings" link-type="anchor"
-                      parameter-map="[monitorId:monitorId]"/>
-            </container>
-        </container>
-
-        <render-mode>
-            <text type="html,vuet"
-                  location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor.html.ftl"/>
+            <text type="js" location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/Monitor.js"/>
+            <text type="vuet" location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/Monitor.vuet"/>
         </render-mode>
     </widgets>
 </screen>

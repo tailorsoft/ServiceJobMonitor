@@ -133,7 +133,7 @@ function renderVega(data, elementId) {
             labelPadding: 10,
             tickCount: 5,
             tickExtra: true
-          },
+          }
         },
         y: {
           field: "value",
@@ -221,7 +221,7 @@ function renderVega(data, elementId) {
     }
   };
 
-  vegaEmbed("#" + elementId, yourVlSpec, {actions: false});
+  vegaEmbed("#" + elementId, yourVlSpec, { actions: false });
 }
 
 function makeChart(data) {
@@ -300,6 +300,23 @@ function fetchSingleChart(monitorId, startDate, endDate) {
         resolve(data.value[0]);
       });
   });
+}
+
+function renderSideAlerts(data, elementId, countId) {
+  const containerElement = document.getElementById(elementId);
+  const countElement = document.getElementById(countId);
+
+  countElement.innerText = data.alerts.length;
+
+  const alerts = data.alerts.map(alert => {
+    const alertDiv = gDC("div", "sideAlert");
+
+    alertDiv.innerText = moment(alert.fromDate).format("DD MMM, HH:MM a");
+
+    return alertDiv;
+  });
+
+  containerElement.append(...alerts);
 }
 
 let lastTab = null;

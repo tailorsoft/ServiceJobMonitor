@@ -91,6 +91,7 @@
 .chartBoxHeaderOpen.alertChart a, .chartBoxHeader.alertChart a {
     color: #FFFFFF;
 }
+
 .chartBoxHeaderOpen.alertChart, .chartBoxHeaderTitle.alertChart {
     color: #FFFFFF;
 }
@@ -197,7 +198,7 @@
     background: #FAFAFA 0% 0% no-repeat padding-box;
 }
 
-.sidebarHeader{
+.sidebarHeader {
     padding-left: 15px;
     height: 51px;
     line-height: 51px;
@@ -211,7 +212,9 @@
 }
 
 .settingsContainer {
-    margin-left: 44px; margin-top: 24px; margin-right: 44px;
+    margin-left: 44px;
+    margin-top: 24px;
+    margin-right: 44px;
 }
 
 .settingMenuItem {
@@ -219,7 +222,7 @@
     padding-left: 32px;
     line-height: 64px;
     font-size: 16px;
-    border-left: 2px solid RGBA(0,0,0,0);
+    border-left: 2px solid RGBA(0, 0, 0, 0);
 }
 
 .settingMenuItem a, .tabMenuItem a {
@@ -240,4 +243,12 @@
 
 #dateSelectors {
     display: none;
+}
+
+.sideAlert {
+    font-size: 14px;
+    height: 48px;
+    line-height: 48px;
+    padding-left: 14px;
+    border-bottom: 1px solid #DDDDDD;;
 }

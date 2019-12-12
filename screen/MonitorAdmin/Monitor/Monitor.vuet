@@ -1,0 +1,18 @@
+<div class="ts-container">
+    <div class="monitorContainer">
+        <div class="monitorSidebar">
+            <div class="sidebarHeader"> <span id="sideAlertsCount">{{alertCount}}</span> open alerts</div>
+            <div class="sidebarBody" id="sidebarAlertsContainer">
+                <div v-for="alert in alerts" class="sideAlert">
+                    {{alert.fromDate}}
+                </div>
+            </div>
+        </div>
+        <div class="monitorChart">
+            <div class="chartHeader">Show From</div>
+            <div id="chartjsContainer" class="chartBody">
+
+            </div>
+        </div>
+    </div>
+</div>
