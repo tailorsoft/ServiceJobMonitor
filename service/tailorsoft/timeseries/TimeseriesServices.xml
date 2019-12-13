@@ -166,6 +166,7 @@ along with this software (see the LICENSE.md file). If not, see
 
                 import javax.naming.directory.SearchControls
 
+                sleep(1200);
                 //create the ES client
                 ExecutionContext ec = context.ec
                 EsClient esClient = ec.getTool("ElasticSearch", EsClient.class)
@@ -232,6 +233,7 @@ along with this software (see the LICENSE.md file). If not, see
                                     id              : jobRunId,
                                     jobName         : jobName,
                                     jobRunId        : jobRunId,
+                                    monitorId       : monitorId,
                                     fromDate        : new Date(),
                                     value           : currentPointValue,
                                     status          : 'open',
@@ -241,7 +243,7 @@ along with this software (see the LICENSE.md file). If not, see
 
                             notificationId = ec
                                     .makeNotificationMessage()
-                                    .topic("MonitorAlertNotification")
+                                    .topic(monitorId)
                                     .type("danger")
                                     .title("Alert Bounds")
                                     .message(notificationData)
