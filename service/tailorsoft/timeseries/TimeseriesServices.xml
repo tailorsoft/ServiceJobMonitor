@@ -177,6 +177,33 @@ along with this software (see the LICENSE.md file). If not, see
                 ExecutionContext ec = context.ec
                 EsClient esClient = ec.getTool("ElasticSearch", EsClient.class)
 
+                String sendNotification(data) {
+                    logger.info("notification ${data}")
+
+                    Map notificationData = [
+                            id              : jobRunId,
+                            jobName         : jobName,
+                            jobRunId        : jobRunId,
+                            monitorId       : monitorId,
+                            fromDate        : new Date(),
+                            value           : value,
+                            status          : 'open',
+                            lastUpdatedStamp: new Date(),
+                            from            : 'cristyan.sv@gmail.com'
+                    ]
+                    notificationId = ec
+                            .makeNotificationMessage()
+                            .topic(monitorId)
+                            .type("danger")
+                            .title("Alert Bounds")
+                            .message(notificationData)
+                            .userGroupId("ALL_USERS")
+                            .send()
+                            .getNotificationMessageId()
+
+                    return notificationId
+                }
+
                 try {
                     Client client = esClient.getClient();
 
@@ -224,36 +251,18 @@ along with this software (see the LICENSE.md file). If not, see
                     logger.info(upperBoundAllValid.toString())
                     logger.info(lowerBoundAllValid.toString())
 
+
                     if (upperBoundAllValid || lowerBoundAllValid) {
+                        Map hit = hits[0].getSourceAsMap()
+                        Float value = Float.parseFloat(hit.value.toString())
+
                         if (alertList.size() > 0 && alertList[0].status.toString() == 'open') {
                             logger.info('=== last alert still open')
                             // @todo do nothing
                             return false;
                         }
 
-                        Map hit = hits[0].getSourceAsMap()
-                        Float value = Float.parseFloat(hit.value.toString())
-
-                        Map notificationData = [
-                                id              : jobRunId,
-                                jobName         : jobName,
-                                jobRunId        : jobRunId,
-                                monitorId       : monitorId,
-                                fromDate        : new Date(),
-                                value           : value,
-                                status          : 'open',
-                                lastUpdatedStamp: new Date(),
-                                from            : 'cristyan.sv@gmail.com'
-                        ]
-                        notificationId = ec
-                                .makeNotificationMessage()
-                                .topic(monitorId)
-                                .type("danger")
-                                .title("Alert Bounds")
-                                .message(notificationData)
-                                .userGroupId("ALL_USERS")
-                                .send()
-                                .getNotificationMessageId()
+                        notificationId = sendNotification([monitorId: monitorId, value: value]);
 
                         ec.service.sync()
                                 .name("create#tailorsoft.timeseries.MonitorAlert")
@@ -295,8 +304,6 @@ along with this software (see the LICENSE.md file). If not, see
                                     .name("update#tailorsoft.timeseries.MonitorAlert")
                                     .parameters([id: currentAlert.id, status: 'closed'])
                                     .call()
-
-                            logger.info('===== close alert !')
                         }
                     }
                 } finally {
@@ -468,20 +475,6 @@ along with this software (see the LICENSE.md file). If not, see
                         in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, monitorId: monitor.monitorId, ]"/>
             </if>
 
-        </actions>
-    </service>
-
-    <service verb="get" noun="Alerts" authenticate="anonymous-all">
-        <in-parameters>
-            <parameter name="monitorId"/>
-        </in-parameters>
-        <actions>
-            <log message="hereeee!!!!"/>
-            <entity-find entity-name="tailorsoft.timeseries.MonitorAlert" list="alertList" limit="1">
-                <econdition field-name="monitorId" from="monitorId"/>
-                <order-by field-name="-fromDate"/>
-            </entity-find>
-            <log message="==== ${alertList}"/>
         </actions>
     </service>
 
