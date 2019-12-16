@@ -36,7 +36,7 @@ define("Monitor", {
                     this.data = res.data.value[0];
                     this.alerts = this.data.alerts.map(alert => {
                         return {
-                            fromDate: moment(alert.fromDate).format("DD MMM, HH:MM a")
+                            fromDate: moment(alert.fromDate).format("DD MMM, h:mm a")
                         };
                     });
 
