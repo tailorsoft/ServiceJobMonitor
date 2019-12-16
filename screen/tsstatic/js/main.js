@@ -48,9 +48,13 @@ function renderVega(data, elementId) {
       return alert.status === "open";
     }).length > 0;
 
-  const el = document.getElementById(elementId);
+  const alerts = data.alerts.map(alert => {
+    alert.color = alert.status === "open" ? "#D9534F" : "#FF9800";
 
-  console.log(data.alerts)
+    return alert;
+  });
+
+  const el = document.getElementById(elementId);
 
   const layer = [
     {
@@ -116,14 +120,18 @@ function renderVega(data, elementId) {
       mark: {
         opacity: 1,
         type: "point",
-        tooltip: true,
+        tooltip: { content: "value" },
         filled: true,
-        color: "#D9534F",
         cursor: "pointer",
-        size: 200,
+        size: 80,
         href: "/vapps/monitor/Monitor?monitorId=" + data.monitorId
       },
       encoding: {
+        color: {
+          field: "color",
+          type: "nominal",
+          scale: null
+        },
         x: {
           field: "fromDate",
           type: "temporal",
@@ -223,7 +231,7 @@ function renderVega(data, elementId) {
     }
   };
 
-  vegaEmbed("#" + elementId, yourVlSpec, { actions: false });
+  vegaEmbed("#" + elementId, yourVlSpec, { actions: false, renderer: "svg" });
 }
 
 function makeChart(data) {
