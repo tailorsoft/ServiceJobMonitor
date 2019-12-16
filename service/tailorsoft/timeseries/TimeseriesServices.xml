@@ -199,6 +199,11 @@ along with this software (see the LICENSE.md file). If not, see
                     int boundsCount = Integer.parseInt(monitorBounds.count.toString());
                     int size = hits.size();
 
+                    if (size < boundsCount) {
+                        // too few points to evaluate
+                        return false;
+                    }
+
                     Boolean upperBoundAllValid = true;
                     Boolean lowerBoundAllValid = true;
 
@@ -268,6 +273,32 @@ along with this software (see the LICENSE.md file). If not, see
 
                     }
 
+                    if (alertList.size() > 0 && alertList[0].status.toString() == 'open') {
+                        currentAlert = alertList[0];
+
+                        Boolean restoreValid = true;
+
+                        for (int i = 0; i < size; i++) {
+                            Map hit = hits[i].getSourceAsMap()
+                            Float value = Float.parseFloat(hit.value.toString())
+
+                            logger.info("alertId: ${currentAlert.id}- ${i.toString()} - ${value.toString()}")
+
+                            if (value > upperBound || value < lowerBound) {
+                                restoreValid = false;
+                            }
+                        }
+
+                        if (restoreValid) {
+
+                            ec.service.sync()
+                                    .name("update#tailorsoft.timeseries.MonitorAlert")
+                                    .parameters([id: currentAlert.id, status: 'closed'])
+                                    .call()
+
+                            logger.info('===== close alert !')
+                        }
+                    }
                 } finally {
                     // TODO close client?
                 }
