@@ -50,6 +50,8 @@ function renderVega(data, elementId) {
 
   const el = document.getElementById(elementId);
 
+  console.log(data.alerts)
+
   const layer = [
     {
       data: {

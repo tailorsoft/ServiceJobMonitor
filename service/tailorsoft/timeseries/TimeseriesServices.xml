@@ -40,7 +40,8 @@ along with this software (see the LICENSE.md file). If not, see
             <set field="pathParts" from="monitor.valuePath.split('\\.')"/>
             <iterate list="pathParts" entry="part">
                 <if condition="!jsonResults[part].toString()">
-                    <return error="true" message="No value found in ${results} at ${monitor.valuePath} value ${jsonResults[part]}"/>
+                    <return error="true"
+                            message="No value found in ${results} at ${monitor.valuePath} value ${jsonResults[part]}"/>
                 </if>
                 <set field="jsonResults" from="jsonResults[part]"/>
             </iterate>
@@ -140,6 +141,11 @@ along with this software (see the LICENSE.md file). If not, see
                 <field-map field-name="monitorId"/>
             </entity-find-one>
 
+            <entity-find entity-name="tailorsoft.timeseries.MonitorAlert" list="alertList" limit="1">
+                <econdition field-name="monitorId" from="monitorId"/>
+                <order-by field-name="-fromDate"/>
+            </entity-find>
+
             <log message="\n ======= entity bounds: ${monitorBounds}"/>
 
             <script>
@@ -179,7 +185,7 @@ along with this software (see the LICENSE.md file). If not, see
                     SearchResponse response = client
                             .prepareSearch((String) indexName)
                             .addSort("@timestamp", SortOrder.DESC)
-                            .setSize(alertCount + 1)
+                            .setSize(alertCount)
                             .get()
 
                     logger.info("\n ======== ES results")
@@ -191,89 +197,75 @@ along with this software (see the LICENSE.md file). If not, see
                     Float upperBound = Float.parseFloat(monitorBounds.upper.toString())
                     Float lowerBound = Float.parseFloat(monitorBounds.lower.toString())
                     int boundsCount = Integer.parseInt(monitorBounds.count.toString());
-
-                    Map firstPoint = hits[hits.size() - 1].getSourceAsMap()
-                    Float firstPointValue = Float.parseFloat(firstPoint.value.toString());
-                    Map currentPoint = hits[0].getSourceAsMap();
-                    Float currentPointValue = Float.parseFloat(currentPoint.value.toString());
                     int size = hits.size();
 
-                    logger.info('====== points to evaluate');
-                    logger.info(firstPoint.toString())
-                    logger.info(currentPoint.toString())
-                    logger.info(size.toString())
-                    logger.info(monitorBounds.toString())
+                    Boolean upperBoundAllValid = true;
+                    Boolean lowerBoundAllValid = true;
 
-                    if (
-                    size >= boundsCount + 1 &&
-                            currentPointValue >= upperBound &&
-                            firstPointValue < upperBound
-                    ) {
-                        /*
-                            the last item in the list is the first in chronological order
-                            the last element has already been evaluated so it is omitted
-                            size - 1 - 1 = size - 2
-                        */
-                        Boolean allPointValid = true;
+                    for (int i = 0; i < size; i++) {
+                        Map hit = hits[i].getSourceAsMap()
+                        Float value = Float.parseFloat(hit.value.toString())
 
-                        for (int i = hits.size() - 2; i >= 0; i--) {
-                            Map hit = hits[i].getSourceAsMap()
-                            Float value = Float.parseFloat(hit.value.toString())
-
-                            if (value < upperBound) {
-                                allPointValid = false;
-                            }
+                        if (value < upperBound) {
+                            upperBoundAllValid = false;
                         }
 
-                        if (allPointValid) {
-                            // @TODO: send alerts here
+                        if (value > lowerBound) {
+                            lowerBoundAllValid = false;
+                        }
+                    }
 
-                            // @TODO: merge notification data, and monitor alert data in a single Map
-                            Map notificationData = [
-                                    id              : jobRunId,
-                                    jobName         : jobName,
-                                    jobRunId        : jobRunId,
-                                    monitorId       : monitorId,
-                                    fromDate        : new Date(),
-                                    value           : currentPointValue,
-                                    status          : 'open',
-                                    lastUpdatedStamp: new Date(),
-                                    from            : 'cristyan.sv@gmail.com'
-                            ]
+                    logger.info('===== upper and lower bounds')
+                    logger.info(upperBoundAllValid.toString())
+                    logger.info(lowerBoundAllValid.toString())
 
-                            notificationId = ec
-                                    .makeNotificationMessage()
-                                    .topic(monitorId)
-                                    .type("danger")
-                                    .title("Alert Bounds")
-                                    .message(notificationData)
-                                    .userGroupId("ALL_USERS")
-                                    .send()
-                                    .getNotificationMessageId()
-
-
-                            ec.service.sync()
-                                    .name("create#tailorsoft.timeseries.MonitorAlert")
-                                    .parameters([
-                                            id              : jobRunId,
-                                            monitorId       : monitorId,
-                                            jobName         : jobName,
-                                            jobRunId        : jobRunId,
-                                            fromDate        : new Date(),
-                                            value           : currentPointValue,
-                                            status          : 'open',
-                                            notification    : notificationId,
-                                            lastUpdatedStamp: new Date(),
-                                    ])
-                                    .call()
+                    if (upperBoundAllValid || lowerBoundAllValid) {
+                        if (alertList.size() > 0 && alertList[0].status.toString() == 'open') {
+                            logger.info('=== last alert still open')
+                            // @todo do nothing
+                            return false;
                         }
 
-                        logger.info('====== all point valid?')
-                        logger.info(allPointValid.toString())
+                        Map hit = hits[0].getSourceAsMap()
+                        Float value = Float.parseFloat(hit.value.toString())
 
+                        Map notificationData = [
+                                id              : jobRunId,
+                                jobName         : jobName,
+                                jobRunId        : jobRunId,
+                                monitorId       : monitorId,
+                                fromDate        : new Date(),
+                                value           : value,
+                                status          : 'open',
+                                lastUpdatedStamp: new Date(),
+                                from            : 'cristyan.sv@gmail.com'
+                        ]
+                        notificationId = ec
+                                .makeNotificationMessage()
+                                .topic(monitorId)
+                                .type("danger")
+                                .title("Alert Bounds")
+                                .message(notificationData)
+                                .userGroupId("ALL_USERS")
+                                .send()
+                                .getNotificationMessageId()
 
-                    } else {
-                        logger.info('============= first and last point not valid')
+                        ec.service.sync()
+                                .name("create#tailorsoft.timeseries.MonitorAlert")
+                                .parameters([
+                                        id              : jobRunId,
+                                        monitorId       : monitorId,
+                                        jobName         : jobName,
+                                        jobRunId        : jobRunId,
+                                        fromDate        : new Date(),
+                                        value           : value,
+                                        status          : 'open',
+                                        notification    : notificationId,
+                                        lastUpdatedStamp: new Date(),
+                                ])
+                                .call()
+                        logger.info('==== notification sent')
+
                     }
 
                 } finally {
@@ -389,7 +381,7 @@ along with this software (see the LICENSE.md file). If not, see
                             .condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("monitorId", "equals", monitorId, monitorId, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "greater", fromDateFormated, null, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "less", thruDateFormated, null, null, false, false, false, "false"))
                     alertsList = alertsList_xafind.list()
 
-                    res.push([jobName: monitorId, monitorId: monitorId,indexName: indexName, data: hitsList, bounds: monitorBoundsEntity, fromDate: fromDateObject, thruDate: thruDateObject, 'alerts': alertsList])
+                    res.push([jobName: monitorId, monitorId: monitorId, indexName: indexName, data: hitsList, bounds: monitorBoundsEntity, fromDate: fromDateObject, thruDate: thruDateObject, 'alerts': alertsList])
 
                 } else {
                     for (int i = 0; i < monitorList.size(); i++) {
@@ -445,6 +437,20 @@ along with this software (see the LICENSE.md file). If not, see
                         in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, monitorId: monitor.monitorId, ]"/>
             </if>
 
+        </actions>
+    </service>
+
+    <service verb="get" noun="Alerts" authenticate="anonymous-all">
+        <in-parameters>
+            <parameter name="monitorId"/>
+        </in-parameters>
+        <actions>
+            <log message="hereeee!!!!"/>
+            <entity-find entity-name="tailorsoft.timeseries.MonitorAlert" list="alertList" limit="1">
+                <econdition field-name="monitorId" from="monitorId"/>
+                <order-by field-name="-fromDate"/>
+            </entity-find>
+            <log message="==== ${alertList}"/>
         </actions>
     </service>
 
