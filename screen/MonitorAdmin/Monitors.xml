@@ -22,16 +22,16 @@
     </actions>
 
     <widgets>
-        <form-list name="ListMonitors" list="monitorList" transition="listMonitors" multi="false" dinamic="true" header-dialog="true">
-            <auto-fields-entity entity-name="tailorsoft.timeseries.Monitor" field-type="find-display"/>
-            <field name="monitorId">
-                <default-field>
-                    <link url="find" text="${monitorId}" link-type="anchor" parameter-map="[monitorId:monitorId]"/>
-                </default-field>
-            </field>
-        </form-list>
-
-
-
+        <container style="ts-container">
+            <form-list name="ListMonitors" list="monitorList" transition="listMonitors" multi="false" dinamic="true"
+                       header-dialog="true">
+                <auto-fields-entity entity-name="tailorsoft.timeseries.Monitor" field-type="find-display"/>
+                <field name="monitorId">
+                    <default-field>
+                        <link url="find" text="${monitorId}" link-type="anchor" parameter-map="[monitorId:monitorId]"/>
+                    </default-field>
+                </field>
+            </form-list>
+        </container>
     </widgets>
 </screen>

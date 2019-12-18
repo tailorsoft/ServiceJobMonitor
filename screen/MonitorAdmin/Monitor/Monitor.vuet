@@ -1,7 +1,22 @@
 <div class="ts-container">
+    <div class="monitorTitle">
+        <a href="./Charts" class="fas fa-arrow-left"></a>
+        <span>{{monitorId}}</span>
+    </div>
+    <div class="tabMenu" style="margin-bottom: 10px">
+        <div class="tabMenuItem active">
+            <a :href="'./Monitor?monitorId='+monitorId">Chart</a>
+        </div>
+        <div class="tabMenuItem">
+            <a :href="'./MonitorAlert?monitorId='+monitorId">Alerts</a>
+        </div>
+        <div class="tabMenuItem">
+            <a :href="'./MonitorSettings?monitorId='+monitorId">Settings</a>
+        </div>
+    </div>
     <div class="monitorContainer">
         <div class="monitorSidebar">
-            <div class="sidebarHeader"> <span id="sideAlertsCount">{{alertCount}}</span> open alerts</div>
+            <div class="sidebarHeader"><span id="sideAlertsCount">{{alertCount}}</span> open alerts</div>
             <div class="sidebarBody" id="sidebarAlertsContainer">
                 <div v-for="alert in alerts" class="sideAlert">
                     {{alert.fromDate}}

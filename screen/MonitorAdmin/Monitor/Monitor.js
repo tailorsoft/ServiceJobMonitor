@@ -4,7 +4,8 @@ define("Monitor", {
             alertCount: 0,
             alerts: [],
             displayFromDate: '',
-            displayThruDate: ''
+            displayThruDate: '',
+            monitorId: '',
         };
     },
     mounted: function () {
@@ -22,6 +23,8 @@ define("Monitor", {
         getAlerts(_fromDate, _thruDate) {
             const monitorId = this.$root.currentParameters.monitorId;
 
+            this.monitorId = monitorId;
+
             const fromDate = moment(_fromDate).startOf('day');
             const thruDate = moment(_thruDate).endOf('day');
 
@@ -34,8 +37,11 @@ define("Monitor", {
                 .get(url)
                 .then(res => {
                     this.data = res.data.value[0];
+
+                    console.log(this.data);
                     this.alerts = this.data.alerts.map(alert => {
                         return {
+
                             fromDate: moment(alert.fromDate).format("DD MMM, h:mm a")
                         };
                     });

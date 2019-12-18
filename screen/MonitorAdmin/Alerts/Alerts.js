@@ -9,15 +9,12 @@ define('Alerts', {
         var librariesPromises = [];
         librariesPromises.push(this.loadAxiosLibrary());
 
-        console.log('=====', this)
-
         Promise.all(librariesPromises).then(() => {
             this.getAlerts();
         })
     },
     methods: {
         getAlerts() {
-            console.log(this.$root)
             // axios.get("/rest/s1/tailorsoft/alerts").then((res) => {
             //     this.alerts = res.data;
             //

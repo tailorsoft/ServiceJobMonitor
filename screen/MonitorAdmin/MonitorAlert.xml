@@ -58,7 +58,7 @@
             </container>
         </container>
 
-        <container>
+        <container style="ts-container">
             <form-list name="ListAlerts" list="alertsList" transition="listAlerts" multi="false" header-dialog="true">
                 <auto-fields-entity entity-name="tailorsoft.timeseries.MonitorAlert" field-type="find-display"/>
             </form-list>
