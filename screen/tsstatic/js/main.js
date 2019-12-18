@@ -120,7 +120,6 @@ function renderVega(data, elementId) {
       mark: {
         opacity: 1,
         type: "point",
-        tooltip: { content: "value" },
         filled: true,
         cursor: "pointer",
         size: 80,
@@ -132,6 +131,10 @@ function renderVega(data, elementId) {
           type: "nominal",
           scale: null
         },
+        "tooltip": [
+          {"field": "fromDate", "type": "temporal", formatType: 'time', format:"%I:%M %p"},
+          {"field": "value", "type": "quantitative"}
+        ],
         x: {
           field: "fromDate",
           type: "temporal",
