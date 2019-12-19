@@ -19,7 +19,7 @@
             valuePath="value.temp"
             indexName="temperature"
             algorithmEnumId="ALGO_BOUNDS"
-            status="STATUS_ACTIVE"
+            statusId="MonitorOpen"
     />
 
         <tailorsoft.timeseries.MonitorBounds
@@ -37,7 +37,7 @@
             valuePath="value"
             indexName="single"
             algorithmEnumId="ALGO_BOUNDS"
-            status="STATUS_ACTIVE"
+            statusId="MonitorOpen"
     />
 
     <tailorsoft.timeseries.MonitorBounds
