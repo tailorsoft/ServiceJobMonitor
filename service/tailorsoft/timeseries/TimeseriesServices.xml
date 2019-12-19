@@ -256,7 +256,7 @@ along with this software (see the LICENSE.md file). If not, see
                         Map hit = hits[0].getSourceAsMap()
                         Float value = Float.parseFloat(hit.value.toString())
 
-                        if (alertList.size() > 0 && alertList[0].status.toString() == 'open') {
+                        if (alertList.size() > 0 && alertList[0].statusId.toString() == 'TsOpen') {
                             logger.info('=== last alert still open')
                             // @todo do nothing
                             return false;
@@ -273,7 +273,7 @@ along with this software (see the LICENSE.md file). If not, see
                                         jobRunId        : jobRunId,
                                         fromDate        : new Date(),
                                         value           : value,
-                                        status          : 'open',
+                                        statusId        : 'TsOpen',
                                         notification    : notificationId,
                                         lastUpdatedStamp: new Date(),
                                 ])
@@ -282,7 +282,7 @@ along with this software (see the LICENSE.md file). If not, see
 
                     }
 
-                    if (alertList.size() > 0 && alertList[0].status.toString() == 'open') {
+                    if (alertList.size() > 0 && alertList[0].statusId.toString() == 'TsOpen') {
                         currentAlert = alertList[0];
 
                         Boolean restoreValid = true;
@@ -302,7 +302,7 @@ along with this software (see the LICENSE.md file). If not, see
 
                             ec.service.sync()
                                     .name("update#tailorsoft.timeseries.MonitorAlert")
-                                    .parameters([id: currentAlert.id, status: 'closed'])
+                                    .parameters([id: currentAlert.id, statusId: 'TsClosed', thruDate: new Date()])
                                     .call()
                         }
                     }

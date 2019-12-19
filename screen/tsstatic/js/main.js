@@ -45,11 +45,11 @@ const container = document.getElementById("chartsContainer");
 function renderVega(data, elementId) {
   const isOpenAlert =
     data.alerts.filter(alert => {
-      return alert.status === "open";
+      return alert.statusId === "TsOpen";
     }).length > 0;
 
   const alerts = data.alerts.map(alert => {
-    alert.color = alert.status === "open" ? "#D9534F" : "#FF9800";
+    alert.color = alert.statusId === "TsOpen" ? "#D9534F" : "#FF9800";
 
     return alert;
   });
@@ -247,9 +247,10 @@ function makeChart(data) {
 
   const isOpenAlert =
     data.alerts.filter(alert => {
-      return alert.status === "open";
+      return alert.statusId === "TsOpen";
     }).length > 0;
 
+  console.log(isOpenAlert, data.alerts)
   const chart = generateBox({
     name: data.jobName,
     type: isOpenAlert ? "alertChart" : ""

@@ -15,11 +15,12 @@
         <field name="description" type="text-long"/>
         <field name="valuePath" type="text-medium"/>
         <field name="indexName" type="text-medium"/>
-        <field name="status" type="id" default="STATUS_ACTIVE" />
+        <field name="status" type="id" default="STATUS_ACTIVE"/>
         <seed-data>
             <moqui.basic.EnumerationType description="algorithm Type" enumTypeId="MonitorStatus"/>
-            <moqui.basic.Enumeration enumId="STATUS_ACTIVE" enumTypeId="MonitorStatus" description="Active status - default value"/>
-            <moqui.basic.Enumeration  enumId="STATUS_PAUSED" enumTypeId="MonitorStatus" description="monitor paused"/>
+            <moqui.basic.Enumeration enumId="STATUS_ACTIVE" enumTypeId="MonitorStatus"
+                                     description="Active status - default value"/>
+            <moqui.basic.Enumeration enumId="STATUS_PAUSED" enumTypeId="MonitorStatus" description="monitor paused"/>
         </seed-data>
         <field name="algorithmEnumId" type="id"/>
         <seed-data>
@@ -51,9 +52,19 @@
         <field name="thruDate" type="date-time"/>
         <field name="value" type="number-float"/>
         <field name="notification" type="text-medium"/>
-        <field name="status" type="text-medium"/>
+        <field name="statusId" type="id"/>
+        <relationship type="one" title="AlertStatus" related="moqui.basic.StatusItem" short-alias="status"/>
+        <seed-data>
+            <moqui.basic.StatusType description="Alert status" parentTypeId="" statusTypeId="AlertStatus"/>
+            <moqui.basic.StatusItem description="alert open" sequenceNum="1" statusId="TsOpen"
+                                    statusTypeId="AlertStatus"/>
+            <moqui.basic.StatusItem description="alert closed" sequenceNum="2" statusId="TsClosed"
+                                    statusTypeId="AlertStatus"/>
+
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="TsOpen" toStatusId="TsClosed"
+                                              transitionName="solved"/>
+        </seed-data>
         <relationship type="many" related="tailorsoft.timeseries.Monitor"/>
-        responsable = partyid
     </entity>
 
 </entities>
