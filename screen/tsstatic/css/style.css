@@ -252,3 +252,46 @@
     padding-left: 14px;
     border-bottom: 1px solid #DDDDDD;;
 }
+
+#timeseries .nav-tabs {
+    border-bottom: 1px solid #DDDDDD;
+    height: 44px;
+    margin-bottom: 25px;
+}
+
+#timeseries .nav-tabs>li  {
+    margin-right: 10px;
+}
+
+#timeseries .nav>li>a {
+    height: 42px;
+    padding: initial;
+    text-transform: uppercase;
+    padding-bottom: 12px;
+    padding-left: 24px;
+    padding-right: 24px;
+    font-size: 16px;
+    color: #555555;
+    cursor: pointer;
+    line-height: 39px;
+}
+
+#timeseries .nav-tabs>li>a:hover, #timeseries .nav>li>a:hover  {
+    border-color: rgba(238, 238, 238, 0) rgba(238, 238, 238, 0) rgba(221, 221, 221, 0);
+
+    background-color: transparent;
+}
+
+#timeseries .nav-tabs>li.active {
+    color: #337AB7;
+    border-bottom: 3px solid #337AB7
+}
+#timeseries li.active a {
+    color: #337AB7;
+}
+
+#timeseries .nav-tabs>li.active>a {
+    background-color: initial;
+    border: none;
+    border-bottom-color: transparent;
+}

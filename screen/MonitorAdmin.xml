@@ -22,7 +22,7 @@
                 ]]>
             </text>
         </render-mode>
-        <container style="ts-container">
+        <container id="timeseries" style="ts-container">
             <subscreens-panel id="MonitorAdminPanel" type="tab"/>
         </container>
     </widgets>
