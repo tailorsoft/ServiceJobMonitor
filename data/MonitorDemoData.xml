@@ -22,12 +22,21 @@
             statusId="MonitorActive"
     />
 
-        <tailorsoft.timeseries.MonitorBounds
-                monitorId="poll_temperature"
-                lower="0"
-                upper="10"
-                count="3"
-        />
+    <tailorsoft.timeseries.MonitorBounds
+            monitorId="poll_temperature"
+            lower="0"
+            upper="10"
+            count="3"
+    />
+
+    <moqui.security.user.NotificationTopic
+            receiveNotifications="Y"
+            description="monitor topic"
+            typeString="danger"
+            topic="poll_temperature"
+            showAlert="Y"
+            titleTemplate="Monitor ${monitorId} out of bounds, value: ${value}"
+    />
 
 
     <!-- single point service monitor    -->
@@ -45,6 +54,15 @@
             lower="0"
             upper="10"
             count="3"
+    />
+
+    <moqui.security.user.NotificationTopic
+            receiveNotifications="Y"
+            description="monitor topic"
+            typeString="danger"
+            topic="single_point"
+            showAlert="Y"
+            titleTemplate="Monitor ${monitorId} out of bounds, value: ${value}"
     />
 
 </entity-facade-xml>
