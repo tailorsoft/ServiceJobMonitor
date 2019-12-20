@@ -5,22 +5,7 @@
         menu-image-type="icon">
 
 
-    <transition name="charts">
-        <default-response url="."/>
-    </transition>
-
-    <transition name="alerts">
-        <default-response url="./Alerts"/>
-    </transition>
-
-    <transition name="monitors">
-        <default-response url="./Monitors"/>
-    </transition>
-
-
     <subscreens default-item="Charts"/>
-
-
     <widgets>
         <render-mode>
             <text type="html,vuet">

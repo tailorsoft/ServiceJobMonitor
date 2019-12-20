@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen require-authentication="anonymous-all" default-menu-title="Timeseries Monitors" default-menu-index="2">
+
+    <transition name="editMonitor"><default-response url="../EditMonitor"/></transition>
+
     <transition name="listMonitors">
         <default-response url="."/>
-    </transition>
-
-    <transition name="monitorDetails">
-        <default-response url="../Monitor"/>
     </transition>
 
     <actions>
@@ -21,7 +20,7 @@
                 <auto-fields-entity entity-name="tailorsoft.timeseries.Monitor" field-type="find-display"/>
                 <field name="monitorId">
                     <default-field>
-                        <link url="monitorDetails" text="${monitorId}" link-type="anchor" parameter-map="[monitorId:monitorId]"/>
+                        <link url="editMonitor" text="${monitorId}" link-type="anchor" parameter-map="[monitorId:monitorId]"/>
                     </default-field>
                 </field>
             </form-list>

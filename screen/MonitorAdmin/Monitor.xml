@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<screen require-authentication="anonymous-all" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd" menu-image="glyphicon glyphicon-log-in" menu-image-type="icon" default-menu-index="5" render-modes="js,vuet" server-static="js,vuet" >
+<screen require-authentication="anonymous-all" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd" menu-image="glyphicon glyphicon-log-in" menu-image-type="icon" default-menu-index="5" >
 
     <subscreens default-item="FindMonitor">
         <subscreens-item name="FindMonitor"  menu-include="false"
-                         location="component://SimpleScreens/screen/SimpleScreens/ProductStore/Promotion/FindPromotion.xml"/>
+                         location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/FindMonitor.xml"/>
+        <subscreens-item name="EditMonitor" menu-index="1" menu-include="false"
+                         location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/EditMonitor.xml"/>
     </subscreens>
 
     <widgets>
