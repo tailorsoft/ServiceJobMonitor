@@ -43,7 +43,7 @@
                 {{formatDate(props.fields.thruDate)}}
             </td>
             <td>
-                {{props.fields.value}}
+                {{formatNumber(props.fields.value)}}
             </td>
             <td>
                 {{props.fields.notification}}

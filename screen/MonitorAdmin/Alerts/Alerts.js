@@ -24,6 +24,9 @@ define('Alerts', {
             //     console.log(err)
             // });
         },
+        formatNumber(num){
+          return parseFloat(num).toFixed(2);
+        },
         formatDate(date){
             return moment(date).format('lll');
         },
