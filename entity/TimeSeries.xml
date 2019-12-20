@@ -19,9 +19,9 @@
         <relationship type="one" title="MonitorStatus" related="moqui.basic.StatusItem" short-alias="status"/>
         <seed-data>
             <moqui.basic.StatusType description="Monitor status" parentTypeId="" statusTypeId="MonitorStatus"/>
-            <moqui.basic.StatusItem description="alert open" sequenceNum="1" statusId="MonitorActive"
+            <moqui.basic.StatusItem description="Monitor Active" sequenceNum="1" statusId="MonitorActive"
                                     statusTypeId="MonitorStatus"/>
-            <moqui.basic.StatusItem description="alert closed" sequenceNum="2" statusId="MonitorPaused"
+            <moqui.basic.StatusItem description="Monitor Paused" sequenceNum="2" statusId="MonitorPaused"
                                     statusTypeId="MonitorStatus"/>
         </seed-data>
         <field name="algorithmEnumId" type="id"/>
