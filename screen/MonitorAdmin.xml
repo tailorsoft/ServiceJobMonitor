@@ -37,30 +37,8 @@
                 ]]>
             </text>
         </render-mode>
-        <container style="topBar ts-container" id="topBarMain">
-            <container style="tabMenu">
-                <container id="Charts" style="tabMenuItem">
-                    <link url="charts" text="charts" link-type="anchor"/>
-                </container>
-                <container id="Alerts" style="tabMenuItem">
-                    <link url="alerts" text="Alerts" link-type="anchor"/>
-                </container>
-                <container id="Monitors" style="tabMenuItem">
-                    <link url="monitors" text="Monitors" link-type="anchor"/>
-                </container>
-            </container>
-            <container id="dateSelectors" style="dateSelectors">
-                <render-mode>
-                    <text type="html,vuet">
-                        <![CDATA[
-                                <input class="dateSelector" id="startDateInput" type="date">
-                                <input class="dateSelector" id="endDateInput" type="date">
-                            ]]>
-                    </text>
-                </render-mode>
-            </container>
-
+        <container style="ts-container">
+            <subscreens-panel id="MonitorAdminPanel" type="tab"/>
         </container>
-        <subscreens-active/>
     </widgets>
 </screen>

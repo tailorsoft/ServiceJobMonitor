@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen require-authentication="anonymous-all" default-menu-title="Charts" default-menu-index="1">
     <widgets>
+        <container id="dateSelectors" style="dateSelectors">
+            <render-mode>
+                <text type="html,vuet">
+                    <![CDATA[
+                                <input class="dateSelector" id="startDateInput" type="date">
+                                <input class="dateSelector" id="endDateInput" type="date">
+                            ]]>
+                </text>
+            </render-mode>
+        </container>
         <render-mode>
             <text type="html,vuet"
                   location="component://tailorsoft-timeseries/screen/MonitorAdmin/test.html.ftl"/>
