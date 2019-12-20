@@ -2,7 +2,7 @@
     <form-list name="alerts" rows="/rest/s1/tailorsoft/alerts" action="asdsd">
         <template slot="header">
             <th>
-                Notification Id
+                Alert Id
             </th>
             <th>
                 Monitor Id
@@ -23,7 +23,7 @@
                 Notification Id
             </th>
             <th>
-                Status
+                Status Id
             </th>
         </template>
         <template slot="row" slot-scope="props">
@@ -37,10 +37,10 @@
                 {{props.fields.jobName}}
             </td>
             <td>
-                {{props.fields.fromDate}}
+                {{formatDate(props.fields.fromDate)}}
             </td>
             <td>
-                {{props.fields.thruDate}}
+                {{formatDate(props.fields.thruDate)}}
             </td>
             <td>
                 {{props.fields.value}}
@@ -49,7 +49,7 @@
                 {{props.fields.notification}}
             </td>
             <td>
-                {{props.fields.status}}
+                {{props.fields.statusId}}
             </td>
         </template>
     </form-list>

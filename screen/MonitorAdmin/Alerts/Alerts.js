@@ -24,6 +24,9 @@ define('Alerts', {
             //     console.log(err)
             // });
         },
+        formatDate(date){
+            return moment(date).format('lll');
+        },
         loadAxiosLibrary() {
             return new Promise(function (resolve, reject) {
                 const importAxios = document.createElement("script");

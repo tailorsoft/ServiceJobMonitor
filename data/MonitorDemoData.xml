@@ -35,6 +35,7 @@
             typeString="danger"
             topic="poll_temperature"
             showAlert="Y"
+            persistOnSend="Y"
             titleTemplate="Monitor ${monitorId} out of bounds, value: ${value}"
     />
 
@@ -63,6 +64,7 @@
             topic="single_point"
             showAlert="Y"
             titleTemplate="Monitor ${monitorId} out of bounds, value: ${value}"
+            persistOnSend="Y"
     />
 
 </entity-facade-xml>
