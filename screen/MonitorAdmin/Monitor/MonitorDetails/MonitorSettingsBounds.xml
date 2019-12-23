@@ -1,7 +1,7 @@
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         require-authentication="anonymous-all"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
-        default-menu-title="Monutor Settings Bounds" default-menu-index="4">
+        default-menu-title="Monitor Settings Bounds" default-menu-index="5">
 
     <parameter name="monitorId" required="true"/>
 
@@ -34,25 +34,11 @@
 
         <render-mode>
             <text type="html,vuet"
-                  location="component://tailorsoft-timeseries/screen/MonitorAdmin/MonitorTopBar.html.ftl"/>
+                  location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorTopBar.html.ftl"/>
         </render-mode>
 
         <container style="ts-container monitorTitle">
-            <link url="monitors" style="fas fa-arrow-left" text=" " link-type="anchor" />
             <label text="${monitor.monitorId}" />
-        </container>
-
-        <container style="tabMenu ts-container">
-            <container style="tabMenuItem">
-                <link url="monitorMain" text="Chart" link-type="anchor"
-                      parameter-map="[monitorId:monitorId]"/>
-            </container>
-            <container style="tabMenuItem">
-                <label text="Alert"/>
-            </container>
-            <container style="tabMenuItem active">
-                <label text="Settings"/>
-            </container>
         </container>
 
         <container-row style="settingsContainer">

@@ -9,6 +9,9 @@
         <method type="get">
             <service name="tailorsoft.timeseries.TimeseriesServices.get#Monitors"/>
         </method>
+        <id name="monitorId">
+            <method type="get"><entity name="tailorsoft.timeseries.Monitor" operation="one"/></method>
+        </id>
     </resource>
 
     <resource name="alerts" require-authentication="anonymous-all">

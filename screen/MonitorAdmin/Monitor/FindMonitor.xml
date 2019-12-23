@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<screen require-authentication="anonymous-all" default-menu-title="Timeseries Monitors" default-menu-index="2">
+<screen require-authentication="anonymous-all" default-menu-title="Timeseries Monitors" default-menu-index="1">
 
-    <transition name="editMonitor"><default-response url="../EditMonitor"/></transition>
+    <transition name="editMonitor"><default-response url="../MonitorDetails"/></transition>
 
     <transition name="listMonitors">
         <default-response url="."/>

@@ -6,6 +6,7 @@ define("Monitor", {
             displayFromDate: '',
             displayThruDate: '',
             monitorId: '',
+            monitor: null
         };
     },
     mounted: function () {
@@ -16,29 +17,36 @@ define("Monitor", {
         const thruDate = new Date(Date.now() + 1000 * 60 * 100);
 
         Promise.all(librariesPromises).then(() => {
+            this.monitorId = this.$root.currentParameters.monitorId;
+            this.getMonitorInfo();
             this.getAlerts(fromDate, thruDate);
         });
     },
     methods: {
+        getMonitorInfo(){
+            const url = '/rest/s1/tailorsoft/monitors/' + this.monitorId;
+            let vm = this;
+
+            axios.get(url).then(res=>{
+                vm.monitor = res.data;
+                console.log(vm.monitor)
+            }).catch(err=>{
+                console.log(err)
+            })
+        },
         getAlerts(_fromDate, _thruDate) {
-            const monitorId = this.$root.currentParameters.monitorId;
-
-            this.monitorId = monitorId;
-
             const fromDate = moment(_fromDate).startOf('day');
             const thruDate = moment(_thruDate).endOf('day');
 
             this.displayFromDate = fromDate.format('YYYY-MM-DD');
             this.displayThruDate = thruDate.format('YYYY-MM-DD');
 
-            const url = `/rest/s1/tailorsoft/monitors?fromDate=${fromDate.toISOString()}&thruDate=${thruDate.toISOString()}&monitorId=${monitorId}`;
+            const url = `/rest/s1/tailorsoft/monitors?fromDate=${fromDate.toISOString()}&thruDate=${thruDate.toISOString()}&monitorId=${this.monitorId}`;
 
             axios
                 .get(url)
                 .then(res => {
                     this.data = res.data.value[0];
-
-                    console.log(this.data);
                     this.alerts = this.data.alerts.map(alert => {
                         return {
 
@@ -71,7 +79,7 @@ define("Monitor", {
             const fromDate = moment(this.displayFromDate, 'YYYY-MM-DD').startOf('day').toDate();
             const thruDate = moment(this.displayThruDate, 'YYYY-MM-DD').endOf('day').toDate();
 
-            this.getAlerts(moment(fromDate), moment(thruDate))
+            this.getAlerts(global(fromDate), moment(thruDate))
         }
     }
 });
