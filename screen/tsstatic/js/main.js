@@ -362,12 +362,4 @@ function selectCurrentTab() {
   lastTab = currentTab;
 }
 
-selectCurrentTab();
-
-setInterval(() => {
-  const currentTab = window.location.pathname.split("/").pop();
-
-  if (currentTab !== lastTab) {
-    selectCurrentTab();
-  }
-}, 100);
+// selectCurrentTab();
