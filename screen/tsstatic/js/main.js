@@ -23,8 +23,8 @@ function generateBox({ name, type = "" }) {
   chartCanvas.id = name;
 
   // fill with data
-  chartBoxHeaderTitle.innerHTML = `<a href='./Monitor?monitorId=${name}'>${name}</a>`;
-  chartBoxHeaderOpen.innerHTML = `<a href='./Monitor?monitorId=${name}'>Open Chart <i class=\"fas fa-angle-right\"></i></a>`;
+  chartBoxHeaderTitle.innerHTML = `<a href='./Monitor/MonitorDetails/MonitorChart?monitorId=${name}'>${name}</a>`;
+  chartBoxHeaderOpen.innerHTML = `<a href='./Monitor/MonitorDetails/MonitorChart?monitorId=${name}'>Open Chart <i class=\"fas fa-angle-right\"></i></a>`;
 
   chartBoxHeader.className = "chartBoxHeader " + type;
   chartBoxHeaderOpen.className = "chartBoxHeaderOpen " + type;
@@ -362,12 +362,4 @@ function selectCurrentTab() {
   lastTab = currentTab;
 }
 
-selectCurrentTab();
-
-setInterval(() => {
-  const currentTab = window.location.pathname.split("/").pop();
-
-  if (currentTab !== lastTab) {
-    selectCurrentTab();
-  }
-}, 100);
+// selectCurrentTab();

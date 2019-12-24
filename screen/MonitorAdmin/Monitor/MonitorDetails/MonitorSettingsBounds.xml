@@ -1,7 +1,7 @@
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         require-authentication="anonymous-all"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
-        default-menu-title="Monutor Settings Bounds" default-menu-index="4">
+        default-menu-title="Monitor Settings Bounds" default-menu-index="5">
 
     <parameter name="monitorId" required="true"/>
 
@@ -26,7 +26,8 @@
     </transition>
 
     <actions>
-        <entity-find-one entity-name="tailorsoft.timeseries.MonitorBounds" value-field="monitor"/>
+        <entity-find-one entity-name="tailorsoft.timeseries.MonitorBounds" value-field="monitorBounds"/>
+        <entity-find-one entity-name="tailorsoft.timeseries.Monitor" value-field="monitor"/>
     </actions>
 
     <widgets>
@@ -34,25 +35,11 @@
 
         <render-mode>
             <text type="html,vuet"
-                  location="component://tailorsoft-timeseries/screen/MonitorAdmin/MonitorTopBar.html.ftl"/>
+                  location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorTopBar.html.ftl"/>
         </render-mode>
 
         <container style="ts-container monitorTitle">
-            <link url="monitors" style="fas fa-arrow-left" text=" " link-type="anchor" />
-            <label text="${monitor.monitorId}" />
-        </container>
-
-        <container style="tabMenu ts-container">
-            <container style="tabMenuItem">
-                <link url="monitorMain" text="Chart" link-type="anchor"
-                      parameter-map="[monitorId:monitorId]"/>
-            </container>
-            <container style="tabMenuItem">
-                <label text="Alert"/>
-            </container>
-            <container style="tabMenuItem active">
-                <label text="Settings"/>
-            </container>
+            <label text="${monitor.title}" />
         </container>
 
         <container-row style="settingsContainer">
@@ -66,7 +53,7 @@
                 </container>
             </row-col>
             <row-col md="8">
-                <form-single name="UpdateMonitor" map="monitor" transition="update" dynamic="true">
+                <form-single name="UpdateMonitor" map="monitorBounds" transition="update" dynamic="true">
                     <auto-fields-entity entity-name="tailorsoft.timeseries.MonitorBounds" include="pk"
                                         field-type="display"/>
                     <auto-fields-entity entity-name="tailorsoft.timeseries.MonitorBounds" include="nonpk"

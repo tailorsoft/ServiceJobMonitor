@@ -5,22 +5,7 @@
         menu-image-type="icon">
 
 
-    <transition name="charts">
-        <default-response url="."/>
-    </transition>
-
-    <transition name="alerts">
-        <default-response url="./Alerts"/>
-    </transition>
-
-    <transition name="monitors">
-        <default-response url="./Monitors"/>
-    </transition>
-
-
     <subscreens default-item="Charts"/>
-
-
     <widgets>
         <render-mode>
             <text type="html,vuet">
@@ -31,36 +16,14 @@
                     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.js"></script>
                     <script src="https://cdn.jsdelivr.net/npm/vega@5.9.0"></script>
-<script src="https://cdn.jsdelivr.net/npm/vega-lite@4.0.0"></script>
-<script src="https://cdn.jsdelivr.net/npm/vega-embed@6.2.0"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/vega-lite@4.0.0"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.2.0"></script>
                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css"/>
                 ]]>
             </text>
         </render-mode>
-        <container style="topBar ts-container" id="topBarMain">
-            <container style="tabMenu">
-                <container id="Charts" style="tabMenuItem">
-                    <link url="charts" text="charts" link-type="anchor"/>
-                </container>
-                <container id="Alerts" style="tabMenuItem">
-                    <link url="alerts" text="Alerts" link-type="anchor"/>
-                </container>
-                <container id="Monitors" style="tabMenuItem">
-                    <link url="monitors" text="Monitors" link-type="anchor"/>
-                </container>
-            </container>
-            <container id="dateSelectors" style="dateSelectors">
-                <render-mode>
-                    <text type="html,vuet">
-                        <![CDATA[
-                                <input class="dateSelector" id="startDateInput" type="date">
-                                <input class="dateSelector" id="endDateInput" type="date">
-                            ]]>
-                    </text>
-                </render-mode>
-            </container>
-
+        <container id="timeseries" style="ts-container">
+            <subscreens-panel id="MonitorAdminPanel" type="tab"/>
         </container>
-        <subscreens-active/>
     </widgets>
 </screen>
