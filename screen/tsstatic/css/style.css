@@ -243,6 +243,7 @@
 
 #dateSelectors {
     display: none;
+    margin-bottom: 1.75em;
 }
 
 .sideAlert {

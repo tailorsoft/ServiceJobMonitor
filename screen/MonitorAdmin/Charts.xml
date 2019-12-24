@@ -5,15 +5,15 @@
             <render-mode>
                 <text type="html,vuet">
                     <![CDATA[
-                                <input class="dateSelector" id="startDateInput" type="date">
-                                <input class="dateSelector" id="endDateInput" type="date">
-                            ]]>
+                        <input class="dateSelector" id="startDateInput" type="date">
+                        <input class="dateSelector" id="endDateInput" type="date">
+                    ]]>
                 </text>
             </render-mode>
         </container>
         <render-mode>
             <text type="html,vuet"
-                  location="component://tailorsoft-timeseries/screen/MonitorAdmin/Charts/test.html.ftl"/>
+                  location="component://tailorsoft-timeseries/screen/MonitorAdmin/Charts/charts.html.ftl"/>
         </render-mode>
     </widgets>
 </screen>
