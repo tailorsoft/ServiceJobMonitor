@@ -138,6 +138,12 @@ function renderVega(data, elementId) {
             formatType: "time",
             format: "%I:%M %p"
           },
+          {
+            field: "thruDate",
+            type: "temporal",
+            formatType: "time",
+            format: "%I:%M %p"
+          },
           { field: "value", type: "quantitative" }
         ],
         x: {
