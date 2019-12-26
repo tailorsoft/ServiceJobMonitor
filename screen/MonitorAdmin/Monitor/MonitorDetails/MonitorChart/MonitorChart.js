@@ -79,7 +79,7 @@ define("Monitor", {
             const fromDate = moment(this.displayFromDate, 'YYYY-MM-DD').startOf('day').toDate();
             const thruDate = moment(this.displayThruDate, 'YYYY-MM-DD').endOf('day').toDate();
 
-            this.getAlerts(global(fromDate), moment(thruDate))
+            this.getAlerts(moment(fromDate), moment(thruDate))
         }
     }
 });
