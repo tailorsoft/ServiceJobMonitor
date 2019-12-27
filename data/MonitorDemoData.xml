@@ -59,7 +59,7 @@
 
     <moqui.security.user.NotificationTopic
             receiveNotifications="Y"
-            description="monitor topic"
+            description="single point topic"
             typeString="danger"
             topic="single_point"
             showAlert="Y"
