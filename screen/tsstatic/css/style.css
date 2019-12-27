@@ -194,9 +194,9 @@
 }
 
 
-#content, body {
-    background: #FAFAFA 0% 0% no-repeat padding-box;
-}
+/*#content, body {*/
+/*    background: #FAFAFA 0% 0% no-repeat padding-box;*/
+/*}*/
 
 .sidebarHeader {
     padding-left: 15px;
@@ -212,9 +212,7 @@
 }
 
 .settingsContainer {
-    margin-left: 44px;
-    margin-top: 24px;
-    margin-right: 44px;
+
 }
 
 .settingMenuItem {
@@ -253,6 +251,8 @@
     padding-left: 14px;
     border-bottom: 1px solid #DDDDDD;;
 }
+
+/*
 
 #timeseries .nav-tabs {
     border-bottom: 1px solid #DDDDDD;
@@ -297,6 +297,7 @@
     border-bottom-color: transparent;
 }
 
+*/
 .side-alert-label {
     color: #CCCCCC;
 }

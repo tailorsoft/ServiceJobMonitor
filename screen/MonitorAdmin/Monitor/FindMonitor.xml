@@ -14,7 +14,7 @@
     </actions>
 
     <widgets>
-        <container style="ts-container">
+        <container >
             <form-list name="ListMonitors" list="monitorList" transition="listMonitors" multi="false" dinamic="true"
                        header-dialog="true">
                 <auto-fields-entity entity-name="tailorsoft.timeseries.Monitor" field-type="find-display"/>

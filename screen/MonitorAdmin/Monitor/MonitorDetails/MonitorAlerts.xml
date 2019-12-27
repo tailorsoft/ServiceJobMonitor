@@ -34,11 +34,11 @@
                   location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorTopBar.html.ftl"/>
         </render-mode>
 
-        <container style="ts-container monitorTitle">
+        <container style="monitorTitle">
             <label text="${monitor.title}"/>
         </container>
 
-        <container style="ts-container">
+        <container>
             <form-list name="ListAlerts" list="alertsList" transition="listAlerts" multi="false" header-dialog="true">
                 <auto-fields-entity entity-name="tailorsoft.timeseries.MonitorAlert" field-type="find-display"/>
             </form-list>

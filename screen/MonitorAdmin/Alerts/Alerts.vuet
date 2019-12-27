@@ -1,4 +1,4 @@
-<div class="ts-container">
+<div >
     <form-list name="alerts" rows="/rest/s1/tailorsoft/alerts" action=""  ref="formAlertsList">
         <template slot="header">
             <th>Status Id</th>
