@@ -15,7 +15,6 @@ define('Alerts', {
         }
     },
     mounted: function () {
-        console.log(this.$root)
         var librariesPromises = [];
         librariesPromises.push(this.loadAxiosLibrary());
 

@@ -7,6 +7,32 @@
         <default-response url="."/>
     </transition>
 
+    <transition name="createMonitor">
+        <actions>
+            <!-- Monitor Bounds -->
+            <set field="algorithmEnumId" value="ALGO_BOUNDS"/>
+
+            <!-- Notification Topic-->
+            <set field="receiveNotifications" value="Y"/>
+            <set field="description" from="monitorId + 'topic'"/>
+            <set field="typeString" value="danger"/>
+            <set field="topic" from="monitorId"/>
+            <set field="showAlert" value="Y"/>
+            <set field="titleTemplate" value="Monitor ${monitorId} out of bounds, value: ${value}"/>
+            <set field="persistOnSend" value="Y"/>
+
+            <!-- Saving Monitor-->
+            <service-call name="create#tailorsoft.timeseries.Monitor" in-map="context"/>
+
+            <!-- Saving Monitor Bounds-->
+            <service-call name="create#tailorsoft.timeseries.MonitorBounds" in-map="context"/>
+
+            <!-- Saving Notification Topic-->
+            <service-call name="create#moqui.security.user.NotificationTopic" in-map="context"/>
+        </actions>
+        <default-response url="."/>
+    </transition>
+
     <actions>
         <entity-find entity-name="tailorsoft.timeseries.Monitor" list="monitorList">
             <search-form-inputs/>
@@ -14,7 +40,45 @@
     </actions>
 
     <widgets>
-        <container >
+        <container-dialog id="CreateDialog" button-text="New Monitor">
+            <form-single name="CreateMonitor" transition="createMonitor">
+                <field name="monitorId"><default-field title="ID"><text-line size="30"/></default-field></field>
+                <field name="jobName">
+                    <default-field title="Job Name">
+                        <drop-down>
+                            <entity-options key="${jobName}" text="${jobName}">
+                                <entity-find entity-name="moqui.service.job.ServiceJob">
+                                    <order-by field-name="jobName"/>
+                                </entity-find>
+                            </entity-options>
+                        </drop-down>
+                    </default-field></field>
+                <field name="title"><default-field title="Title"><text-line size="120"/></default-field></field>
+                <field name="valuePath"><default-field title="Value Path"><text-line size="30"/></default-field></field>
+                <field name="indexName"><default-field title="Index Name"><text-line size="30"/></default-field></field>
+                <field name="statusId">
+                    <default-field title="Status Id">
+                        <drop-down>
+                            <entity-options key="${statusId}" text="${statusId}">
+                                <entity-find entity-name="moqui.basic.StatusItem">
+                                    <econdition field-name="statusTypeId" value="MonitorStatus"/>
+                                </entity-find>
+                            </entity-options>
+                        </drop-down>
+                    </default-field>
+                </field>
+                <field name="jobType">
+                    <default-field title="Job Type">
+                        <display text="Bounds"/>
+                    </default-field>
+                </field>
+                <field name="upper"><default-field title="Upper Bound"><text-line size="30"/></default-field></field>
+                <field name="lower"><default-field title="Lower Bound"><text-line size="30"/></default-field></field>
+                <field name="count"><default-field title="Count"><text-line size="30"/></default-field></field>
+                <field name="submitButton"><default-field title="Create"><submit/></default-field></field>
+            </form-single>
+        </container-dialog>
+        <container>
             <form-list name="ListMonitors" list="monitorList" transition="listMonitors" multi="false" dinamic="true"
                        header-dialog="true">
                 <auto-fields-entity entity-name="tailorsoft.timeseries.Monitor" field-type="find-display"/>
