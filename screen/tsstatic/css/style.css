@@ -305,3 +305,7 @@
     border-bottom: 1px solid #DDDDDD;
     padding: 15px;
 }
+
+.delete-icon-wrapper{
+    cursor: pointer;
+}
