@@ -1,28 +1,74 @@
 define('Alerts', {
     data: function () {
         return {
-            app: 'xx2',
-            alerts: []
+            alerts: [],
+            axiosConfig: {
+                headers: {
+                    "Content-Type": "application/json;charset=UTF-8", "Access-Control-Allow-Origin": "*",
+                    "moquiSessionToken": this.$root.moquiSessionToken
+                }
+            },
+            showNewIssueUrlDialog: false,
+            containerDialogKey: 0,
+            currentAlertId: null,
+            newIssueUrl: ''
         }
     },
     mounted: function () {
+        console.log(this.$root)
         var librariesPromises = [];
         librariesPromises.push(this.loadAxiosLibrary());
 
         Promise.all(librariesPromises).then(() => {
-            this.getAlerts();
+
         })
     },
     methods: {
-        getAlerts() {
-            // axios.get("/rest/s1/tailorsoft/alerts").then((res) => {
-            //     this.alerts = res.data;
-            //
-            //     console.log('alerts ===== ')
-            //
-            // }).catch(function (err) {
-            //     console.log(err)
-            // });
+        showIssueUrlDialog(alertId){
+            this.currentAlertId = alertId;
+            this.showNewIssueUrlDialog = true;
+
+            this.$nextTick().then(() => {
+                this.containerDialogKey += 1;
+            });
+        },
+        createIssueUrl(){
+            var vm =this;
+            const url = '/rest/s1/tailorsoft/alerts/' + this.currentAlertId;
+            const notiMsg = 'Alert Issue URL added correctly!';
+
+            this.$root.loading = 1;
+
+            this.$nextTick().then(() => { //Avoid the annulment of the $root.loading value setted to 1
+                axios.put(url, {issueUrl: this.newIssueUrl}, this.axiosConfig).then(res => {
+                    vm.newIssueUrl = '';
+                    vm.$refs.formAlertsList.fetchRows();
+                    vm.$refs.newIssueUrlDialog.hide();
+                    vm.$root.loading = 0;
+                    moqui.notifyMessages([{message:notiMsg, type:'success'}], null, null);
+                }).catch(err => {
+                    vm.$root.loading = 0;
+                    moqui.handleAjaxError(err.response.request, 'error', err.response.data)
+                })
+            })
+        },
+        deleteIssueUrl(alertId){
+            var vm =this;
+            const url = '/rest/s1/tailorsoft/alerts/' + alertId;
+            const notiMsg = 'Alert Issue URL deleted correctly!';
+
+            this.$root.loading = 1;
+
+            this.$nextTick().then(() => { //Avoid the annulment of the $root.loading value setted to 1
+                axios.put(url, {issueUrl: ''}, this.axiosConfig).then(res => {
+                    vm.$refs.formAlertsList.fetchRows();
+                    vm.$root.loading = 0;
+                    moqui.notifyMessages([{message:notiMsg, type:'success'}], null, null);
+                }).catch(err => {
+                    vm.$root.loading = 0;
+                    moqui.handleAjaxError(err.response.request, 'error', err.response.data)
+                })
+            })
         },
         formatNumber(num){
           return parseFloat(num).toFixed(2);

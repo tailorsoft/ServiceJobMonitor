@@ -54,6 +54,7 @@
         <field name="thruDate" type="date-time"/>
         <field name="value" type="number-float"/>
         <field name="notification" type="text-medium"/>
+        <field name="issueUrl" type="text-medium"/>
         <field name="statusId" type="id"/>
         <relationship type="one" title="AlertStatus" related="moqui.basic.StatusItem" short-alias="status"/>
         <seed-data>
