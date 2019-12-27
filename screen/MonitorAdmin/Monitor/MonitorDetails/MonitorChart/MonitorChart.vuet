@@ -1,16 +1,37 @@
-<div class="ts-container">
+<div >
     <div class="monitorTitle">
         <span v-if="monitor">{{monitor.title}}</span>
     </div>
     <div class="monitorContainer">
         <div class="monitorSidebar">
-            <div class="sidebarHeader"><span id="sideAlertsCount">{{alertCount}}</span> open alerts</div>
+            <div class="sidebarHeader">Alerts</div>
             <div class="sidebarBody" id="sidebarAlertsContainer">
-                <div v-for="alert in alerts" class="sideAlert">
+                <div v-if="selectedAlert">
+                    <div class="sideAlert">
+                        <span v-on:click="selectAlert(null)">X</span> {{selectedAlert.fromDate}}
+                    </div>
+                    <div >
+                        <div class="side-alert-body">
+                            <span class="side-alert-label">status</span>
+                            <div>{{selectedAlert.status}}</div>
+                        </div>
+
+                        <div class="side-alert-body">
+                            <span class="side-alert-label"> alertid</span>
+                            <div>{{selectedAlert.id}}</div>
+                        </div>
+                        <div class="side-alert-body">
+                            <span class="side-alert-label">Events</span>
+                        </div>
+
+                    </div>
+                </div>
+                <div v-else v-for="alert in alerts" class="sideAlert" v-on:click="selectAlert(alert)">
                     {{alert.fromDate}}
                 </div>
             </div>
         </div>
+
         <div class="monitorChart">
             <div class="chartHeader">
                 <div>Show From</div>
