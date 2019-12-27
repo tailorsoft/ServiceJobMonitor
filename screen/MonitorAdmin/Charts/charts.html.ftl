@@ -3,7 +3,6 @@
 <div>
     <div id="chartsContainer">
     </div>
-    <script src="/tsstatic/js/main.js"></script>
     <script>
         fetchData(DaysOld, new Date(Date.now() + 1000 * 60 * 60 * 24));
 
