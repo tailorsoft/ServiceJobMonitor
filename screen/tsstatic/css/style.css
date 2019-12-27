@@ -296,3 +296,12 @@
     border: none;
     border-bottom-color: transparent;
 }
+
+.side-alert-label {
+    color: #CCCCCC;
+}
+
+.side-alert-body {
+    border-bottom: 1px solid #DDDDDD;
+    padding: 15px;
+}
