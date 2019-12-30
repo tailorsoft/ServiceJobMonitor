@@ -1,0 +1,15 @@
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd">
+    <!-- see the mantle.shipment.ShipmentServices.send#ShipmentStoreEmail service for email parameter prep and call to send this email -->
+    <parameter name="monitorId"/>
+    <actions>
+        <set field="rootUrl" from="org.moqui.impl.context.WebFacadeImpl.getWebappRootUrl(sri?.webappName ?: 'webroot', null, true, false, ec)"/>
+        <set field="notificationData" from="bodyParameters.message" />
+        <log message="web ==== ${ec.factory.getStatusMap()}" />
+    </actions>
+    <widgets>
+        <render-mode>
+            <text type="html" location="component://tailorsoft-timeseries/screen/email/Notification.html.ftl"/>
+        </render-mode>
+    </widgets>
+</screen>
