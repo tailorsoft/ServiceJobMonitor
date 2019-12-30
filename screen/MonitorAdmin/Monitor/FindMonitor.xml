@@ -9,6 +9,29 @@
 
     <transition name="createMonitor">
         <actions>
+            <!-- Validations -->
+            <if condition="monitorId == ''">
+                <message type="danger">Error: Monitor Id can't be empty, please provide a valid Monitor Id value.</message>
+                <return/>
+            </if>
+
+            <script>
+                def monitorIdIsValid = monitorId.matches("^[a-zA-Z0-9*_-]+\$")
+            </script>
+            <if condition="!monitorIdIsValid">
+                <message type="danger">Error: Monitor Id can only contains numbers, letters and underscore ( _ ) character, please don't use spaces and special characters.</message>
+                <return/>
+            </if>
+
+            <if condition="valuePath == ''">
+                <message type="danger">Error: Value Path can't be empty, please provide a valid Monitor Id value.</message>
+                <return/>
+            </if>
+            <!-- End Validations-->
+
+            <!-- Monitor -->
+            <set field="indexName" from="monitorId"/>
+
             <!-- Monitor Bounds -->
             <set field="algorithmEnumId" value="ALGO_BOUNDS"/>
 
@@ -45,7 +68,7 @@
                 <field name="monitorId"><default-field title="ID"><text-line size="30"/></default-field></field>
                 <field name="jobName">
                     <default-field title="Job Name">
-                        <drop-down>
+                        <drop-down allow-empty="true">
                             <entity-options key="${jobName}" text="${jobName}">
                                 <entity-find entity-name="moqui.service.job.ServiceJob">
                                     <order-by field-name="jobName"/>
@@ -55,7 +78,6 @@
                     </default-field></field>
                 <field name="title"><default-field title="Title"><text-line size="120"/></default-field></field>
                 <field name="valuePath"><default-field title="Value Path"><text-line size="30"/></default-field></field>
-                <field name="indexName"><default-field title="Index Name"><text-line size="30"/></default-field></field>
                 <field name="statusId">
                     <default-field title="Status Id">
                         <drop-down>
