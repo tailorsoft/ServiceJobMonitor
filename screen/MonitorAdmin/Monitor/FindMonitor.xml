@@ -37,12 +37,13 @@
 
             <!-- Notification Topic-->
             <set field="receiveNotifications" value="Y"/>
-            <set field="description" from="monitorId + 'topic'"/>
+            <set field="description" from="monitorId + '_topic'"/>
             <set field="typeString" value="danger"/>
             <set field="topic" from="monitorId"/>
             <set field="showAlert" value="Y"/>
             <set field="titleTemplate" value="Monitor ${monitorId} out of bounds, value: ${value}"/>
             <set field="persistOnSend" value="Y"/>
+            <set field="emailTemplateId" value="ALERT_NOTIFICATION"/>
 
             <!-- Saving Monitor-->
             <service-call name="create#tailorsoft.timeseries.Monitor" in-map="context"/>
