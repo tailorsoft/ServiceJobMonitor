@@ -67,4 +67,16 @@
             persistOnSend="Y"
     />
 
+    <emailTemplates
+            subject="Monitor ${bodyParameters.message.monitorId} out of bounds. value [${bodyParameters.message.value}]"
+            bodyScreenLocation="component://tailorsoft-timeseries/screen/email/Notification.xml"
+            sendPartial="Y"
+            emailServerId="SYSTEM"
+            fromName="Moqui notification"
+            emailTemplateId="ALERT_NOTIFICATION"
+            emailTypeEnumId="EMT_NOTIFICATION"
+            fromAddress="noreply@moqui.org"
+    />
+
+
 </entity-facade-xml>
