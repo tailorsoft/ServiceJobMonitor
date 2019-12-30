@@ -49,7 +49,7 @@ function renderVega(data, elementId) {
     }).length > 0;
 
   const alerts = data.alerts.map(alert => {
-    alert.color = alert.statusId === "TsOpen" ? "#D9534F" : "#FF9800";
+    alert.color = alert.statusId === "TsOpen" ? "#D9534F" : "#5cb85c";
 
     return alert;
   });

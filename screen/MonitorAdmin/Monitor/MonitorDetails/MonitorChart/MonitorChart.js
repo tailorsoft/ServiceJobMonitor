@@ -56,7 +56,6 @@ define("Monitor", {
         .get(url)
         .then(res => {
           this.data = res.data.value[0];
-          console.log(this.data.alerts)
           this.alerts = this.data.alerts.map(alert => {
             return {
               id: alert.id,
@@ -64,7 +63,7 @@ define("Monitor", {
               thrumDate: moment(alert.thruDate).format("DD MMM, h:mm a"),
               status: alert.statusId
             };
-          });
+          }).reverse();
 
           renderVega(this.data, "chartjsContainer");
           this.alertCount = this.alerts.length;
