@@ -160,7 +160,7 @@
 }
 
 .monitorSidebar {
-    width: 220px;
+    width: 240px;
     background: #FFFFFF 0% 0% no-repeat padding-box;
     border: 1px solid #DDDDDD;
     border-radius: 4px;
@@ -250,6 +250,15 @@
     line-height: 48px;
     padding-left: 14px;
     border-bottom: 1px solid #DDDDDD;;
+}
+
+.sideAlertBack {
+    margin-right: 13px;
+    cursor: pointer;
+}
+
+.sideAlert.selected {
+    background-color: #fbeded;
 }
 
 /*

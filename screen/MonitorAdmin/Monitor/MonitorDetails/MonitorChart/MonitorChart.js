@@ -35,7 +35,6 @@ define("Monitor", {
         .get(url)
         .then(res => {
           vm.monitor = res.data;
-          console.log(vm.monitor);
         })
         .catch(err => {
           console.log(err);
@@ -60,8 +59,9 @@ define("Monitor", {
             return {
               id: alert.id,
               fromDate: moment(alert.fromDate).format("DD MMM, h:mm a"),
-              thrumDate: moment(alert.thruDate).format("DD MMM, h:mm a"),
-              status: alert.statusId
+              thruDate: alert.thruDate ? moment(alert.thruDate).format("DD MMM, h:mm a") : null,
+              status: alert.statusId,
+              value: parseFloat(alert.value).toFixed(2)
             };
           }).reverse();
 

@@ -1,4 +1,4 @@
-<div >
+<div>
     <div class="monitorTitle">
         <span v-if="monitor">{{monitor.title}}</span>
     </div>
@@ -7,10 +7,11 @@
             <div class="sidebarHeader">Alerts</div>
             <div class="sidebarBody" id="sidebarAlertsContainer">
                 <div v-if="selectedAlert">
-                    <div class="sideAlert">
-                        <span v-on:click="selectAlert(null)">X</span> {{selectedAlert.fromDate}}
+                    <div class="sideAlert selected">
+                        <i class="fas fa-arrow-left sideAlertBack" v-on:click="selectAlert(null)"></i>
+                        {{selectedAlert.fromDate}}
                     </div>
-                    <div >
+                    <div>
                         <div class="side-alert-body">
                             <span class="side-alert-label">status</span>
                             <div>{{selectedAlert.status}}</div>
@@ -22,6 +23,14 @@
                         </div>
                         <div class="side-alert-body">
                             <span class="side-alert-label">Events</span>
+                            <div>
+                                <div v-if="selectedAlert.thruDate">
+                                    <div><strong>Closed</strong></div>
+                                    <div>{{selectedAlert.thruDate}}</div>
+                                </div>
+                                <div><strong>Open</strong></div>
+                                <div>{{selectedAlert.fromDate}} - value: {{selectedAlert.value}}</div>
+                            </div>
                         </div>
 
                     </div>
