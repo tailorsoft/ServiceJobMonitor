@@ -38,19 +38,17 @@
                   location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorTopBar.html.ftl"/>
         </render-mode>
 
-        <container style="ts-container monitorTitle">
+        <container style="monitorTitle">
             <label text="${monitor.title}" />
         </container>
 
         <container-row style="settingsContainer">
             <row-col md="3">
-                <container style="settingMenuItem">
-                    <link url="monitorSettings" text="Monitor Settings" link-type="anchor"
-                          parameter-map="[monitorId:monitorId]"/>
-                </container>
-                <container style="settingMenuItem active">
-                    <label text="Bounds"/>
-                </container>
+                <widgets>
+                    <render-mode>
+                        <text type="html,vuet" template="true" location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorSideMenu.html.ftl"/>
+                    </render-mode>
+                </widgets>
             </row-col>
             <row-col md="8">
                 <form-single name="UpdateMonitor" map="monitorBounds" transition="update" dynamic="true">
