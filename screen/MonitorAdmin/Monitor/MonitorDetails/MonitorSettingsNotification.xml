@@ -1,0 +1,60 @@
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        require-authentication="anonymous-all"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Monitor Settings Notifications" default-menu-index="6">
+
+    <parameter name="monitorId" required="true"/>
+
+    <transition name="topicSubscriptions">
+        <service-call name="store#moqui.security.user.NotificationTopicUser" in-map="context + [userId:ec.user.userId]"/>
+        <default-response url="."/>
+    </transition>
+    <actions>
+        <entity-find-one entity-name="tailorsoft.timeseries.Monitor" value-field="monitor"/>
+        <entity-find entity-name="moqui.security.user.NotificationTopic" list="notificationTopicList">
+            <econdition field-name="topic" from="monitorId"/>
+            <order-by field-name="description"/></entity-find>
+    </actions>
+
+    <widgets>
+        <render-mode>
+            <text type="html,vuet" location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorTopBar.html.ftl"/>
+        </render-mode>
+        <container style="monitorTitle">
+            <label text="${monitor.title}" />
+        </container>
+
+        <container-row>
+            <row-col md="3">
+                <widgets>
+                    <render-mode>
+                        <text type="html,vuet" template="true" location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorSideMenu.html.ftl"/>
+                    </render-mode>
+                </widgets>
+            </row-col>
+            <row-col md="8">
+                <form-list name="NotificationTopicList" list="notificationTopicList" transition="topicSubscriptions" multi="true">
+                    <row-actions>
+                        <entity-find-one entity-name="moqui.security.user.NotificationTopicUser" value-field="notTopicUser">
+                            <field-map field-name="topic"/><field-map field-name="userId" from="ec.user.userId"/></entity-find-one>
+                    </row-actions>
+                    <field name="userId"><default-field><hidden/></default-field></field>
+                    <field name="topic"><default-field><hidden/></default-field></field>
+                    <field name="description"><default-field title="Topic"><display/></default-field></field>
+                    <field name="receiveNotifications" from="notTopicUser?.receiveNotifications ?: receiveNotifications ?: 'N'"><default-field title="Receive">
+                        <radio><option key="Y"/><option key="N"/></radio>
+                    </default-field></field>
+                    <field name="allNotifications" from="notTopicUser?.allNotifications ?: allNotifications ?: 'N'"><default-field title="All">
+                        <radio><option key="Y"/><option key="N"/></radio>
+                    </default-field></field>
+                    <field name="emailNotifications" from="notTopicUser?.emailNotifications ?: 'N'">
+                        <conditional-field condition="emailTemplateId"><radio><option key="Y"/><option key="N"/></radio></conditional-field>
+                        <default-field title="Email"><display text=""/></default-field>
+                    </field>
+                    <field name="submitButton"><default-field><submit text="Update"/></default-field></field>
+                </form-list>
+            </row-col>
+        </container-row>
+
+    </widgets>
+</screen>
