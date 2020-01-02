@@ -31,7 +31,8 @@
                                               transitionName="deleted"/>
 
             <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="MonitorDeleted"
-                                              toStatusId="MonitorActive"/>
+                                              toStatusId="MonitorActive"
+                                              transitionName="activated"/>
         </seed-data>
         <field name="algorithmEnumId" type="id"/>
         <seed-data>
@@ -86,15 +87,15 @@
         </member-entity>
         <alias name="monitorStatusId" entity-alias="Monitor" field="statusId"/>
         <alias name="id" entity-alias="Alert" field="id"/>
-        <alias name="monitorId" entity-alias="Alert" field="monitorId" />
-        <alias name="jobName" entity-alias="Alert" field="jobName" />
-        <alias name="jobRunId" entity-alias="Alert" field="jobRunId" />
-        <alias name="fromDate" entity-alias="Alert" field="fromDate" />
-        <alias name="thruDate" entity-alias="Alert" field="thruDate" />
-        <alias name="value" entity-alias="Alert" field="value" />
-        <alias name="notification" entity-alias="Alert" field="notification" />
-        <alias name="issueUrl" entity-alias="Alert" field="issueUrl" />
-        <alias name="statusId" entity-alias="Alert" field="statusId" />
+        <alias name="monitorId" entity-alias="Alert" field="monitorId"/>
+        <alias name="jobName" entity-alias="Alert" field="jobName"/>
+        <alias name="jobRunId" entity-alias="Alert" field="jobRunId"/>
+        <alias name="fromDate" entity-alias="Alert" field="fromDate"/>
+        <alias name="thruDate" entity-alias="Alert" field="thruDate"/>
+        <alias name="value" entity-alias="Alert" field="value"/>
+        <alias name="notification" entity-alias="Alert" field="notification"/>
+        <alias name="issueUrl" entity-alias="Alert" field="issueUrl"/>
+        <alias name="statusId" entity-alias="Alert" field="statusId"/>
     </view-entity>
 
 </entities>
