@@ -1,17 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen require-authentication="anonymous-all" default-menu-title="Timeseries Monitors" default-menu-index="1">
 
-    <transition name="editMonitor"><default-response url="../MonitorDetails"/></transition>
+    <transition name="editMonitor">
+        <default-response url="../MonitorDetails"/>
+    </transition>
 
     <transition name="listMonitors">
+        <actions>
+            <log message="==== transition here ${delete}"/>
+            <if condition="delete">
+                <log message="==== delete here"/>
+            </if>
+        </actions>
+
         <default-response url="."/>
     </transition>
+
+    <transition name="deleteMonitor">
+        <actions>
+            <service-call name="update#tailorsoft.timeseries.Monitor"
+                          in-map="[monitorId: monitorId, statusId: 'MonitorDeleted']"/>
+        </actions>
+        <default-response url="."/>
+    </transition>
+
 
     <transition name="createMonitor">
         <actions>
             <!-- Validations -->
             <if condition="monitorId == ''">
-                <message type="danger">Error: Monitor Id can't be empty, please provide a valid Monitor Id value.</message>
+                <message type="danger">Error: Monitor Id can't be empty, please provide a valid Monitor Id value.
+                </message>
                 <return/>
             </if>
 
@@ -19,12 +38,15 @@
                 def monitorIdIsValid = monitorId.matches("^[a-zA-Z0-9*_-]+\$")
             </script>
             <if condition="!monitorIdIsValid">
-                <message type="danger">Error: Monitor Id can only contains numbers, letters and underscore ( _ ) character, please don't use spaces and special characters.</message>
+                <message type="danger">Error: Monitor Id can only contains numbers, letters and underscore ( _ )
+                    character, please don't use spaces and special characters.
+                </message>
                 <return/>
             </if>
 
             <if condition="valuePath == ''">
-                <message type="danger">Error: Value Path can't be empty, please provide a valid Monitor Id value.</message>
+                <message type="danger">Error: Value Path can't be empty, please provide a valid Monitor Id value.
+                </message>
                 <return/>
             </if>
             <!-- End Validations-->
@@ -57,16 +79,21 @@
         <default-response url="."/>
     </transition>
 
+
     <actions>
         <entity-find entity-name="tailorsoft.timeseries.Monitor" list="monitorList">
-            <search-form-inputs/>
+            <econdition field-name="statusId" value="MonitorDeleted"  operator="not-equals"/>
         </entity-find>
     </actions>
 
     <widgets>
         <container-dialog id="CreateDialog" button-text="New Monitor">
             <form-single name="CreateMonitor" transition="createMonitor">
-                <field name="monitorId"><default-field title="ID"><text-line size="30"/></default-field></field>
+                <field name="monitorId">
+                    <default-field title="ID">
+                        <text-line size="30"/>
+                    </default-field>
+                </field>
                 <field name="jobName">
                     <default-field title="Job Name">
                         <drop-down allow-empty="true">
@@ -76,9 +103,18 @@
                                 </entity-find>
                             </entity-options>
                         </drop-down>
-                    </default-field></field>
-                <field name="title"><default-field title="Title"><text-line size="120"/></default-field></field>
-                <field name="valuePath"><default-field title="Value Path"><text-line size="30"/></default-field></field>
+                    </default-field>
+                </field>
+                <field name="title">
+                    <default-field title="Title">
+                        <text-line size="120"/>
+                    </default-field>
+                </field>
+                <field name="valuePath">
+                    <default-field title="Value Path">
+                        <text-line size="30"/>
+                    </default-field>
+                </field>
                 <field name="statusId">
                     <default-field title="Status Id">
                         <drop-down>
@@ -95,10 +131,26 @@
                         <display text="Bounds"/>
                     </default-field>
                 </field>
-                <field name="upper"><default-field title="Upper Bound"><text-line size="30"/></default-field></field>
-                <field name="lower"><default-field title="Lower Bound"><text-line size="30"/></default-field></field>
-                <field name="count"><default-field title="Count"><text-line size="30"/></default-field></field>
-                <field name="submitButton"><default-field title="Create"><submit/></default-field></field>
+                <field name="upper">
+                    <default-field title="Upper Bound">
+                        <text-line size="30"/>
+                    </default-field>
+                </field>
+                <field name="lower">
+                    <default-field title="Lower Bound">
+                        <text-line size="30"/>
+                    </default-field>
+                </field>
+                <field name="count">
+                    <default-field title="Count">
+                        <text-line size="30"/>
+                    </default-field>
+                </field>
+                <field name="submitButton">
+                    <default-field title="Create">
+                        <submit/>
+                    </default-field>
+                </field>
             </form-single>
         </container-dialog>
         <container>
@@ -107,7 +159,20 @@
                 <auto-fields-entity entity-name="tailorsoft.timeseries.Monitor" field-type="find-display"/>
                 <field name="monitorId">
                     <default-field>
-                        <link url="editMonitor" text="${monitorId}" link-type="anchor" parameter-map="[monitorId:monitorId]"/>
+                        <link url="editMonitor" text="${monitorId}" link-type="anchor"
+                              parameter-map="[monitorId:monitorId]"/>§
+                    </default-field>
+                </field>
+                <field name="delete">
+                    <default-field title="Delete">
+                        <container-dialog id="DeleteMonitorDialog" icon="glyphicon glyphicon-trash"
+                                          button-text="Delete">
+                            <container>
+                                <label text="are you sure?"/>
+                            </container>
+                            <link url="deleteMonitor?monitorId=${monitorId}" icon="glyphicon glyphicon-trash"
+                                  text="Delete"/>
+                        </container-dialog>
                     </default-field>
                 </field>
             </form-list>

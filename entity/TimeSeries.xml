@@ -23,6 +23,14 @@
                                     statusTypeId="MonitorStatus"/>
             <moqui.basic.StatusItem description="Monitor Paused" sequenceNum="2" statusId="MonitorPaused"
                                     statusTypeId="MonitorStatus"/>
+            <moqui.basic.StatusItem description="Monitor Deleted" sequenceNum="3" statusId="MonitorDeleted"
+                                    statusTypeId="MonitorStatus"/>
+            <!-- flow transition            -->
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="MonitorActive" toStatusId="MonitorDeleted"
+                                              transitionName="deleted"/>
+
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="MonitorDeleted" toStatusId="MonitorActive"
+                                              transitionName="activated"/>
         </seed-data>
         <field name="algorithmEnumId" type="id"/>
         <seed-data>

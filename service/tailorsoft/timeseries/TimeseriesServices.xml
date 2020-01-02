@@ -34,6 +34,12 @@ along with this software (see the LICENSE.md file). If not, see
                 <!-- No monitor found, abort -->
                 <return/>
             </if>
+
+            <if condition="monitor.status != 'MonitorActive'" >
+                <!-- monitor is not active -->
+                <return/>
+            </if>
+
             <set field="jsonResults" from="new groovy.json.JsonSlurper().parseText(results)"/>
 
             <!-- TODO, switch to JsonPath: https://github.com/json-path/JsonPath -->
@@ -459,6 +465,11 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="!monitor">
                 <log message="no monitor '${monitorId}' found, abort"/>
                 <!-- No monitor found, abort -->
+                <return/>
+            </if>
+
+            <if condition="monitor.status != 'MonitorActive'" >
+                <!-- monitor is not active -->
                 <return/>
             </if>
 
