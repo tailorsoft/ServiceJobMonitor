@@ -501,6 +501,7 @@ along with this software (see the LICENSE.md file). If not, see
         </out-parameters>
         <actions>
             <entity-find entity-name="tailorsoft.timeseries.MonitorAlertDetails" list="alerts">
+                <econdition field-name="monitorStatusId" value="MonitorDeleted"  operator="not-equals"/>
             </entity-find>
         </actions>
     </service>
