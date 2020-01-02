@@ -26,11 +26,12 @@
             <moqui.basic.StatusItem description="Monitor Deleted" sequenceNum="3" statusId="MonitorDeleted"
                                     statusTypeId="MonitorStatus"/>
             <!-- flow transition            -->
-            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="MonitorActive" toStatusId="MonitorDeleted"
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="MonitorActive"
+                                              toStatusId="MonitorDeleted"
                                               transitionName="deleted"/>
 
-            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="MonitorDeleted" toStatusId="MonitorActive"
-                                              transitionName="activated"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="MonitorDeleted"
+                                              toStatusId="MonitorActive"/>
         </seed-data>
         <field name="algorithmEnumId" type="id"/>
         <seed-data>
@@ -77,5 +78,23 @@
         </seed-data>
         <relationship type="many" related="tailorsoft.timeseries.Monitor"/>
     </entity>
+
+    <view-entity entity-name="MonitorAlertDetails" package="tailorsoft.timeseries">
+        <member-entity entity-alias="Alert" entity-name="tailorsoft.timeseries.MonitorAlert"/>
+        <member-entity entity-alias="Monitor" entity-name="tailorsoft.timeseries.Monitor" join-from-alias="Alert">
+            <key-map field-name="monitorId"/>
+        </member-entity>
+        <alias name="monitorStatusId" entity-alias="Monitor" field="statusId"/>
+        <alias name="id" entity-alias="Alert" field="id"/>
+        <alias name="monitorId" entity-alias="Alert" field="monitorId" />
+        <alias name="jobName" entity-alias="Alert" field="jobName" />
+        <alias name="jobRunId" entity-alias="Alert" field="jobRunId" />
+        <alias name="fromDate" entity-alias="Alert" field="fromDate" />
+        <alias name="thruDate" entity-alias="Alert" field="thruDate" />
+        <alias name="value" entity-alias="Alert" field="value" />
+        <alias name="notification" entity-alias="Alert" field="notification" />
+        <alias name="issueUrl" entity-alias="Alert" field="issueUrl" />
+        <alias name="statusId" entity-alias="Alert" field="statusId" />
+    </view-entity>
 
 </entities>

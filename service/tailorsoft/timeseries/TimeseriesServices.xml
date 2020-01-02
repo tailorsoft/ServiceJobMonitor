@@ -333,7 +333,9 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <set field="res" from="[]"/>
             <!-- TODO restrict by Org -->
-            <entity-find entity-name="tailorsoft.timeseries.Monitor" list="monitorList"/>
+            <entity-find entity-name="tailorsoft.timeseries.Monitor" list="monitorList">
+                <econdition field-name="statusId" value="MonitorDeleted"  operator="not-equals"/>
+            </entity-find>
 
             <set field="fromDateFormated" from="[]"/>
             <set field="thruDateFormated" from="[]"/>
@@ -486,6 +488,20 @@ along with this software (see the LICENSE.md file). If not, see
                         in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, monitorId: monitor.monitorId, ]"/>
             </if>
 
+        </actions>
+    </service>
+
+    <!-- get alerts by active monitor   -->
+    <service verb="get" noun="Alerts" authenticate="anonymous-view" >
+        <in-parameters>
+
+        </in-parameters>
+        <out-parameters>
+            <parameter name="alerts"/>
+        </out-parameters>
+        <actions>
+            <entity-find entity-name="tailorsoft.timeseries.MonitorAlertDetails" list="alerts">
+            </entity-find>
         </actions>
     </service>
 

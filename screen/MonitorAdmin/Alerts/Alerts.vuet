@@ -1,5 +1,5 @@
 <div >
-    <form-list name="alerts" rows="/rest/s1/tailorsoft/alerts" action=""  ref="formAlertsList">
+    <form-list name="alerts" :rows="alerts" action=""  ref="formAlertsList">
         <template slot="header">
             <th>Status Id</th>
             <th>Issue Url</th>

@@ -16,7 +16,7 @@
 
     <resource name="alerts" require-authentication="anonymous-all">
         <method type="get">
-            <entity name="tailorsoft.timeseries.MonitorAlert" operation="list"/>
+            <service name="tailorsoft.timeseries.TimeseriesServices.get#Alerts"/>
         </method>
         <id name="id">
             <method type="put"><entity name="tailorsoft.timeseries.MonitorAlert" operation="update"/></method>

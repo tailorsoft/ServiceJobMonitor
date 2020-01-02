@@ -19,10 +19,18 @@ define('Alerts', {
         librariesPromises.push(this.loadAxiosLibrary());
 
         Promise.all(librariesPromises).then(() => {
-
+            this.getAlerts();
         })
     },
+
     methods: {
+        getAlerts(){
+            const url = '/rest/s1/tailorsoft/alerts';
+
+            return axios.get(url).then((response)=>{
+                this.alerts = response.data.alerts;
+            })
+        },
         showIssueUrlDialog(alertId){
             this.currentAlertId = alertId;
             this.showNewIssueUrlDialog = true;
@@ -45,6 +53,7 @@ define('Alerts', {
                     vm.$refs.newIssueUrlDialog.hide();
                     vm.$root.loading = 0;
                     moqui.notifyMessages([{message:notiMsg, type:'success'}], null, null);
+                    this.getAlerts()
                 }).catch(err => {
                     vm.$root.loading = 0;
                     moqui.handleAjaxError(err.response.request, 'error', err.response.data)
@@ -63,6 +72,7 @@ define('Alerts', {
                     vm.$refs.formAlertsList.fetchRows();
                     vm.$root.loading = 0;
                     moqui.notifyMessages([{message:notiMsg, type:'success'}], null, null);
+                    this.getAlerts()
                 }).catch(err => {
                     vm.$root.loading = 0;
                     moqui.handleAjaxError(err.response.request, 'error', err.response.data)
