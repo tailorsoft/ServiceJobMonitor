@@ -35,7 +35,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <return/>
             </if>
 
-            <if condition="monitor.status != 'MonitorActive'" >
+            <if condition="monitor.statusId != 'MonitorActive'" >
                 <!-- monitor is not active -->
                 <return/>
             </if>
@@ -470,7 +470,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <return/>
             </if>
 
-            <if condition="monitor.status != 'MonitorActive'" >
+            <if condition="monitor.statusId != 'MonitorActive'" >
                 <!-- monitor is not active -->
                 <return/>
             </if>
