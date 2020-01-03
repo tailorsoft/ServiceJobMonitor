@@ -65,6 +65,7 @@
         <field name="value" type="number-float"/>
         <field name="notification" type="text-medium"/>
         <field name="issueUrl" type="text-medium"/>
+        <field name="partyId" type="id"/>
         <field name="statusId" type="id"/>
         <relationship type="one" title="AlertStatus" related="moqui.basic.StatusItem" short-alias="status"/>
         <seed-data>
@@ -78,6 +79,7 @@
                                               transitionName="solved"/>
         </seed-data>
         <relationship type="many" related="tailorsoft.timeseries.Monitor"/>
+        <relationship type="one" related="mantle.party.Party" short-alias="party"/>
     </entity>
 
     <view-entity entity-name="MonitorAlertDetails" package="tailorsoft.timeseries">
@@ -85,7 +87,22 @@
         <member-entity entity-alias="Monitor" entity-name="tailorsoft.timeseries.Monitor" join-from-alias="Alert">
             <key-map field-name="monitorId"/>
         </member-entity>
+        <member-entity entity-alias="PTY" entity-name="mantle.party.Party" join-from-alias="Alert" join-optional="true">
+            <key-map field-name="partyId"/>
+        </member-entity>
+        <member-entity entity-alias="ORG" entity-name="mantle.party.Organization" join-from-alias="PTY" join-optional="true">
+            <key-map field-name="partyId"/>
+        </member-entity>
+        <member-entity entity-alias="PER" entity-name="mantle.party.Person" join-from-alias="PTY" join-optional="true">
+            <key-map field-name="partyId"/>
+        </member-entity>
         <alias name="monitorStatusId" entity-alias="Monitor" field="statusId"/>
+        <alias name="partyName" function="concat_ws" type="text-medium"><complex-alias operator=",">
+            <complex-alias expression="' '"/>
+            <complex-alias-field entity-alias="ORG" field="organizationName"/>
+            <complex-alias-field entity-alias="PER" field="firstName"/>
+            <complex-alias-field entity-alias="PER" field="lastName"/>
+        </complex-alias></alias>
         <alias name="id" entity-alias="Alert" field="id"/>
         <alias name="monitorId" entity-alias="Alert" field="monitorId"/>
         <alias name="jobName" entity-alias="Alert" field="jobName"/>
@@ -95,7 +112,24 @@
         <alias name="value" entity-alias="Alert" field="value"/>
         <alias name="notification" entity-alias="Alert" field="notification"/>
         <alias name="issueUrl" entity-alias="Alert" field="issueUrl"/>
+        <alias name="partyId" entity-alias="Alert" field="partyId"/>
         <alias name="statusId" entity-alias="Alert" field="statusId"/>
     </view-entity>
 
+    <view-entity entity-name="PartyName" package="tailorsoft.timeseries">
+        <member-entity entity-alias="PTY" entity-name="mantle.party.Party"/>
+        <member-entity entity-alias="PER" entity-name="mantle.party.Person" join-from-alias="PTY" join-optional="true">
+            <key-map field-name="partyId"/></member-entity>
+        <member-entity entity-alias="ORG" entity-name="mantle.party.Organization" join-from-alias="PTY" join-optional="true">
+            <key-map field-name="partyId"/></member-entity>
+        <alias name="partyId" entity-alias="PTY" field="partyId"/>
+        <alias name="partyName" function="concat_ws" type="text-medium">
+            <complex-alias operator=",">
+                <complex-alias expression="' '"/>
+                <complex-alias-field entity-alias="ORG" field="organizationName"/>
+                <complex-alias-field entity-alias="PER" field="firstName"/>
+                <complex-alias-field entity-alias="PER" field="lastName"/>
+            </complex-alias>
+        </alias>
+    </view-entity>
 </entities>

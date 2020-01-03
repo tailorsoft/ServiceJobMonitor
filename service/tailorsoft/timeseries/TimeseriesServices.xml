@@ -506,4 +506,25 @@ along with this software (see the LICENSE.md file). If not, see
         </actions>
     </service>
 
+    <service verb="search" noun="Parties" authenticate="anonymous-view">
+        <in-parameters>
+            <parameter name="term"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="options"/>
+        </out-parameters>
+        <actions>
+            <if condition="term">
+                <then>
+                    <entity-find entity-name="tailorsoft.timeseries.PartyName" list="options">
+                        <econdition field-name="partyName" operator="like" value="%${term}%" ignore-case="true"/>
+                    </entity-find>
+                </then>
+                <else>
+                    <log level="warn" message="Can't search parties by an empty term."/>
+                </else>
+            </if>
+        </actions>
+    </service>
+
 </services>

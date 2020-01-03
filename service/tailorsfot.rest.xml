@@ -22,5 +22,10 @@
             <method type="put"><entity name="tailorsoft.timeseries.MonitorAlert" operation="update"/></method>
         </id>
     </resource>
+    <resource name="parties" require-authentication="anonymous-all">
+        <method type="post">
+            <service name="tailorsoft.timeseries.TimeseriesServices.search#Parties"/>
+        </method>
+    </resource>
 
 </resource>

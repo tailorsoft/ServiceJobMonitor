@@ -9,9 +9,13 @@ define('Alerts', {
                 }
             },
             showNewIssueUrlDialog: false,
-            containerDialogKey: 0,
+            showPartyAssigmentDialog: false,
+            containerIssueUrlDialogKey: 0, //Helps to re-render dialog component
+            containerPartyAssigmentDialogKey: 9999, //Helps to re-render dialog component
             currentAlertId: null,
-            newIssueUrl: ''
+            newIssueUrl: '',
+            partyIdSelected: '',
+            partiesList: []
         }
     },
     mounted: function () {
@@ -36,7 +40,7 @@ define('Alerts', {
             this.showNewIssueUrlDialog = true;
 
             this.$nextTick().then(() => {
-                this.containerDialogKey += 1;
+                this.containerIssueUrlDialogKey += 1;
             });
         },
         createIssueUrl(){
@@ -69,6 +73,54 @@ define('Alerts', {
 
             this.$nextTick().then(() => { //Avoid the annulment of the $root.loading value setted to 1
                 axios.put(url, {issueUrl: ''}, this.axiosConfig).then(res => {
+                    vm.$refs.formAlertsList.fetchRows();
+                    vm.$root.loading = 0;
+                    moqui.notifyMessages([{message:notiMsg, type:'success'}], null, null);
+                    this.getAlerts()
+                }).catch(err => {
+                    vm.$root.loading = 0;
+                    moqui.handleAjaxError(err.response.request, 'error', err.response.data)
+                })
+            })
+        },
+        showPartyDialog(alertId){
+            this.currentAlertId = alertId;
+            this.showPartyAssigmentDialog = true;
+
+            this.$nextTick().then(() => {
+                this.containerPartyAssigmentDialogKey += 1;
+            });
+        },
+        assignPartyToAlert(){
+            var vm =this;
+            const url = '/rest/s1/tailorsoft/alerts/' + this.currentAlertId;
+            const notiMsg = 'Party assigned to alert correctly!';
+
+            this.$root.loading = 1;
+
+            this.$nextTick().then(() => { //Avoid the annulment of the $root.loading value setted to 1
+                axios.put(url, {partyId: this.partyIdSelected}, this.axiosConfig).then(res => {
+                    vm.partyIdSelected = '';
+                    vm.$refs.formAlertsList.fetchRows();
+                    vm.$refs.assignPartyDialog.hide();
+                    vm.$root.loading = 0;
+                    moqui.notifyMessages([{message:notiMsg, type:'success'}], null, null);
+                    this.getAlerts()
+                }).catch(err => {
+                    vm.$root.loading = 0;
+                    moqui.handleAjaxError(err.response.request, 'error', err.response.data)
+                })
+            })
+        },
+        deleteParty(alertId){
+            var vm =this;
+            const url = '/rest/s1/tailorsoft/alerts/' + alertId;
+            const notiMsg = 'Party deleted from alert correctly!';
+
+            this.$root.loading = 1;
+
+            this.$nextTick().then(() => { //Avoid the annulment of the $root.loading value setted to 1
+                axios.put(url, {partyId: ''}, this.axiosConfig).then(res => {
                     vm.$refs.formAlertsList.fetchRows();
                     vm.$root.loading = 0;
                     moqui.notifyMessages([{message:notiMsg, type:'success'}], null, null);

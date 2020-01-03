@@ -10,6 +10,7 @@
             <th>Thru Date</th>
             <th>Value</th>
             <th>Notification Id</th>
+            <th>Notified</th>
         </template>
         <template slot="row" slot-scope="props">
             <td>
@@ -47,10 +48,21 @@
             <td>
                 {{props.fields.notification}}
             </td>
+            <td>
+                <button v-if="!props.fields.partyId" @click="showPartyDialog(props.fields.id)" type="button" class="btn btn-link" style="padding-left: 0; padding-right: 0;">Add Party</button>
+                <template v-else>
+                    <span v-if="props.fields.partyName">
+                        {{props.fields.partyName}} [{{props.fields.partyId}}]
+                    </span>
+                    <span class="delete-icon-wrapper" @click="deleteParty(props.fields.id)">
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </span>
+                </template>
+            </td>
         </template>
     </form-list>
 
-    <container-dialog id="newIssueUrlDialog" title="Add an Issue URL" :open-dialog="showNewIssueUrlDialog" :key="containerDialogKey" ref="newIssueUrlDialog">
+    <container-dialog id="newIssueUrlDialog" title="Add an Issue URL" :open-dialog="showNewIssueUrlDialog" :key="containerIssueUrlDialogKey" ref="newIssueUrlDialog">
         <template slot="">
             <fieldset class="form-horizontal">
                 <div class="form-group">
@@ -63,6 +75,24 @@
                     <div class="col-sm-2 hidden-xs"></div>
                     <div class="col-sm-10">
                         <button @click="createIssueUrl()" type="submit" class="btn btn-primary btn-sm">Add URL</button>
+                    </div>
+                </div>
+            </fieldset>
+        </template>
+    </container-dialog>
+    <container-dialog id="assignPartyDialog" title="Assign Party To Be Notified" :open-dialog="showPartyAssigmentDialog" :key="containerPartyAssigmentDialogKey" ref="assignPartyDialog">
+        <template slot="">
+            <fieldset class="form-horizontal">
+                <div class="form-group">
+                    <label for="issueUrl" class="col-sm-2">Search Party</label>
+                    <div class="col-sm-10">
+                        <drop-down v-model="partyIdSelected" :allow-empty="true" optionsUrl="/rest/s1/tailorsoft/parties" :serverSearch="true" labelField="partyName" valueField="partyId"></drop-down>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 hidden-xs"></div>
+                    <div class="col-sm-10">
+                        <button @click="assignPartyToAlert()" type="submit" class="btn btn-primary btn-sm">Assign Party</button>
                     </div>
                 </div>
             </fieldset>
