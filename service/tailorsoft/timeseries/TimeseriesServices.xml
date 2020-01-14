@@ -195,7 +195,7 @@ along with this software (see the LICENSE.md file). If not, see
                             value           : value,
                             status          : 'open',
                             lastUpdatedStamp: new Date(),
-                            from            : 'cristyan.sv@gmail.com'
+                            from            : 'noreply@moqui.org'
                     ]
                     notificationId = ec
                             .makeNotificationMessage()
