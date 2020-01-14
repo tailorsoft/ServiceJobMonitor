@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2020 Tailorsoft. All Rights Reserved. -->
+<entity-facade-xml type="install">
+    <moqui.security.ArtifactGroup artifactGroupId="TIMESERIES_MONITOR" description="Time Series (via root screen)"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="TIMESERIES_MONITOR" artifactTypeEnumId="AT_XML_SCREEN" inheritAuthz="Y" artifactName="component://tailorsoft-timeseries/screen/MonitorAdmin.xml"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="TIMESERIES_MONITOR" artifactName="tailorsoft.timeseries..*" nameIsPattern="Y" artifactTypeEnumId="AT_SERVICE" inheritAuthz="Y"/>
+
+    <moqui.security.ArtifactAuthz artifactAuthzId="TIMESERIES_MONITOR_AUTHZ_ALL" userGroupId="ADMIN" artifactGroupId="TIMESERIES_MONITOR" authzTypeEnumId="AUTHZT_ALWAYS" authzActionEnumId="AUTHZA_ALL"/>
+</entity-facade-xml>
