@@ -14,7 +14,7 @@ along with this software (see the LICENSE.md file). If not, see
 -->
 <eecas xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/entity-eca-2.1.xsd">
-    <eeca id="TimeseriesJobRunCreate" entity="moqui.service.job.ServiceJobRun" on-create="true" on-update="true" on-delete="true" run-on-error="false" get-entire-entity="true" get-original-value="true">
+    <eeca id="ServiceJobMonitorJobRunCreate" entity="moqui.service.job.ServiceJobRun" on-create="true" on-update="true" on-delete="true" run-on-error="false" get-entire-entity="true" get-original-value="true">
         <condition><expression>results</expression></condition>
         <actions>
             <service-call name="tailorsoft.monitor.MonitorServices.process#JobRunResults" in-map="context" transaction="force-new" /></actions>
