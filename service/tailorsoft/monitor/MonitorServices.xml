@@ -58,12 +58,12 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
 
             <!-- store in elasticsearch -->
-            <service-call name="tailorsoft.timeseries.TimeseriesServices.save#Datapoint"
+            <service-call name="tailorsoft.monitor.MonitorServices.save#Datapoint"
                           in-map="[date:endTime, value:doubleValue, indexName:monitor.indexName]"/>
 
             <if condition="monitor.algorithmEnumId == 'ALGO_BOUNDS'">
                 <service-call
-                        name="tailorsoft.timeseries.TimeseriesServices.process#DatapointBounds"
+                        name="tailorsoft.monitor.MonitorServices.process#DatapointBounds"
                         in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, jobName:jobName, jobRunId: jobRunId, monitorId: monitor.monitorId, ]"/>
             </if>
         </actions>
@@ -479,12 +479,12 @@ along with this software (see the LICENSE.md file). If not, see
             <set field="endDate" from="new Date()"/>
 
             <!-- store in elasticsearch -->
-            <service-call name="tailorsoft.timeseries.TimeseriesServices.save#Datapoint"
+            <service-call name="tailorsoft.monitor.MonitorServices.save#Datapoint"
                           in-map="[date: endDate, value:doubleValue, indexName:monitor.indexName]"/>
 
             <if condition="monitor.algorithmEnumId == 'ALGO_BOUNDS'">
                 <service-call
-                        name="tailorsoft.timeseries.TimeseriesServices.process#DatapointBounds"
+                        name="tailorsoft.monitor.MonitorServices.process#DatapointBounds"
                         in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, monitorId: monitor.monitorId, ]"/>
             </if>
 

@@ -7,7 +7,7 @@
 
     <resource name="monitors">
         <method type="get">
-            <service name="tailorsoft.timeseries.TimeseriesServices.get#Monitors"/>
+            <service name="tailorsoft.monitor.MonitorServices.get#Monitors"/>
         </method>
         <id name="monitorId">
             <method type="get"><entity name="tailorsoft.timeseries.Monitor" operation="one"/></method>
@@ -16,7 +16,7 @@
 
     <resource name="alerts">
         <method type="get">
-            <service name="tailorsoft.timeseries.TimeseriesServices.get#Alerts"/>
+            <service name="tailorsoft.monitor.MonitorServices.get#Alerts"/>
         </method>
         <id name="id">
             <method type="put"><entity name="tailorsoft.timeseries.MonitorAlert" operation="update"/></method>
@@ -24,7 +24,7 @@
     </resource>
     <resource name="parties">
         <method type="post">
-            <service name="tailorsoft.timeseries.TimeseriesServices.search#Parties"/>
+            <service name="tailorsoft.monitor.MonitorServices.search#Parties"/>
         </method>
     </resource>
 

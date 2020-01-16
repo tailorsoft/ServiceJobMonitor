@@ -17,6 +17,6 @@ along with this software (see the LICENSE.md file). If not, see
     <eeca id="TimeseriesJobRunCreate" entity="moqui.service.job.ServiceJobRun" on-create="true" on-update="true" on-delete="true" run-on-error="false" get-entire-entity="true" get-original-value="true">
         <condition><expression>results</expression></condition>
         <actions>
-            <service-call name="tailorsoft.timeseries.TimeseriesServices.process#JobRunResults" in-map="context" transaction="force-new" /></actions>
+            <service-call name="tailorsoft.monitor.MonitorServices.process#JobRunResults" in-map="context" transaction="force-new" /></actions>
     </eeca>
 </eecas>
