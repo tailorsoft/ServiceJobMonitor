@@ -3,14 +3,16 @@
         default-menu-title="Monitor Details" default-menu-index="2">
 
     <subscreens default-item="MonitorChart">
-        <subscreens-item name="MonitorChart"
+        <subscreens-item name="MonitorChart" menu-index="1"
                          location="component://ServiceJobMonitor/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorChart.xml"/>
-        <subscreens-item name="MonitorAlerts"
+        <subscreens-item name="MonitorAlerts" menu-index="2"
                          location="component://ServiceJobMonitor/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorAlerts.xml"/>
-        <subscreens-item name="MonitorSettings"
+        <subscreens-item name="MonitorSettings" menu-index="3"
                          location="component://ServiceJobMonitor/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorSettings.xml"/>
         <subscreens-item name="MonitorSettingsBounds" menu-include="false"
                          location="component://ServiceJobMonitor/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorSettingsBounds.xml"/>
+        <subscreens-item name="MonitorSettingsNotification" menu-include="false"
+                         location="component://ServiceJobMonitor/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorSettingsNotification.xml"/>
     </subscreens>
     <widgets>
         <subscreens-panel id="MonitorDetailsPanel" type="tab"/>
