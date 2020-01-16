@@ -13,7 +13,7 @@
         </container>
         <render-mode>
             <text type="html,vuet"
-                  location="component://tailorsoft-timeseries/screen/MonitorAdmin/Charts/charts.html.ftl"/>
+                  location="component://ServiceJobMonitor/screen/MonitorAdmin/Charts/charts.html.ftl"/>
         </render-mode>
     </widgets>
 </screen>

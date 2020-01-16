@@ -4,13 +4,13 @@
 
     <subscreens default-item="MonitorChart">
         <subscreens-item name="MonitorChart"
-                         location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorChart.xml"/>
+                         location="component://ServiceJobMonitor/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorChart.xml"/>
         <subscreens-item name="MonitorAlerts"
-                         location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorAlerts.xml"/>
+                         location="component://ServiceJobMonitor/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorAlerts.xml"/>
         <subscreens-item name="MonitorSettings"
-                         location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorSettings.xml"/>
+                         location="component://ServiceJobMonitor/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorSettings.xml"/>
         <subscreens-item name="MonitorSettingsBounds" menu-include="false"
-                         location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorSettingsBounds.xml"/>
+                         location="component://ServiceJobMonitor/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorSettingsBounds.xml"/>
     </subscreens>
     <widgets>
         <subscreens-panel id="MonitorDetailsPanel" type="tab"/>

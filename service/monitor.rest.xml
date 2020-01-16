@@ -3,7 +3,7 @@
 
 <resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/rest-api-2.1.xsd"
-          name="tailorsoft" displayName="Tailorsoft REST API" version="1.0.0">
+          name="service-job-monitor" displayName="Service Job Monitor" version="1.0.0">
 
     <resource name="monitors">
         <method type="get">

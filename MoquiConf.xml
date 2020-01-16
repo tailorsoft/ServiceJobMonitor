@@ -4,11 +4,11 @@
             xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/moqui-conf-2.1.xsd">
     <screen-facade>
         <screen location="component://webroot/screen/webroot.xml">
-            <subscreens-item name="tsstatic" menu-include="false" location="component://tailorsoft-timeseries/screen/tsstatic.xml"/>
+            <subscreens-item name="jsmstatic" menu-include="false" location="component://ServiceJobMonitor/screen/sjmstatic.xml"/>
         </screen>
         <screen location="component://webroot/screen/webroot/apps.xml">
-            <subscreens-item name="monitor" menu-title="Monitor Timeseries" menu-index="15"
-                             location="component://tailorsoft-timeseries/screen/MonitorAdmin.xml"/>
+            <subscreens-item name="monitor" menu-title="Service Job Monitor" menu-index="15"
+                             location="component://ServiceJobMonitor/screen/MonitorAdmin.xml"/>
         </screen>
     </screen-facade>
 </moqui-conf>

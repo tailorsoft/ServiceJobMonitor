@@ -9,7 +9,7 @@
     </actions>
     <widgets>
         <render-mode>
-            <text type="html" location="component://tailorsoft-timeseries/screen/email/Notification.html.ftl"/>
+            <text type="html" location="component://ServiceJobMonitor/screen/email/Notification.html.ftl"/>
         </render-mode>
     </widgets>
 </screen>

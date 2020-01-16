@@ -29,7 +29,7 @@ define('Alerts', {
 
     methods: {
         getAlerts(){
-            const url = '/rest/s1/tailorsoft/alerts';
+            const url = '/rest/s1/service-job-monitor/alerts';
 
             return axios.get(url).then((response)=>{
                 this.alerts = response.data.alerts;
@@ -45,7 +45,7 @@ define('Alerts', {
         },
         createIssueUrl(){
             var vm =this;
-            const url = '/rest/s1/tailorsoft/alerts/' + this.currentAlertId;
+            const url = '/rest/s1/service-job-monitor/alerts/' + this.currentAlertId;
             const notiMsg = 'Alert Issue URL added correctly!';
 
             this.$root.loading = 1;
@@ -66,7 +66,7 @@ define('Alerts', {
         },
         deleteIssueUrl(alertId){
             var vm =this;
-            const url = '/rest/s1/tailorsoft/alerts/' + alertId;
+            const url = '/rest/s1/service-job-monitor/alerts/' + alertId;
             const notiMsg = 'Alert Issue URL deleted correctly!';
 
             this.$root.loading = 1;
@@ -93,7 +93,7 @@ define('Alerts', {
         },
         assignPartyToAlert(){
             var vm =this;
-            const url = '/rest/s1/tailorsoft/alerts/' + this.currentAlertId;
+            const url = '/rest/s1/service-job-monitor/alerts/' + this.currentAlertId;
             const notiMsg = 'Party assigned to alert correctly!';
 
             this.$root.loading = 1;
@@ -114,7 +114,7 @@ define('Alerts', {
         },
         deleteParty(alertId){
             var vm =this;
-            const url = '/rest/s1/tailorsoft/alerts/' + alertId;
+            const url = '/rest/s1/service-job-monitor/alerts/' + alertId;
             const notiMsg = 'Party deleted from alert correctly!';
 
             this.$root.loading = 1;

@@ -4,8 +4,8 @@
 
     <widgets>
         <render-mode>
-            <text type="js" location="component://tailorsoft-timeseries/screen/MonitorAdmin/MonitorDetails/MonitorChart/MonitorChart.js"/>
-            <text type="vuet" location="component://tailorsoft-timeseries/screen/MonitorAdmin/MonitorDetails/MonitorChart/MonitorChart.vuet"/>
+            <text type="js" location="component://ServiceJobMonitor/screen/MonitorAdmin/MonitorDetails/MonitorChart/MonitorChart.js"/>
+            <text type="vuet" location="component://ServiceJobMonitor/screen/MonitorAdmin/MonitorDetails/MonitorChart/MonitorChart.vuet"/>
         </render-mode>
     </widgets>
 </screen>

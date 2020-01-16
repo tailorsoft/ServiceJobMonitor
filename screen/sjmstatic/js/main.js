@@ -292,7 +292,7 @@ function fetchData(startDate, endDate) {
   setDates(startDate, endDate);
 
   fetch(
-    "/rest/s1/tailorsoft/monitors?fromDate=" +
+    "/rest/s1/service-job-monitor/monitors?fromDate=" +
       parseDate(startDate) +
       "&thruDate=" +
       parseDate(endDate)
@@ -309,7 +309,7 @@ function fetchData(startDate, endDate) {
 function fetchSingleChart(monitorId, startDate, endDate) {
   return new Promise((resolve, reject) => {
     fetch(
-      "/rest/s1/tailorsoft/monitors?fromDate=" +
+      "/rest/s1/service-job-monitor/monitors?fromDate=" +
         parseDate(startDate) +
         "&thruDate=" +
         parseDate(endDate) +

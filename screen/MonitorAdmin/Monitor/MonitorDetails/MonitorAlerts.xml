@@ -30,7 +30,7 @@
     <widgets>
         <render-mode>
             <text type="html,vuet"
-                  location="component://tailorsoft-timeseries/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorTopBar.html.ftl"/>
+                  location="component://ServiceJobMonitor/screen/MonitorAdmin/Monitor/MonitorDetails/MonitorTopBar.html.ftl"/>
         </render-mode>
 
         <container style="monitorTitle">

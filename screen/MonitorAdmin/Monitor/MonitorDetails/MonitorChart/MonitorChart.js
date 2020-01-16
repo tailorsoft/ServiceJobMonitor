@@ -28,7 +28,7 @@ define("Monitor", {
       this.selectedAlert = alert;
     },
     getMonitorInfo() {
-      const url = "/rest/s1/tailorsoft/monitors/" + this.monitorId;
+      const url = "/rest/s1/service-job-monitor/monitors/" + this.monitorId;
       let vm = this;
 
       axios
@@ -47,7 +47,7 @@ define("Monitor", {
       this.displayFromDate = fromDate.format("YYYY-MM-DD");
       this.displayThruDate = thruDate.format("YYYY-MM-DD");
 
-      const url = `/rest/s1/tailorsoft/monitors?fromDate=${fromDate.toISOString()}&thruDate=${thruDate.toISOString()}&monitorId=${
+      const url = `/rest/s1/service-job-monitor/monitors?fromDate=${fromDate.toISOString()}&thruDate=${thruDate.toISOString()}&monitorId=${
         this.monitorId
       }`;
 

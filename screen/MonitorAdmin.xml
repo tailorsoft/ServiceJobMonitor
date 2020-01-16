@@ -10,12 +10,12 @@
         <render-mode>
             <text type="html,vuet">
                 <![CDATA[
-                    <link href="/tsstatic/css/normalize.css" />
-                    <link href="/tsstatic/css/style.css" />
+                    <link href="/jsmstatic/css/normalize.css" />
+                    <link href="/jsmstatic/css/style.css" />
                     <script src="https://cdn.jsdelivr.net/npm/vega@5.9.0"></script>
                     <script src="https://cdn.jsdelivr.net/npm/vega-lite@4.0.0"></script>
                     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.2.0"></script>
-                    <script src="/tsstatic/js/main.js" />
+                    <script src="/jsmstatic/js/main.js" />
                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css"/>
                 ]]>
             </text>
