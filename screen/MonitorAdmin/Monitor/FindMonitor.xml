@@ -18,7 +18,7 @@
 
     <transition name="deleteMonitor">
         <actions>
-            <service-call name="update#tailorsoft.timeseries.Monitor"
+            <service-call name="update#tailorsoft.servicejobmonitor.Monitor"
                           in-map="[monitorId: monitorId, statusId: 'MonitorDeleted']"/>
         </actions>
         <default-response url="."/>
@@ -68,10 +68,10 @@
             <set field="emailTemplateId" value="ALERT_NOTIFICATION"/>
 
             <!-- Saving Monitor-->
-            <service-call name="create#tailorsoft.timeseries.Monitor" in-map="context"/>
+            <service-call name="create#tailorsoft.servicejobmonitor.Monitor" in-map="context"/>
 
             <!-- Saving Monitor Bounds-->
-            <service-call name="create#tailorsoft.timeseries.MonitorBounds" in-map="context"/>
+            <service-call name="create#tailorsoft.servicejobmonitor.MonitorBounds" in-map="context"/>
 
             <!-- Saving Notification Topic-->
             <service-call name="create#moqui.security.user.NotificationTopic" in-map="context"/>
@@ -81,7 +81,7 @@
 
 
     <actions>
-        <entity-find entity-name="tailorsoft.timeseries.Monitor" list="monitorList">
+        <entity-find entity-name="tailorsoft.servicejobmonitor.Monitor" list="monitorList">
             <econdition field-name="statusId" value="MonitorDeleted"  operator="not-equals"/>
         </entity-find>
     </actions>
@@ -156,7 +156,7 @@
         <container>
             <form-list name="ListMonitors" list="monitorList" transition="listMonitors" multi="false" dinamic="true"
                        header-dialog="true">
-                <auto-fields-entity entity-name="tailorsoft.timeseries.Monitor" field-type="find-display"/>
+                <auto-fields-entity entity-name="tailorsoft.servicejobmonitor.Monitor" field-type="find-display"/>
                 <field name="monitorId">
                     <default-field>
                         <link url="editMonitor" text="${monitorId}" link-type="anchor"

@@ -3,12 +3,12 @@
 <entity-facade-xml type="install">
     <moqui.security.ArtifactGroup artifactGroupId="TIMESERIES_MONITOR" description="Time Series (via root screen)"/>
     <moqui.security.ArtifactGroupMember artifactGroupId="TIMESERIES_MONITOR" artifactTypeEnumId="AT_XML_SCREEN" inheritAuthz="Y" artifactName="component://ServiceJobMonitor/screen/MonitorAdmin.xml"/>
-    <moqui.security.ArtifactGroupMember artifactGroupId="TIMESERIES_MONITOR" artifactName="tailorsoft.timeseries..*" nameIsPattern="Y" artifactTypeEnumId="AT_SERVICE" inheritAuthz="Y"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="TIMESERIES_MONITOR" artifactName="tailorsoft.servicejobmonitor..*" nameIsPattern="Y" artifactTypeEnumId="AT_SERVICE" inheritAuthz="Y"/>
 
     <moqui.security.ArtifactAuthz artifactAuthzId="TIMESERIES_MONITOR_AUTHZ_ALL" userGroupId="ADMIN" artifactGroupId="TIMESERIES_MONITOR" authzTypeEnumId="AUTHZT_ALWAYS" authzActionEnumId="AUTHZA_ALL"/>
 
     <artifactGroups artifactGroupId="TIMESERIES_MONITOR_API" description="Time Series REST API (via root resource)">
-        <artifacts artifactTypeEnumId="AT_REST_PATH" artifactName="/tailorsoft" inheritAuthz="Y"/>
+        <artifacts artifactTypeEnumId="AT_REST_PATH" artifactName="/service-job-monitor" inheritAuthz="Y"/>
         <authz artifactAuthzId="TIMESERIES_MONITOR_API_ADMIN" userGroupId="ADMIN" authzTypeEnumId="AUTHZT_ALWAYS" authzActionEnumId="AUTHZA_ALL"/>
     </artifactGroups>
 </entity-facade-xml>

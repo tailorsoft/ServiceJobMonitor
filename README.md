@@ -17,16 +17,16 @@ example
 ### Service monitoring
 monitoring services requires two entities (`Monitor`, `MonitorBounds`), these will control which service to listen to, and when to launch alerts based on their bounds.
 
-#### tailorsoft.timeseries.Monitor
+#### tailorsoft.servicejobmonitor.Monitor
 ```xml
-<tailorsoft.timeseries.Monitor jobName="poll_temperature" title="Temperature"
+<tailorsoft.servicejobmonitor.Monitor jobName="poll_temperature" title="Temperature"
                                    valuePath="value.temp" indexName="temperature"/>
 ```
 
-#### tailorsoft.timeseries.MonitorBounds
+#### tailorsoft.servicejobmonitor.MonitorBounds
 
  ```xml
- <tailorsoft.timeseries.MonitorBounds
+ <tailorsoft.servicejobmonitor.MonitorBounds
              jobName="poll_SftpCountFiles_MuckCA"
              lower="0"
              upper="10"

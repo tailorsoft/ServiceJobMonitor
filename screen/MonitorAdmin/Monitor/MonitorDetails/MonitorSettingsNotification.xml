@@ -9,7 +9,7 @@
         <default-response url="."/>
     </transition>
     <actions>
-        <entity-find-one entity-name="tailorsoft.timeseries.Monitor" value-field="monitor"/>
+        <entity-find-one entity-name="tailorsoft.servicejobmonitor.Monitor" value-field="monitor"/>
         <entity-find entity-name="moqui.security.user.NotificationTopic" list="notificationTopicList">
             <econdition field-name="topic" from="monitorId"/>
             <order-by field-name="description"/></entity-find>

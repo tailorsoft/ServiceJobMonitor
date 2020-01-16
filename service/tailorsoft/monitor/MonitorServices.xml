@@ -27,7 +27,7 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="value"/>
         </out-parameters>
         <actions>
-            <entity-find-one entity-name="tailorsoft.timeseries.Monitor" value-field="monitor" cache="true">
+            <entity-find-one entity-name="tailorsoft.servicejobmonitor.Monitor" value-field="monitor" cache="true">
                 <field-map field-name="jobName"/>
             </entity-find-one>
             <if condition="!monitor">
@@ -143,11 +143,11 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <log message="\n ======= bounds ${indexName}, ${value}, ${jobName}, ${context} ${monitorId} "/>
             <set field="messageData" from="[:]"/>
-            <entity-find-one entity-name="tailorsoft.timeseries.MonitorBounds" value-field="monitorBounds" cache="true">
+            <entity-find-one entity-name="tailorsoft.servicejobmonitor.MonitorBounds" value-field="monitorBounds" cache="true">
                 <field-map field-name="monitorId"/>
             </entity-find-one>
 
-            <entity-find entity-name="tailorsoft.timeseries.MonitorAlert" list="alertList" limit="1">
+            <entity-find entity-name="tailorsoft.servicejobmonitor.MonitorAlert" list="alertList" limit="1">
                 <econdition field-name="monitorId" from="monitorId"/>
                 <order-by field-name="-fromDate"/>
             </entity-find>
@@ -271,7 +271,7 @@ along with this software (see the LICENSE.md file). If not, see
                         notificationId = sendNotification([monitorId: monitorId, value: value]);
 
                         ec.service.sync()
-                                .name("create#tailorsoft.timeseries.MonitorAlert")
+                                .name("create#tailorsoft.servicejobmonitor.MonitorAlert")
                                 .parameters([
                                         id              : jobRunId,
                                         monitorId       : monitorId,
@@ -307,7 +307,7 @@ along with this software (see the LICENSE.md file). If not, see
                         if (restoreValid) {
 
                             ec.service.sync()
-                                    .name("update#tailorsoft.timeseries.MonitorAlert")
+                                    .name("update#tailorsoft.servicejobmonitor.MonitorAlert")
                                     .parameters([id: currentAlert.id, statusId: 'TsClosed', thruDate: new Date()])
                                     .call()
                         }
@@ -333,7 +333,7 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <set field="res" from="[]"/>
             <!-- TODO restrict by Org -->
-            <entity-find entity-name="tailorsoft.timeseries.Monitor" list="monitorList">
+            <entity-find entity-name="tailorsoft.servicejobmonitor.Monitor" list="monitorList">
                 <econdition field-name="statusId" value="MonitorDeleted"  operator="not-equals"/>
             </entity-find>
 
@@ -347,7 +347,7 @@ along with this software (see the LICENSE.md file). If not, see
                 thruDateFormated = dateFormat.parse(thruDate)
             </script>
 
-            <entity-find entity-name="tailorsoft.timeseries.MonitorAlert" list="alertsList">
+            <entity-find entity-name="tailorsoft.servicejobmonitor.MonitorAlert" list="alertsList">
                 <econdition field-name="monitorId" value="poll_temperature"/>
                 <econdition field-name="fromDate" operator="greater" from="fromDateFormated"/>
                 <econdition field-name="fromDate" operator="less" from="thruDateFormated"/>
@@ -417,13 +417,13 @@ along with this software (see the LICENSE.md file). If not, see
                 }
 
                 if (monitorId) {
-                    Map monitorEntity = ec.entity.find("tailorsoft.timeseries.Monitor").condition("monitorId", monitorId).one()
-                    Map monitorBoundsEntity = ec.entity.find("tailorsoft.timeseries.MonitorBounds").condition("monitorId", monitorId).one()
+                    Map monitorEntity = ec.entity.find("tailorsoft.servicejobmonitor.Monitor").condition("monitorId", monitorId).one()
+                    Map monitorBoundsEntity = ec.entity.find("tailorsoft.servicejobmonitor.MonitorBounds").condition("monitorId", monitorId).one()
                     String indexName = monitorEntity.indexName
 
                     hitsList = getIndexData(indexName, client, fromDate, thruDate, esClient)
 
-                    alertsList_xafind = ec.entity.find("tailorsoft.timeseries.MonitorAlert")
+                    alertsList_xafind = ec.entity.find("tailorsoft.servicejobmonitor.MonitorAlert")
                             .condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("monitorId", "equals", monitorId, monitorId, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "greater", fromDateFormated, null, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "less", thruDateFormated, null, null, false, false, false, "false"))
                     alertsList = alertsList_xafind.list()
 
@@ -434,11 +434,11 @@ along with this software (see the LICENSE.md file). If not, see
                         String indexName = monitorList[i].indexName
                         String monitorIdStr = monitorList[i].monitorId
 
-                        Map bounds = ec.entity.find("tailorsoft.timeseries.MonitorBounds").condition("monitorId", monitorIdStr).one()
+                        Map bounds = ec.entity.find("tailorsoft.servicejobmonitor.MonitorBounds").condition("monitorId", monitorIdStr).one()
 
                         hitsList = getIndexData(indexName, client, fromDate, thruDate, esClient)
 
-                        alertsList_xafind = ec.entity.find("tailorsoft.timeseries.MonitorAlert")
+                        alertsList_xafind = ec.entity.find("tailorsoft.servicejobmonitor.MonitorAlert")
                                 .condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("monitorId", "equals", monitorId, monitorIdStr, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "greater", fromDateFormated, null, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "less", thruDateFormated, null, null, false, false, false, "false"))
                         alertsList = alertsList_xafind.list()
 
@@ -461,7 +461,7 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <log message="==== ${monitorId} ${value}"/>
 
-            <entity-find-one entity-name="tailorsoft.timeseries.Monitor" value-field="monitor" cache="true">
+            <entity-find-one entity-name="tailorsoft.servicejobmonitor.Monitor" value-field="monitor" cache="true">
                 <field-map field-name="monitorId"/>
             </entity-find-one>
             <if condition="!monitor">
@@ -500,7 +500,7 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="alerts"/>
         </out-parameters>
         <actions>
-            <entity-find entity-name="tailorsoft.timeseries.MonitorAlertDetails" list="alerts">
+            <entity-find entity-name="tailorsoft.servicejobmonitor.MonitorAlertDetails" list="alerts">
                 <econdition field-name="monitorStatusId" value="MonitorDeleted"  operator="not-equals"/>
             </entity-find>
         </actions>
@@ -516,7 +516,7 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <if condition="term">
                 <then>
-                    <entity-find entity-name="tailorsoft.timeseries.PartyName" list="options">
+                    <entity-find entity-name="tailorsoft.servicejobmonitor.PartyName" list="options">
                         <econdition field-name="partyName" operator="like" value="%${term}%" ignore-case="true"/>
                     </entity-find>
                 </then>
