@@ -89,7 +89,7 @@ function renderVega(data, elementId) {
       },
       encoding: {
         x: {
-          field: "@timestamp",
+          field: "_source.@timestamp",
           type: "temporal",
           // scale: { domain: { selection: "brush" } },
           axis: {
@@ -103,7 +103,7 @@ function renderVega(data, elementId) {
           }
         },
         y: {
-          field: "value",
+          field: "_source.value",
           type: "quantitative",
           axis: {
             title: null,
@@ -249,6 +249,7 @@ function renderVega(data, elementId) {
 }
 
 function makeChart(data) {
+  console.log(data)
   const container = document.getElementById("chartsContainer");
 
   const isOpenAlert =

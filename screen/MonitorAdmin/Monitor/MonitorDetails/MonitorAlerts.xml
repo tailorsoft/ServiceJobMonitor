@@ -21,8 +21,8 @@
     </transition>
 
     <actions>
-        <entity-find-one entity-name="tailorsoft.servicejobmonitor.Monitor" value-field="monitor"/>
-        <entity-find entity-name="tailorsoft.servicejobmonitor.MonitorAlert" list="alertsList">
+        <entity-find-one entity-name="tailorsoft.service.job.ServiceJobMonitor" value-field="monitor"/>
+        <entity-find entity-name="tailorsoft.service.job.ServiceJobMonitorAlert" list="alertsList">
             <search-form-inputs/>
         </entity-find>
     </actions>
@@ -39,7 +39,7 @@
 
         <container>
             <form-list name="ListAlerts" list="alertsList" transition="listAlerts" multi="false" header-dialog="true">
-                <auto-fields-entity entity-name="tailorsoft.servicejobmonitor.MonitorAlert" field-type="find-display"/>
+                <auto-fields-entity entity-name="tailorsoft.service.job.ServiceJobMonitorAlert" field-type="find-display"/>
             </form-list>
         </container>
     </widgets>

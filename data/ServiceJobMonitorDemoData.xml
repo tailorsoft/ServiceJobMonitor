@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <entity-facade-xml type="demo">
+    <statusTypes statusTypeId="MonitorStatus" lastUpdatedStamp="1579188461696" description="Monitor status"/>
+    <statuses lastUpdatedStamp="1579027474837" statusId="MonitorActive" sequenceNum="1" statusTypeId="MonitorStatus" description="Monitor Active"/>
+    <statuses lastUpdatedStamp="1579027474837" statusId="MonitorPaused" sequenceNum="2" statusTypeId="MonitorStatus" description="Monitor Paused"/>
+    <statuses lastUpdatedStamp="1579027474837" statusId="MonitorDeleted" sequenceNum="3" statusTypeId="MonitorStatus" description="Monitor Deleted"/>
     <!--    Email template for notifications    -->
     <emailTemplates
             subject="Monitor ${bodyParameters.message.monitorId} out of bounds. value [${bodyParameters.message.value}]"
@@ -24,7 +28,7 @@
         <parameters parameterName="city" parameterValue="Salt Lake City"/>
     </moqui.service.job.ServiceJob>
 
-    <tailorsoft.servicejobmonitor.Monitor
+    <tailorsoft.service.job.ServiceJobMonitor
             monitorId="poll_temperature"
             jobName="poll_temperature"
             title="Temperature"
@@ -34,7 +38,7 @@
             statusId="MonitorActive"
     />
 
-    <tailorsoft.servicejobmonitor.MonitorBounds
+    <tailorsoft.service.job.ServiceJobMonitorBounds
             monitorId="poll_temperature"
             lower="0"
             upper="10"
@@ -54,7 +58,7 @@
 
 
     <!-- single point service monitor    -->
-    <tailorsoft.servicejobmonitor.Monitor
+    <tailorsoft.service.job.ServiceJobMonitor
             monitorId="single_point"
             title="Single Point monitor"
             valuePath="value"
@@ -63,7 +67,7 @@
             statusId="MonitorActive"
     />
 
-    <tailorsoft.servicejobmonitor.MonitorBounds
+    <tailorsoft.service.job.ServiceJobMonitorBounds
             monitorId="single_point"
             lower="0"
             upper="10"

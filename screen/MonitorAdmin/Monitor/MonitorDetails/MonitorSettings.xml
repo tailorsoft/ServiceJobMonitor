@@ -6,10 +6,10 @@
 
     <transition name="update">
         <actions>
-            <service-call name="update#tailorsoft.servicejobmonitor.Monitor" in-map="true"/>
+            <service-call name="update#tailorsoft.service.job.ServiceJobMonitor" in-map="true"/>
         </actions>
         <default-response url="."
-                          parameter-map="ec.entity.getEntityDefinition('tailorsoft.servicejobmonitor.Monitor').getPrimaryKeys(context)"/>
+                          parameter-map="ec.entity.getEntityDefinition('tailorsoft.service.job.ServiceJobMonitor').getPrimaryKeys(context)"/>
     </transition>
 
     <transition name="bounds">
@@ -29,7 +29,7 @@
     </transition>
 
     <actions>
-        <entity-find-one entity-name="tailorsoft.servicejobmonitor.Monitor" value-field="monitor"/>
+        <entity-find-one entity-name="tailorsoft.service.job.ServiceJobMonitor" value-field="monitor"/>
     </actions>
 
     <widgets>
@@ -52,8 +52,8 @@
             </row-col>
             <row-col md="8">
                 <form-single name="UpdateMonitor" map="monitor" transition="update" dynamic="true">
-                    <auto-fields-entity entity-name="tailorsoft.servicejobmonitor.Monitor" include="pk" field-type="display"/>
-                    <auto-fields-entity entity-name="tailorsoft.servicejobmonitor.Monitor" include="nonpk" field-type="edit"/>
+                    <auto-fields-entity entity-name="tailorsoft.service.job.ServiceJobMonitor" include="pk" field-type="display"/>
+                    <auto-fields-entity entity-name="tailorsoft.service.job.ServiceJobMonitor" include="nonpk" field-type="edit"/>
                     <field name="submitButton">
                         <default-field title="Update">
                             <submit/>

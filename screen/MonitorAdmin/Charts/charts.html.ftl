@@ -14,8 +14,6 @@
             startDateInput.onchange = changeDate;
             endDateInput.onchange = changeDate;
         }
-
-
     </script>
 </div>
 </body>

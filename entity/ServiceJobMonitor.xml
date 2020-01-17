@@ -8,7 +8,7 @@
     <!-- ========================================================= -->
 
     <!-- ========== DataSource ========== -->
-    <entity entity-name="Monitor" package="tailorsoft.servicejobmonitor" use="nontransactional" cache="true">
+    <entity entity-name="ServiceJobMonitor" package="tailorsoft.service.job" use="nontransactional" cache="true">
         <field name="monitorId" type="id" is-pk="true"/>
         <field name="jobName" type="text-short"/>
         <field name="title" type="text-short"/>
@@ -46,16 +46,15 @@
         <relationship type="one" related="moqui.service.job.ServiceJob"/>
     </entity>
 
-    <entity entity-name="MonitorBounds" package="tailorsoft.servicejobmonitor" use="nontransactional" cache="true">
+    <entity entity-name="ServiceJobMonitorBounds" package="tailorsoft.service.job" use="nontransactional" cache="true">
         <field name="monitorId" type="id" is-pk="true"/>
         <field name="lower" type="number-float"/>
         <field name="upper" type="number-float"/>
         <field name="count" type="number-integer"/>
-        <relationship type="one" related="tailorsoft.servicejobmonitor.Monitor"/>
+        <relationship type="one" related="tailorsoft.service.job.ServiceJobMonitor"/>
     </entity>
 
-
-    <entity entity-name="MonitorAlert" package="tailorsoft.servicejobmonitor" use="nontransactional">
+    <entity entity-name="ServiceJobMonitorAlert" package="tailorsoft.service.job" use="nontransactional">
         <field name="id" type="id" is-pk="true"/>
         <field name="monitorId" type="id"/>
         <field name="jobName" type="id"/>
@@ -78,13 +77,13 @@
             <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="TsOpen" toStatusId="TsClosed"
                                               transitionName="solved"/>
         </seed-data>
-        <relationship type="many" related="tailorsoft.servicejobmonitor.Monitor"/>
+        <relationship type="many" related="tailorsoft.service.job.ServiceJobMonitor"/>
         <relationship type="one" related="mantle.party.Party" short-alias="party"/>
     </entity>
 
-    <view-entity entity-name="MonitorAlertDetails" package="tailorsoft.servicejobmonitor">
-        <member-entity entity-alias="Alert" entity-name="tailorsoft.servicejobmonitor.MonitorAlert"/>
-        <member-entity entity-alias="Monitor" entity-name="tailorsoft.servicejobmonitor.Monitor" join-from-alias="Alert">
+    <view-entity entity-name="ServiceJobMonitorAlertDetails" package="tailorsoft.service.job">
+        <member-entity entity-alias="Alert" entity-name="tailorsoft.service.job.ServiceJobMonitorAlert"/>
+        <member-entity entity-alias="Monitor" entity-name="tailorsoft.service.job.ServiceJobMonitor" join-from-alias="Alert">
             <key-map field-name="monitorId"/>
         </member-entity>
         <member-entity entity-alias="PTY" entity-name="mantle.party.Party" join-from-alias="Alert" join-optional="true">
@@ -116,7 +115,7 @@
         <alias name="statusId" entity-alias="Alert" field="statusId"/>
     </view-entity>
 
-    <view-entity entity-name="PartyName" package="tailorsoft.servicejobmonitor">
+    <view-entity entity-name="ServiceJobPartyName" package="tailorsoft.service.job">
         <member-entity entity-alias="PTY" entity-name="mantle.party.Party"/>
         <member-entity entity-alias="PER" entity-name="mantle.party.Person" join-from-alias="PTY" join-optional="true">
             <key-map field-name="partyId"/></member-entity>

@@ -6,10 +6,10 @@
 
     <transition name="update">
         <actions>
-            <service-call name="update#tailorsoft.servicejobmonitor.MonitorBounds" in-map="true"/>
+            <service-call name="update#tailorsoft.service.job.ServiceJobMonitorBounds" in-map="true"/>
         </actions>
         <default-response url="."
-                          parameter-map="ec.entity.getEntityDefinition('tailorsoft.servicejobmonitor.MonitorBounds').getPrimaryKeys(context)"/>
+                          parameter-map="ec.entity.getEntityDefinition('tailorsoft.service.job.ServiceJobMonitorBounds').getPrimaryKeys(context)"/>
     </transition>
 
     <transition name="monitorSettings">
@@ -25,8 +25,8 @@
     </transition>
 
     <actions>
-        <entity-find-one entity-name="tailorsoft.servicejobmonitor.MonitorBounds" value-field="monitorBounds"/>
-        <entity-find-one entity-name="tailorsoft.servicejobmonitor.Monitor" value-field="monitor"/>
+        <entity-find-one entity-name="tailorsoft.service.job.ServiceJobMonitorBounds" value-field="monitorBounds"/>
+        <entity-find-one entity-name="tailorsoft.service.job.ServiceJobMonitor" value-field="monitor"/>
     </actions>
 
     <widgets>
@@ -51,9 +51,9 @@
             </row-col>
             <row-col md="8">
                 <form-single name="UpdateMonitor" map="monitorBounds" transition="update" dynamic="true">
-                    <auto-fields-entity entity-name="tailorsoft.servicejobmonitor.MonitorBounds" include="pk"
+                    <auto-fields-entity entity-name="tailorsoft.service.job.ServiceJobMonitorBounds" include="pk"
                                         field-type="display"/>
-                    <auto-fields-entity entity-name="tailorsoft.servicejobmonitor.MonitorBounds" include="nonpk"
+                    <auto-fields-entity entity-name="tailorsoft.service.job.ServiceJobMonitorBounds" include="nonpk"
                                         field-type="edit"/>
                     <field name="submitButton">
                         <default-field title="Update">

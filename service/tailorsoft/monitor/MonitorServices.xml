@@ -27,7 +27,7 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="value"/>
         </out-parameters>
         <actions>
-            <entity-find-one entity-name="tailorsoft.servicejobmonitor.Monitor" value-field="monitor" cache="true">
+            <entity-find-one entity-name="tailorsoft.service.job.ServiceJobMonitor" value-field="monitor" cache="true">
                 <field-map field-name="jobName"/>
             </entity-find-one>
             <if condition="!monitor">
@@ -80,23 +80,10 @@ along with this software (see the LICENSE.md file). If not, see
             <set field="json" from="[:]"/>
             <script>
                 <![CDATA[
-                import org.elasticsearch.action.get.MultiGetItemResponse
-                import org.elasticsearch.action.get.MultiGetRequestBuilder
-                import org.elasticsearch.action.search.SearchRequest
-                import org.elasticsearch.action.search.SearchRequestBuilder
-                import org.elasticsearch.index.query.QueryBuilder
-                import org.elasticsearch.index.query.QueryBuilders
-                import org.elasticsearch.search.SearchHit
-                import org.elasticsearch.search.SearchHits
-                import org.elasticsearch.search.sort.SortOrder
-                import org.elasticsearch.client.Client
                 import org.moqui.context.ExecutionContext
-                import org.moqui.elasticsearch.ElasticSearchUtil
-                import org.moqui.elasticsearch.EsClient
 
-                //create the ES client
                 ExecutionContext ec = context.ec
-                EsClient esClient = ec.getTool("ElasticSearch", EsClient.class)
+                client = ec.elastic.getDefault()
 
                 //use the default timestamp value
                 // @TODO: Parse date from endTime service
@@ -105,20 +92,14 @@ along with this software (see the LICENSE.md file). If not, see
                 json.put("value", value)
 
                 try {
-                    Client client = esClient.getClient();
+                    String createIndexResult = ec.service.sync().name("tailorsoft.monitor.MonitorServices.create#Index").parameter("indexName", indexName).call()
 
-                    if (!esClient.checkIndexExists(indexName)) {
-                        client
-                                .admin()
-                                .indices()
-                                .prepareCreate(indexName)
-                                .addMapping("_doc", "@timestamp", "type=date", "value", "type=float")
-                                .get()
-
-                        logger.info("\n ====== ElasticSearch index created: ${indexName}")
+                    if(createIndexResult == "INDEX_NOT_CREATED"){
+                        logger.error("Can't create the index with name: ${indexName}")
+                        return
                     }
 
-                    client.prepareIndex(indexName, "_doc").setSource(json).get()
+                    client.index(indexName, UUID.randomUUID().toString(), json)
                 } finally {
 
                 }
@@ -143,11 +124,11 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <log message="\n ======= bounds ${indexName}, ${value}, ${jobName}, ${context} ${monitorId} "/>
             <set field="messageData" from="[:]"/>
-            <entity-find-one entity-name="tailorsoft.servicejobmonitor.MonitorBounds" value-field="monitorBounds" cache="true">
+            <entity-find-one entity-name="tailorsoft.service.job.ServiceJobMonitorBounds" value-field="monitorBounds" cache="true">
                 <field-map field-name="monitorId"/>
             </entity-find-one>
 
-            <entity-find entity-name="tailorsoft.servicejobmonitor.MonitorAlert" list="alertList" limit="1">
+            <entity-find entity-name="tailorsoft.service.job.ServiceJobMonitorAlert" list="alertList" limit="1">
                 <econdition field-name="monitorId" from="monitorId"/>
                 <order-by field-name="-fromDate"/>
             </entity-find>
@@ -156,32 +137,12 @@ along with this software (see the LICENSE.md file). If not, see
 
             <script>
                 <![CDATA[
-                import org.elasticsearch.action.get.MultiGetItemResponse
-                import org.elasticsearch.action.get.MultiGetRequestBuilder
-                import org.elasticsearch.action.search.SearchRequest
-                import org.elasticsearch.action.search.SearchRequestBuilder
-                import org.elasticsearch.index.query.QueryBuilder
-                import org.elasticsearch.index.query.QueryBuilders
-                import org.elasticsearch.search.SearchHit
-                import org.elasticsearch.search.SearchHits
-                import org.elasticsearch.search.sort.SortBuilder
-                import org.elasticsearch.search.sort.SortOrder
-                import org.elasticsearch.client.Client
                 import org.moqui.context.ExecutionContext
-                import org.moqui.elasticsearch.ElasticSearchUtil
-                import org.moqui.elasticsearch.EsClient
-                import org.elasticsearch.action.search.SearchResponse
-                import org.elasticsearch.action.search.SearchType;
-                import org.elasticsearch.index.query.QueryBuilders.*;
-                import org.elasticsearch.search.sort.SortBuilders
-                import org.elasticsearch.search.sort.SortOrder
-
                 import javax.naming.directory.SearchControls
 
                 sleep(1200);
-                //create the ES client
+
                 ExecutionContext ec = context.ec
-                EsClient esClient = ec.getTool("ElasticSearch", EsClient.class)
 
                 String sendNotification(data) {
                     logger.info("notification ${data}")
@@ -211,26 +172,22 @@ along with this software (see the LICENSE.md file). If not, see
                 }
 
                 try {
-                    Client client = esClient.getClient();
-
                     int alertCount = Integer.parseInt(monitorBounds.count.toString())
 
-                    SearchResponse response = client
-                            .prepareSearch((String) indexName)
-                            .addSort("@timestamp", SortOrder.DESC)
-                            .setSize(alertCount)
-                            .get()
-
-                    logger.info("\n ======== ES results")
-                    logger.info(response.toString())
 
                     // hits from elasticsearch
-                    SearchHits hits = response.getHits()
+                    Map searchMap = ["sort":["@timestamp":"desc"]]
+                    indexHits = ec.service.sync().name("tailorsoft.monitor.MonitorServices.get#IndexHits").parameters(["indexName":indexName, "searchMap":searchMap]).call()
+                    hits = indexHits.hitList
+
+                    logger.info("\n ======== ES results")
+                    logger.info(hits.toString())
 
                     Float upperBound = Float.parseFloat(monitorBounds.upper.toString())
                     Float lowerBound = Float.parseFloat(monitorBounds.lower.toString())
                     int boundsCount = Integer.parseInt(monitorBounds.count.toString());
                     int size = hits.size();
+
 
                     if (size < boundsCount) {
                         // too few points to evaluate
@@ -241,7 +198,7 @@ along with this software (see the LICENSE.md file). If not, see
                     Boolean lowerBoundAllValid = true;
 
                     for (int i = 0; i < size; i++) {
-                        Map hit = hits[i].getSourceAsMap()
+                        Map hit = hits[i]._source
                         Float value = Float.parseFloat(hit.value.toString())
 
                         if (value < upperBound) {
@@ -259,7 +216,7 @@ along with this software (see the LICENSE.md file). If not, see
 
 
                     if (upperBoundAllValid || lowerBoundAllValid) {
-                        Map hit = hits[0].getSourceAsMap()
+                        Map hit = hits[0]._source
                         Float value = Float.parseFloat(hit.value.toString())
 
                         if (alertList.size() > 0 && alertList[0].statusId.toString() == 'TsOpen') {
@@ -271,7 +228,7 @@ along with this software (see the LICENSE.md file). If not, see
                         notificationId = sendNotification([monitorId: monitorId, value: value]);
 
                         ec.service.sync()
-                                .name("create#tailorsoft.servicejobmonitor.MonitorAlert")
+                                .name("create#tailorsoft.service.job.ServiceJobMonitorAlert")
                                 .parameters([
                                         id              : jobRunId,
                                         monitorId       : monitorId,
@@ -294,7 +251,7 @@ along with this software (see the LICENSE.md file). If not, see
                         Boolean restoreValid = true;
 
                         for (int i = 0; i < size; i++) {
-                            Map hit = hits[i].getSourceAsMap()
+                            Map hit = hits[i]._source
                             Float value = Float.parseFloat(hit.value.toString())
 
                             logger.info("alertId: ${currentAlert.id}- ${i.toString()} - ${value.toString()}")
@@ -307,7 +264,7 @@ along with this software (see the LICENSE.md file). If not, see
                         if (restoreValid) {
 
                             ec.service.sync()
-                                    .name("update#tailorsoft.servicejobmonitor.MonitorAlert")
+                                    .name("update#tailorsoft.service.job.ServiceJobMonitorAlert")
                                     .parameters([id: currentAlert.id, statusId: 'TsClosed', thruDate: new Date()])
                                     .call()
                         }
@@ -333,7 +290,7 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <set field="res" from="[]"/>
             <!-- TODO restrict by Org -->
-            <entity-find entity-name="tailorsoft.servicejobmonitor.Monitor" list="monitorList">
+            <entity-find entity-name="tailorsoft.service.job.ServiceJobMonitor" list="monitorList">
                 <econdition field-name="statusId" value="MonitorDeleted"  operator="not-equals"/>
             </entity-find>
 
@@ -347,7 +304,7 @@ along with this software (see the LICENSE.md file). If not, see
                 thruDateFormated = dateFormat.parse(thruDate)
             </script>
 
-            <entity-find entity-name="tailorsoft.servicejobmonitor.MonitorAlert" list="alertsList">
+            <entity-find entity-name="tailorsoft.service.job.ServiceJobMonitorAlert" list="alertsList">
                 <econdition field-name="monitorId" value="poll_temperature"/>
                 <econdition field-name="fromDate" operator="greater" from="fromDateFormated"/>
                 <econdition field-name="fromDate" operator="less" from="thruDateFormated"/>
@@ -358,23 +315,12 @@ along with this software (see the LICENSE.md file). If not, see
 
             <script>
                  <![CDATA[
-                import org.apache.lucene.util.QueryBuilder
-                import org.elasticsearch.index.query.QueryBuilders
-                import org.elasticsearch.search.SearchHit
-                import org.elasticsearch.search.SearchHits
-                import org.elasticsearch.search.sort.SortOrder
-                import org.elasticsearch.client.Client
                 import org.moqui.context.ExecutionContext
-                import org.moqui.elasticsearch.ElasticSearchUtil
-                import org.moqui.elasticsearch.EsClient
-                import org.elasticsearch.action.search.SearchResponse
                 import groovy.json.JsonOutput
                 import java.text.SimpleDateFormat;
 
-                //create the ES client
                 ExecutionContext ec = context.ec
-                EsClient esClient = ec.getTool("ElasticSearch", EsClient.class)
-                Client client = esClient.getClient();
+                client = ec.elastic.getDefault()
 
                 logger.info("=================")
                 logger.info(fromDate)
@@ -386,66 +332,39 @@ along with this software (see the LICENSE.md file). If not, see
                 Date fromDateObject = formatter.parse(fromDate)
                 Date thruDateObject = formatter.parse(thruDate)
 
-                // get ES data by index
-                static List getIndexData(indexName, client, fromDate, thruDate, esClient) {
-
-                    if (!esClient.checkIndexExists(indexName)) {
-                        client
-                                .admin()
-                                .indices()
-                                .prepareCreate(indexName)
-                                .addMapping("_doc", "@timestamp", "type=date", "value", "type=float")
-                                .get()
-                    }
-
-
-                    List hitsList = []
-
-                    SearchHits hits = client
-                            .prepareSearch((String) indexName)
-                            .setQuery(QueryBuilders.rangeQuery("@timestamp").from(fromDate).to(thruDate))
-                            .addSort("@timestamp", SortOrder.DESC)
-                            .setSize(9999)
-                            .get()
-                            .getHits()
-
-                    for (int x = 0; x < hits.size(); x++) {
-                        hitsList.push(hits[x].getSourceAsMap())
-                    }
-
-                    return hitsList
-                }
-
                 if (monitorId) {
-                    Map monitorEntity = ec.entity.find("tailorsoft.servicejobmonitor.Monitor").condition("monitorId", monitorId).one()
-                    Map monitorBoundsEntity = ec.entity.find("tailorsoft.servicejobmonitor.MonitorBounds").condition("monitorId", monitorId).one()
+                    Map monitorEntity = ec.entity.find("tailorsoft.service.job.ServiceJobMonitor").condition("monitorId", monitorId).one()
+                    Map monitorBoundsEntity = ec.entity.find("tailorsoft.service.job.ServiceJobMonitorBounds").condition("monitorId", monitorId).one()
                     String indexName = monitorEntity.indexName
 
-                    hitsList = getIndexData(indexName, client, fromDate, thruDate, esClient)
+                    Map searchMap = ["sort":["@timestamp":["order":"desc"]], "query": ["range":["@timestamp":["gte":fromDate,"lte":thruDate]]], "size":9999]
 
-                    alertsList_xafind = ec.entity.find("tailorsoft.servicejobmonitor.MonitorAlert")
+                    indexHits = ec.service.sync().name("tailorsoft.monitor.MonitorServices.get#IndexHits").parameters([indexName:indexName, searchMap:searchMap]).call()
+
+                    alertsList_xafind = ec.entity.find("tailorsoft.service.job.ServiceJobMonitorAlert")
                             .condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("monitorId", "equals", monitorId, monitorId, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "greater", fromDateFormated, null, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "less", thruDateFormated, null, null, false, false, false, "false"))
                     alertsList = alertsList_xafind.list()
 
-                    res.push([jobName: monitorId, monitorId: monitorId, indexName: indexName, data: hitsList, bounds: monitorBoundsEntity, fromDate: fromDateObject, thruDate: thruDateObject, 'alerts': alertsList])
+                    res.push([jobName: monitorId, monitorId: monitorId, indexName: indexName, data: indexHits.hitList, bounds: monitorBoundsEntity, fromDate: fromDateObject, thruDate: thruDateObject, 'alerts': alertsList])
 
                 } else {
                     for (int i = 0; i < monitorList.size(); i++) {
                         String indexName = monitorList[i].indexName
                         String monitorIdStr = monitorList[i].monitorId
 
-                        Map bounds = ec.entity.find("tailorsoft.servicejobmonitor.MonitorBounds").condition("monitorId", monitorIdStr).one()
+                        Map bounds = ec.entity.find("tailorsoft.service.job.ServiceJobMonitorBounds").condition("monitorId", monitorIdStr).one()
 
-                        hitsList = getIndexData(indexName, client, fromDate, thruDate, esClient)
+                        Map searchMap = ["sort":["@timestamp":["order":"desc"]], "query": ["range":["@timestamp":["gte":fromDate,"lte":thruDate]]], "size":9999]
 
-                        alertsList_xafind = ec.entity.find("tailorsoft.servicejobmonitor.MonitorAlert")
+                        indexHits = ec.service.sync().name("tailorsoft.monitor.MonitorServices.get#IndexHits").parameters([indexName:indexName, searchMap:searchMap]).call()
+
+                        alertsList_xafind = ec.entity.find("tailorsoft.service.job.ServiceJobMonitorAlert")
                                 .condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("monitorId", "equals", monitorId, monitorIdStr, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "greater", fromDateFormated, null, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "less", thruDateFormated, null, null, false, false, false, "false"))
                         alertsList = alertsList_xafind.list()
 
-                        res.push([jobName: monitorIdStr, monitorId: monitorIdStr, indexName: indexName, data: hitsList, bounds: bounds, fromDate: fromDateObject, thruDate: thruDateObject, 'alerts': alertsList])
+                        res.push([jobName: monitorIdStr, monitorId: monitorIdStr, indexName: indexName, data: indexHits.hitList, bounds: bounds, fromDate: fromDateObject, thruDate: thruDateObject, 'alerts': alertsList])
                     }
                 }
-
                 value = res
                 ]]>
             </script>
@@ -461,7 +380,7 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <log message="==== ${monitorId} ${value}"/>
 
-            <entity-find-one entity-name="tailorsoft.servicejobmonitor.Monitor" value-field="monitor" cache="true">
+            <entity-find-one entity-name="tailorsoft.service.job.ServiceJobMonitor" value-field="monitor" cache="true">
                 <field-map field-name="monitorId"/>
             </entity-find-one>
             <if condition="!monitor">
@@ -500,7 +419,7 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="alerts"/>
         </out-parameters>
         <actions>
-            <entity-find entity-name="tailorsoft.servicejobmonitor.MonitorAlertDetails" list="alerts">
+            <entity-find entity-name="tailorsoft.service.job.ServiceJobMonitorAlertDetails" list="alerts">
                 <econdition field-name="monitorStatusId" value="MonitorDeleted"  operator="not-equals"/>
             </entity-find>
         </actions>
@@ -516,7 +435,7 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <if condition="term">
                 <then>
-                    <entity-find entity-name="tailorsoft.servicejobmonitor.PartyName" list="options">
+                    <entity-find entity-name="tailorsoft.service.job.ServiceJobPartyName" list="options">
                         <econdition field-name="partyName" operator="like" value="%${term}%" ignore-case="true"/>
                     </entity-find>
                 </then>
@@ -527,4 +446,62 @@ along with this software (see the LICENSE.md file). If not, see
         </actions>
     </service>
 
+    <service verb="create" noun="Index">
+        <in-parameters>
+            <parameter name="indexName"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="result"/>
+        </out-parameters>
+        <actions>
+            <script>
+                <![CDATA[
+
+                    client = ec.elastic.getDefault()
+
+                    if (!client.indexExists(indexName)) {
+                        try {
+                            Map indexMapping = ["properties":["@timestamp":["type":"date"], "value":["type":"float"]]];
+                            client.createIndex(indexName, indexMapping, (String) null)
+                            result = "INDEX_CREATED"
+                        } catch (Exception e) {
+                            logger.error("Error checking and creating ${indexName} ES index", e)
+                            result = "INDEX_NOT_CREATED"
+                        }
+                    }else{
+                        result = "INDEX_ALREADY_EXIST"
+                    }
+                ]]>
+            </script>
+        </actions>
+    </service>
+
+    <service verb="get" noun="IndexHits">
+        <in-parameters>
+            <parameter name="indexName"/>
+            <parameter name="searchMap" type="Map"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="hitList"/>
+        </out-parameters>
+        <actions>
+            <set field="hitList" from="[]"/>
+            <script>
+                <![CDATA[
+
+                    client = ec.elastic.getDefault()
+
+                    if (client.indexExists(indexName)) {
+                        try {
+                            hitList = client.searchHits(indexName, searchMap)
+                        } catch (Exception e) {
+                            logger.error("Can't find hits in the index: ${indexName}", e)
+                        }
+                    }else{
+                        logger.error("Can't find index with name: ${indexName}", e)
+                    }
+                ]]>
+            </script>
+        </actions>
+    </service>
 </services>
