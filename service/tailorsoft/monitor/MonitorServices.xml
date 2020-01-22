@@ -176,7 +176,7 @@ along with this software (see the LICENSE.md file). If not, see
 
 
                     // hits from elasticsearch
-                    Map searchMap = ["sort":["@timestamp":"desc"]]
+                    Map searchMap = ["sort":["@timestamp":"desc"], "size":alertCount]
                     indexHits = ec.service.sync().name("tailorsoft.monitor.MonitorServices.get#IndexHits").parameters(["indexName":indexName, "searchMap":searchMap]).call()
                     hits = indexHits.hitList
 
