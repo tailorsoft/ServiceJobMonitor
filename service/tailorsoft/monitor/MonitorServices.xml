@@ -92,14 +92,13 @@ along with this software (see the LICENSE.md file). If not, see
                 json.put("value", value)
 
                 try {
-                    String createIndexResult = ec.service.sync().name("tailorsoft.monitor.MonitorServices.create#Index").parameter("indexName", indexName).call()
+                    Map createIndexResult = ec.service.sync().name("tailorsoft.monitor.MonitorServices.create#Index").parameter("indexName", indexName).call()
 
-                    if(createIndexResult == "INDEX_NOT_CREATED"){
+                    if(createIndexResult.result == "INDEX_NOT_CREATED"){
                         logger.error("Can't create the index with name: ${indexName}")
-                        return
+                    }else{
+                        client.index(indexName, UUID.randomUUID().toString(), json)
                     }
-
-                    client.index(indexName, UUID.randomUUID().toString(), json)
                 } finally {
 
                 }
