@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <entity-facade-xml type="demo">
-    <statusTypes statusTypeId="MonitorStatus" lastUpdatedStamp="1579188461696" description="Monitor status"/>
-    <statuses lastUpdatedStamp="1579027474837" statusId="MonitorActive" sequenceNum="1" statusTypeId="MonitorStatus" description="Monitor Active"/>
-    <statuses lastUpdatedStamp="1579027474837" statusId="MonitorPaused" sequenceNum="2" statusTypeId="MonitorStatus" description="Monitor Paused"/>
-    <statuses lastUpdatedStamp="1579027474837" statusId="MonitorDeleted" sequenceNum="3" statusTypeId="MonitorStatus" description="Monitor Deleted"/>
-    <!--    Email template for notifications    -->
-    <emailTemplates
-            subject="Monitor ${bodyParameters.message.monitorId} out of bounds. value [${bodyParameters.message.value}]"
-            bodyScreenLocation="component://ServiceJobMonitor/screen/email/Notification.xml"
-            sendPartial="Y"
-            emailServerId="SYSTEM"
-            fromName="Moqui notification"
-            emailTemplateId="ALERT_NOTIFICATION"
-            emailTypeEnumId="EMT_NOTIFICATION"
-            fromAddress="noreply@moqui.org"
-    />
-
     <!--  Temperature Example   -->
     <moqui.service.job.ServiceJob jobId="poll_temperature" jobName="poll_temperature"
                                   description="get temperature salt lake city"

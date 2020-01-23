@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2020 Tailorsoft. All Rights Reserved. -->
 <entity-facade-xml type="install">
+    <statusTypes statusTypeId="MonitorStatus" lastUpdatedStamp="1579188461696" description="Monitor status"/>
+    <statuses statusId="MonitorActive" sequenceNum="1" statusTypeId="MonitorStatus" description="Monitor Active"/>
+    <statuses statusId="MonitorPaused" sequenceNum="2" statusTypeId="MonitorStatus" description="Monitor Paused"/>
+    <statuses statusId="MonitorDeleted" sequenceNum="3" statusTypeId="MonitorStatus" description="Monitor Deleted"/>
+    <!--    Email template for notifications    -->
+    <emailTemplates
+            subject="Monitor ${bodyParameters.message.monitorId} out of bounds. value [${bodyParameters.message.value}]"
+            bodyScreenLocation="component://ServiceJobMonitor/screen/email/Notification.xml"
+            sendPartial="Y"
+            emailServerId="SYSTEM"
+            fromName="Moqui notification"
+            emailTemplateId="ALERT_NOTIFICATION"
+            emailTypeEnumId="EMT_NOTIFICATION"
+            fromAddress="noreply@moqui.org"
+    />
+
     <moqui.security.ArtifactGroup artifactGroupId="TIMESERIES_MONITOR" description="Time Series (via root screen)"/>
     <moqui.security.ArtifactGroupMember artifactGroupId="TIMESERIES_MONITOR" artifactTypeEnumId="AT_XML_SCREEN" inheritAuthz="Y" artifactName="component://ServiceJobMonitor/screen/MonitorAdmin.xml"/>
     <moqui.security.ArtifactGroupMember artifactGroupId="TIMESERIES_MONITOR" artifactName="tailorsoft.servicejobmonitor..*" nameIsPattern="Y" artifactTypeEnumId="AT_SERVICE" inheritAuthz="Y"/>
