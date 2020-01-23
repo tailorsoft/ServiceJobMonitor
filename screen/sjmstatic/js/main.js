@@ -12,7 +12,7 @@ function gDC(tag = "div", className = "") {
  * @param { string } type
  * @returns {{chartBox: *, chartCanvas: *}}
  */
-function generateBox({ name, type = "" }) {
+function generateBox({ name, type = "", title = "" }) {
   // generate divs
   const chartBox = gDC("div", "chartBox");
   const chartBoxHeader = gDC("div", "chartBoxHeader");
@@ -23,7 +23,7 @@ function generateBox({ name, type = "" }) {
   chartCanvas.id = name;
 
   // fill with data
-  chartBoxHeaderTitle.innerHTML = `<a href='./Monitor/MonitorDetails/MonitorChart?monitorId=${name}'>${name}</a>`;
+  chartBoxHeaderTitle.innerHTML = `<a href='./Monitor/MonitorDetails/MonitorChart?monitorId=${name}'>${title}</a>`;
   chartBoxHeaderOpen.innerHTML = `<a href='./Monitor/MonitorDetails/MonitorChart?monitorId=${name}'>Open Chart <i class=\"fas fa-angle-right\"></i></a>`;
 
   chartBoxHeader.className = "chartBoxHeader " + type;
@@ -260,7 +260,8 @@ function makeChart(data) {
   console.log(isOpenAlert, data.alerts)
   const chart = generateBox({
     name: data.jobName,
-    type: isOpenAlert ? "alertChart" : ""
+    title: data.monitorTitle,
+    type: isOpenAlert ? "alertChart" : "",
   });
 
   container.append(chart.chartBox);

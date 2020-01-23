@@ -350,6 +350,7 @@ along with this software (see the LICENSE.md file). If not, see
                     for (int i = 0; i < monitorList.size(); i++) {
                         String indexName = monitorList[i].indexName
                         String monitorIdStr = monitorList[i].monitorId
+                        String monitorTitle = monitorList[i].title
 
                         Map bounds = ec.entity.find("tailorsoft.service.job.ServiceJobMonitorBounds").condition("monitorId", monitorIdStr).one()
 
@@ -361,7 +362,7 @@ along with this software (see the LICENSE.md file). If not, see
                                 .condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("monitorId", "equals", monitorId, monitorIdStr, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "greater", fromDateFormated, null, null, false, false, false, "false")).condition((org.moqui.entity.EntityCondition) ec.entity.conditionFactory.makeActionConditionDirect("fromDate", "less", thruDateFormated, null, null, false, false, false, "false"))
                         alertsList = alertsList_xafind.list()
 
-                        res.push([jobName: monitorIdStr, monitorId: monitorIdStr, indexName: indexName, data: indexHits.hitList, bounds: bounds, fromDate: fromDateObject, thruDate: thruDateObject, 'alerts': alertsList])
+                        res.push([jobName: monitorIdStr, monitorId: monitorIdStr, monitorTitle: monitorTitle, indexName: indexName, data: indexHits.hitList, bounds: bounds, fromDate: fromDateObject, thruDate: thruDateObject, 'alerts': alertsList])
                     }
                 }
                 value = res
