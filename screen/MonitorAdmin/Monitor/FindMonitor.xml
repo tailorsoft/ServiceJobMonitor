@@ -52,7 +52,7 @@
             <!-- End Validations-->
 
             <!-- Monitor -->
-            <set field="indexName" from="monitorId"/>
+            <set field="indexName" from="monitorId.toLowerCase()"/>
 
             <!-- Monitor Bounds -->
             <set field="algorithmEnumId" value="ALGO_BOUNDS"/>
