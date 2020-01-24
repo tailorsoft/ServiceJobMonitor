@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2020 Tailorsoft. All Rights Reserved. -->
 <entity-facade-xml type="install">
-    <statusTypes statusTypeId="MonitorStatus" lastUpdatedStamp="1579188461696" description="Monitor status"/>
+    <statusTypes statusTypeId="MonitorStatus"  description="Monitor status"/>
     <statuses statusId="MonitorActive" sequenceNum="1" statusTypeId="MonitorStatus" description="Monitor Active"/>
     <statuses statusId="MonitorPaused" sequenceNum="2" statusTypeId="MonitorStatus" description="Monitor Paused"/>
     <statuses statusId="MonitorDeleted" sequenceNum="3" statusTypeId="MonitorStatus" description="Monitor Deleted"/>
