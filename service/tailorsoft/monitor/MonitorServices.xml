@@ -498,7 +498,7 @@ along with this software (see the LICENSE.md file). If not, see
                             logger.error("Can't find hits in the index: ${indexName}", e)
                         }
                     }else{
-                        logger.error("Can't find index with name: ${indexName}", e)
+                        logger.warn("Can't find index with name: ${indexName}", e)
                     }
                 ]]>
             </script>
