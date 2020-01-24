@@ -54,6 +54,7 @@
                 <form-single name="UpdateMonitor" map="monitor" transition="update" dynamic="true">
                     <auto-fields-entity entity-name="tailorsoft.service.job.ServiceJobMonitor" include="pk" field-type="display"/>
                     <auto-fields-entity entity-name="tailorsoft.service.job.ServiceJobMonitor" include="nonpk" field-type="edit"/>
+                    <field name="jobName"><default-field><link url="/vapps/system/ServiceJob/Jobs/ServiceJobDetail?jobName=${monitor.jobName}" text="${monitor.jobName}" link-type="anchor"/></default-field></field>
                     <field name="submitButton">
                         <default-field title="Update">
                             <submit/>
@@ -62,6 +63,5 @@
                 </form-single>
             </row-col>
         </container-row>
-
     </widgets>
 </screen>
