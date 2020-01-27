@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<screen default-menu-title="Timeseries Monitors" default-menu-index="1">
+<screen default-menu-title="Find Monitor" default-menu-index="1">
 
     <transition name="editMonitor">
         <default-response url="../MonitorDetails"/>
