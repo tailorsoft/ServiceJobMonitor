@@ -154,7 +154,7 @@
             </form-single>
         </container-dialog>
         <container>
-            <form-list name="ListMonitors" list="monitorList" transition="listMonitors" multi="false" dinamic="true"
+            <form-list name="ListMonitors" list="monitorList" transition="listMonitors" multi="false" dynamic="true"
                        header-dialog="true">
                 <auto-fields-entity entity-name="tailorsoft.service.job.ServiceJobMonitor" field-type="find-display"/>
                 <field name="monitorId">

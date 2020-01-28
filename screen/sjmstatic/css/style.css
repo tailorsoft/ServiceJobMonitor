@@ -319,3 +319,9 @@
 .delete-icon-wrapper{
     cursor: pointer;
 }
+#RemovePartyId .hidden-xs{
+    display: none;
+}
+#RemovePartyId fieldset{
+    padding: 0;
+}

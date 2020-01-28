@@ -5,7 +5,7 @@
         menu-image-type="icon">
 
 
-    <subscreens default-item="Charts"/>
+    <subscreens default-item="Charts" always-use-full-path="true"/>
     <widgets>
         <render-mode>
             <text type="html,vuet">
@@ -15,7 +15,6 @@
                     <script src="https://cdn.jsdelivr.net/npm/vega@5.9.0"></script>
                     <script src="https://cdn.jsdelivr.net/npm/vega-lite@4.0.0"></script>
                     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.2.0"></script>
-                    <script src="/jsmstatic/js/main.js" />
                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css"/>
                 ]]>
             </text>
