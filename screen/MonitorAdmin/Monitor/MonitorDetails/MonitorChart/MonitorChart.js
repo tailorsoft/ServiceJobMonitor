@@ -13,6 +13,7 @@ define("Monitor", {
   mounted: function() {
     const librariesPromises = [];
     librariesPromises.push(this.loadAxiosLibrary());
+    librariesPromises.push(this.loadMainJSFile());
 
     const fromDate = new Date(Date.now() - 1000 * 60 * 60 * 24 * 5);
     const thruDate = new Date(Date.now() + 1000 * 60 * 100);
@@ -84,6 +85,20 @@ define("Monitor", {
           resolve();
         };
         document.head.appendChild(importAxios);
+      });
+    },
+    loadMainJSFile(){
+      return new Promise(function(resolve, reject) {
+        const importMainJS = document.createElement("script");
+        const scriptType = "text/javascript";
+        importMainJS.type = scriptType;
+        importMainJS.src =
+            "/jsmstatic/js/main.js";
+        importMainJS.async = false;
+        importMainJS.onload = function() {
+          resolve();
+        };
+        document.head.appendChild(importMainJS);
       });
     },
     setDates({ type, target }) {
