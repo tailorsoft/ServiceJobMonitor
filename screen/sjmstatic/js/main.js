@@ -50,7 +50,10 @@ function renderVega(data, elementId) {
 
   const alerts = data.alerts.map(alert => {
     alert.color = alert.statusId === "TsOpen" ? "#D9534F" : "#5cb85c";
-
+    if(alert.value){
+      alert.value = alert.value.toFixed(2);
+    }
+    //
     return alert;
   });
 
@@ -134,17 +137,19 @@ function renderVega(data, elementId) {
         tooltip: [
           {
             field: "fromDate",
+            title: "Start Date",
             type: "temporal",
             formatType: "time",
-            format: "%I:%M %p"
+            format: "%Y %m %d %I:%M %p"
           },
           {
             field: "thruDate",
+            title: "End Date",
             type: "temporal",
             formatType: "time",
-            format: "%I:%M %p"
+            format: "%Y %m %d %I:%M %p"
           },
-          { field: "value", type: "quantitative" }
+          { field: "value", title: "Value", type: "quantitative" }
         ],
         x: {
           field: "fromDate",
@@ -249,7 +254,6 @@ function renderVega(data, elementId) {
 }
 
 function makeChart(data) {
-  console.log(data)
   const container = document.getElementById("chartsContainer");
 
   const isOpenAlert =
@@ -257,7 +261,6 @@ function makeChart(data) {
       return alert.statusId === "TsOpen";
     }).length > 0;
 
-  console.log(isOpenAlert, data.alerts)
   const chart = generateBox({
     name: data.jobName,
     title: data.monitorTitle,
@@ -277,7 +280,6 @@ function parseDate(date) {
 const DaysOld = new Date(Date.now() - 1000 * 60 * 60 * 24 * 7);
 
 function changeDate() {
-  console.log("entrasssss")
   const startDate = new Date(startDateInput.value);
   const endDate = new Date(endDateInput.value);
 
