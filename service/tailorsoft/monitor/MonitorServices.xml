@@ -52,6 +52,10 @@ along with this software (see the LICENSE.md file). If not, see
                 <set field="jsonResults" from="jsonResults[part]"/>
             </iterate>
 
+            <if condition="!jsonResults || !jsonResults.toString().isNumber()">
+                <return error="true" message="'${jsonResults.toString()}' is not a valid result found in Job ${monitor.jobName} for Monitor ${monitor.monitorId}"/>
+            </if>
+
             <set field="doubleValue" from="Float.parseFloat(jsonResults.toString())"/>
             <if condition="doubleValue == null">
                 <return error="true" message="No double value found at path: ${monitor.valuePath} in ${results} "/>
