@@ -1,11 +1,4 @@
 // generate div with class
-const startDateInput = document.getElementById('startDateInput');
-const endDateInput = document.getElementById('endDateInput');
-
-if (startDateInput && endDateInput) {
-  startDateInput.onchange = changeDate;
-  endDateInput.onchange = changeDate;
-}
 
 function gDC(tag = "div", className = "") {
   const div = document.createElement(tag);
@@ -377,5 +370,4 @@ function selectCurrentTab() {
   }
   lastTab = currentTab;
 }
-fetchData(DaysOld, new Date(Date.now() + 1000 * 60 * 60 * 24));
 // selectCurrentTab();

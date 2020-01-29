@@ -3,7 +3,6 @@
 <div>
     <div id="chartsContainer">
     </div>
-    <script src="/jsmstatic/js/main.js" />
     <script>
         fetchData(DaysOld, new Date(Date.now() + 1000 * 60 * 60 * 24));
 
