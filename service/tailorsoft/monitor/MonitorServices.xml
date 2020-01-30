@@ -222,7 +222,7 @@ along with this software (see the LICENSE.md file). If not, see
                         Map hit = hits[0]._source
                         Float value = Float.parseFloat(hit.value.toString())
 
-                        if (alertList.size() > 0 && alertList[0].statusId.toString() == 'TsOpen') {
+                        if (alertList.size() > 0 && alertList[0].statusId.toString() == 'SjmOpen') {
                             logger.info('=== last alert still open')
                             // @todo do nothing
                             return false;
@@ -239,7 +239,7 @@ along with this software (see the LICENSE.md file). If not, see
                                         jobRunId        : jobRunId,
                                         fromDate        : new Date(),
                                         value           : value,
-                                        statusId        : 'TsOpen',
+                                        statusId        : 'SjmOpen',
                                         notification    : notificationId,
                                         lastUpdatedStamp: new Date(),
                                 ])
@@ -248,7 +248,7 @@ along with this software (see the LICENSE.md file). If not, see
 
                     }
 
-                    if (alertList.size() > 0 && alertList[0].statusId.toString() == 'TsOpen') {
+                    if (alertList.size() > 0 && alertList[0].statusId.toString() == 'SjmOpen') {
                         currentAlert = alertList[0];
 
                         Boolean restoreValid = true;
@@ -268,7 +268,7 @@ along with this software (see the LICENSE.md file). If not, see
 
                             ec.service.sync()
                                     .name("update#tailorsoft.service.job.ServiceJobMonitorAlert")
-                                    .parameters([id: currentAlert.id, statusId: 'TsClosed', thruDate: new Date()])
+                                    .parameters([id: currentAlert.id, statusId: 'SjmClosed', thruDate: new Date()])
                                     .call()
                         }
                     }

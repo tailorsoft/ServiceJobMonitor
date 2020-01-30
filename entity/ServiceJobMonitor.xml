@@ -69,12 +69,12 @@
         <relationship type="one" title="AlertStatus" related="moqui.basic.StatusItem" short-alias="status"/>
         <seed-data>
             <moqui.basic.StatusType description="Alert status" parentTypeId="" statusTypeId="AlertStatus"/>
-            <moqui.basic.StatusItem description="alert open" sequenceNum="1" statusId="TsOpen"
+            <moqui.basic.StatusItem description="alert open" sequenceNum="1" statusId="SjmOpen"
                                     statusTypeId="AlertStatus"/>
-            <moqui.basic.StatusItem description="alert closed" sequenceNum="2" statusId="TsClosed"
+            <moqui.basic.StatusItem description="alert closed" sequenceNum="2" statusId="SjmClosed"
                                     statusTypeId="AlertStatus"/>
 
-            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="TsOpen" toStatusId="TsClosed"
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="SjmOpen" toStatusId="SjmClosed"
                                               transitionName="solved"/>
         </seed-data>
         <relationship type="many" related="tailorsoft.service.job.ServiceJobMonitor"/>

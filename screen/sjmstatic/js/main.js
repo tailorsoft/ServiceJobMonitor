@@ -45,11 +45,11 @@ const container = document.getElementById("chartsContainer");
 function renderVega(data, elementId) {
   const isOpenAlert =
     data.alerts.filter(alert => {
-      return alert.statusId === "TsOpen";
+      return alert.statusId === "SjmOpen";
     }).length > 0;
 
   const alerts = data.alerts.map(alert => {
-    alert.color = alert.statusId === "TsOpen" ? "#D9534F" : "#5cb85c";
+    alert.color = alert.statusId === "SjmOpen" ? "#D9534F" : "#5cb85c";
     if(alert.value){
       alert.value = alert.value.toFixed(2);
     }
@@ -258,7 +258,7 @@ function makeChart(data) {
 
   const isOpenAlert =
     data.alerts.filter(alert => {
-      return alert.statusId === "TsOpen";
+      return alert.statusId === "SjmOpen";
     }).length > 0;
 
   const chart = generateBox({
