@@ -20,7 +20,7 @@
                 ]]>
             </text>
         </render-mode>
-        <container id="timeseries" style="ts-container">
+        <container id="sjm" style="ts-container">
             <subscreens-panel id="MonitorAdminPanel" type="tab"/>
         </container>
     </widgets>
