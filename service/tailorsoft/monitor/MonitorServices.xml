@@ -508,4 +508,49 @@ along with this software (see the LICENSE.md file). If not, see
             </script>
         </actions>
     </service>
+
+<!--    Validate false, as with true it filters out HTML elements such as < and > -->
+    <service verb="get" noun="QueryResults" authenticate="true" validate="false">
+        <in-parameters>
+            <parameter name="groupName" default="transactional" />
+            <parameter name="startDate" type="Timestamp" />
+            <parameter name="endDate" type="Timestamp" />
+            <parameter name="query" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="result" type="Integer" />
+        </out-parameters>
+        <actions>
+            <script><![CDATA[
+                import java.sql.Connection
+                import org.moqui.context.ExecutionContext
+
+                ExecutionContext ec = context.ec
+                Connection con = ec.getEntity().getConnection(groupName)
+                def statement = con.createStatement()
+
+                //Create a timestamp literal http://www.h2database.com/html/grammar.html#timestamp
+                query = query.replace("{FROM}",
+                                "TIMESTAMP '" + startDate.toString()+"'")
+                            .replace("{THRU}",
+                                "TIMESTAMP '" + endDate.toString()+"'")
+
+                def results = statement.executeQuery(query)
+
+                //The cursor starts before the first row
+                if(!results.next())
+                    throw new Exception("No values returned")
+
+                def meta = results.getMetaData()
+                if (meta.getColumnCount() > 1)
+                    throw new Exception("More than 1 column returned, 1 expected")
+
+                // get the first column, which we expect to be an int.
+                result = results.getInt(1);
+
+                statement.close()
+                con.close()
+                ]]></script>
+        </actions>
+    </service>
 </services>
