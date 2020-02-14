@@ -12,7 +12,6 @@
                 <![CDATA[
                     <link href="/jsmstatic/css/normalize.css" />
                     <link href="/jsmstatic/css/style.css" />
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js" integrity="sha256-/ijcOLwFf26xEYAjW75FizKVo5tnTYiQddPZoLUHHZ8=" crossorigin="anonymous"></script>
                     <script src="https://cdn.jsdelivr.net/npm/vega@5.9.0"></script>
                     <script src="https://cdn.jsdelivr.net/npm/vega-lite@4.0.0"></script>
                     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.2.2/build/vega-embed.js"></script>
