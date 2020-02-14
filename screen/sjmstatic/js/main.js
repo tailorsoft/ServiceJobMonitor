@@ -1,10 +1,12 @@
 // generate div with class
-
 function gDC(tag = "div", className = "") {
   const div = document.createElement(tag);
   div.className = className;
   return div;
 }
+
+//Append popup element
+$(document.body).append('<div id="vg-tooltip-element" class="vg-tooltip light-theme"></div>');
 
 /**
  *
@@ -40,7 +42,93 @@ function generateBox({ name, type = "", title = "" }) {
   return { chartBox, chartCanvas };
 }
 
+function showPopover(el, popoverId, event, vegaItem) {
+  let popover = $("#"+popoverId).first();
+
+  //Render the data inside the popover
+  //As the render function doesnt have access to the vue component, do it manipulating the DOM directy.
+  popover.empty();
+
+  let tooltip = vegaItem.tooltip;
+
+  let table = document.createElement("table");
+  let tbody = document.createElement("tbody");
+
+  for(k in tooltip){
+    if(tooltip.hasOwnProperty(k))
+    {
+      let tr = document.createElement("tr");
+
+      let key = document.createElement("td");
+      key.classList.add("key");
+      key.innerText = k;
+      tr.append(key);
+
+      let value = document.createElement("td");
+      value.classList.add("value");
+      value.innerText = tooltip[k];
+      tr.append(value);
+      tbody.append(tr);
+    }
+  }
+
+  table.append(tbody);
+  popover.append(table);
+
+  popover.css({
+    'top': event.clientY,
+    'left': event.clientX
+  });
+
+  popover.addClass("visible");
+}
+
+function hidePopover(popoverId, source) {
+  //If user leaves the popover parent element without entering the popover, close it.
+  if(source == 'element') {
+    //We need to allow time for the user to enter the popover
+    setTimeout(function() {
+      if(!mouseInPopover)
+        $("#"+popoverId).first().removeClass("visible");
+    }, 150);
+  } else {
+    $("#"+popoverId).first().removeClass("visible");
+    mouseInPopover = false;
+  }
+}
+
 const container = document.getElementById("chartsContainer");
+
+let mouseInElement = false;
+let mouseInPopover = false;
+
+$("#vg-tooltip-element").mouseleave(function () {
+  hidePopover('vg-tooltip-element', 'popover')
+}).mouseenter(function () {
+  mouseInPopover = true;
+  mouseInElement = false;
+});
+
+//Override the default handler with our own, to customize the rendered html element with our requirements
+//see: https://vega.github.io/vega/docs/api/view/#view_tooltip
+function tooltipHandler(handler, event, item, value) {
+  console.log(handler, event, item, value);
+  if(item && item.tooltip) {
+    switch (event.vegaType) {
+      case "mousemove":
+        //Dont execute the function on mousemove after the first time
+        if (!mouseInElement) {
+          mouseInElement = true;
+          showPopover(item._svg, "vg-tooltip-element", event, item)
+        }
+        break;
+      case "mouseout":
+        mouseInElement = false;
+        hidePopover('vg-tooltip-element', 'element');
+        break;
+    }
+  }
+}
 
 function renderVega(data, elementId) {
   const isOpenAlert =
@@ -135,22 +223,22 @@ function renderVega(data, elementId) {
           scale: null
         },
         tooltip: [
-          {
-            field: "fromDate",
-            title: "Start Date",
-            type: "temporal",
-            formatType: "time",
-            format: "%Y %m %d %I:%M %p"
-          },
-          {
-            field: "thruDate",
-            title: "End Date",
-            type: "temporal",
-            formatType: "time",
-            format: "%Y %m %d %I:%M %p"
-          },
-          { field: "value", title: "Value", type: "quantitative" }
-        ],
+                {
+                  field: "fromDate",
+                  title: "Start Date",
+                  type: "temporal",
+                  formatType: "time",
+                  format: "%Y %m %d %I:%M %p"
+                },
+                {
+                  field: "thruDate",
+                  title: "End Date",
+                  type: "temporal",
+                  formatType: "time",
+                  format: "%Y %m %d %I:%M %p"
+                },
+                { field: "value", title: "Value", type: "quantitative" },
+              ],
         x: {
           field: "fromDate",
           type: "temporal",
@@ -249,8 +337,12 @@ function renderVega(data, elementId) {
       }
     }
   };
+  const VeOptions = {
+    tooltip: tooltipHandler,
+    actions: false,
+    renderer: "svg" };
 
-  vegaEmbed("#" + elementId, yourVlSpec, { actions: false, renderer: "svg" });
+  vegaEmbed("#" + elementId, yourVlSpec, VeOptions);
 }
 
 function makeChart(data) {
