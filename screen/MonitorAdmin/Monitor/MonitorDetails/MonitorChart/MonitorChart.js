@@ -62,6 +62,7 @@ define("Monitor", {
               fromDate: moment(alert.fromDate).format("DD MMM, h:mm a"),
               thruDate: alert.thruDate ? moment(alert.thruDate).format("DD MMM, h:mm a") : null,
               status: alert.statusId,
+              metadata: alert.metadata,
               value: parseFloat(alert.value).toFixed(2)
             };
           }).reverse();
