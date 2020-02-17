@@ -14,6 +14,7 @@
         <field name="title" type="text-short"/>
         <field name="description" type="text-long"/>
         <field name="valuePath" type="text-medium"/>
+        <field name="metadataPath" type="text-medium"/>
         <field name="indexName" type="text-medium"/>
         <field name="statusId" type="id"/>
         <relationship type="one" title="MonitorStatus" related="moqui.basic.StatusItem" short-alias="status"/>
@@ -62,6 +63,7 @@
         <field name="fromDate" type="date-time"/>
         <field name="thruDate" type="date-time"/>
         <field name="value" type="number-float"/>
+        <field name="metadata" type="text-long"/>
         <field name="notification" type="text-medium"/>
         <field name="issueUrl" type="text-medium"/>
         <field name="partyId" type="id"/>
@@ -109,6 +111,7 @@
         <alias name="fromDate" entity-alias="Alert" field="fromDate"/>
         <alias name="thruDate" entity-alias="Alert" field="thruDate"/>
         <alias name="value" entity-alias="Alert" field="value"/>
+        <alias name="metadata" entity-alias="Alert" field="metadata"/>
         <alias name="notification" entity-alias="Alert" field="notification"/>
         <alias name="issueUrl" entity-alias="Alert" field="issueUrl"/>
         <alias name="partyId" entity-alias="Alert" field="partyId"/>
