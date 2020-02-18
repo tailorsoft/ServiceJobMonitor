@@ -42,6 +42,24 @@ function generateBox({ name, type = "", title = "" }) {
   return { chartBox, chartCanvas };
 }
 
+function createTableRow(name, val, elparent){
+  let tr = document.createElement("tr");
+
+  let key = document.createElement("td");
+  key.classList.add("key");
+  key.innerText = name;
+  tr.append(key);
+
+  let value = document.createElement("td");
+  value.classList.add("value");
+  value.innerText = val;
+  tr.append(value);
+
+  elparent.append(tr);
+
+  return value
+}
+
 function showPopover(el, popoverId, event, vegaItem) {
   let popover = $("#"+popoverId).first();
 
@@ -50,7 +68,6 @@ function showPopover(el, popoverId, event, vegaItem) {
   popover.empty();
 
   let tooltip = vegaItem.tooltip;
-  let metadata = vegaItem.datum.metadata ? JSON.parse(vegaItem.datum.metadata) : {};
 
   let table = document.createElement("table");
   let tbody = document.createElement("tbody");
@@ -58,46 +75,7 @@ function showPopover(el, popoverId, event, vegaItem) {
   //Create tooltip
   for(k in tooltip){
     if(tooltip.hasOwnProperty(k)){
-      let tr = document.createElement("tr");
-
-      let key = document.createElement("td");
-      key.classList.add("key");
-      key.innerText = k;
-      tr.append(key);
-
-      let value = document.createElement("td");
-      value.classList.add("value");
-      value.innerText = tooltip[k];
-      tr.append(value);
-
-      tbody.append(tr);
-    }
-  }
-
-  //Append metadata
-  for(k in metadata){
-    if(metadata.hasOwnProperty(k)){
-      let tr = document.createElement("tr");
-
-      let key = document.createElement("td");
-      key.classList.add("key");
-      key.innerText = metadata[k].name;
-      tr.append(key);
-
-      let value = document.createElement("td");
-      value.classList.add("value");
-
-      let tag = document.createElement(metadata[k].tag);
-      tag.innerHTML = metadata[k].innerHTML;
-      for(attr in metadata[k].attributes){
-        if(metadata[k].attributes.hasOwnProperty(attr)){
-          tag.setAttribute(attr, metadata[k].attributes[attr])
-        }
-      }
-
-      value.append(tag);
-      tr.append(value);
-      tbody.append(tr);
+      createTableRow(k, tooltip[k], tbody);
     }
   }
 
@@ -266,7 +244,7 @@ function renderVega(data, elementId) {
                   formatType: "time",
                   format: "%Y %m %d %I:%M %p"
                 },
-                { field: "value", title: "Value", type: "quantitative" },
+                { field: "value", title: "Value", type: "quantitative" }
               ],
         x: {
           field: "fromDate",
