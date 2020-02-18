@@ -518,38 +518,43 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="query" required="true"/>
         </in-parameters>
         <out-parameters>
-            <parameter name="result" type="Integer" />
+            <parameter name="count" type="Integer"/>
+            <parameter name="result" type="List"/>
         </out-parameters>
         <actions>
+            <set field="count" from="0"/>
+            <set field="result" from="[]"/>
             <script><![CDATA[
                 import java.sql.Connection
                 import org.moqui.context.ExecutionContext
+
+                import java.util.logging.Logger
 
                 ExecutionContext ec = context.ec
                 Connection con = ec.getEntity().getConnection(groupName)
                 def statement = con.createStatement()
 
+                def logger = ec.getLogger()
+
                 //Create a timestamp literal http://www.h2database.com/html/grammar.html#timestamp
                 query = query.replace("{FROM}",
-                                "TIMESTAMP '" + startDate.toString()+"'")
-                            .replace("{THRU}",
-                                "TIMESTAMP '" + endDate.toString()+"'")
+                        "TIMESTAMP '" + startDate.toString() + "'")
+                        .replace("{THRU}",
+                                "TIMESTAMP '" + endDate.toString() + "'")
 
-                def results = statement.executeQuery(query)
+                def queryrs = statement.executeQuery(query)
 
-                //The cursor starts before the first row
-                if(!results.next())
-                    throw new Exception("No values returned")
+                def meta = queryrs.getMetaData()
+                def columns = meta.getColumnCount()
 
-                def meta = results.getMetaData()
-                if (meta.getColumnCount() > 1)
-                    throw new Exception("More than 1 column returned, 1 expected")
-
-                // get the first column, which we expect to be an int.
-                result = results.getInt(1);
-
-                statement.close()
-                con.close()
+                while (queryrs.next()) {
+                    Map<String, Object> row = new HashMap<>()
+                    for (int i = 1; i <= columns; ++i) {
+                        row.put(meta.getColumnName(i), queryrs.getObject(i))
+                    }
+                    count++
+                    result.add(row);
+                }
                 ]]></script>
         </actions>
     </service>
