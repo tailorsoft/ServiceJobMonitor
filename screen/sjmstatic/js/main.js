@@ -50,13 +50,14 @@ function showPopover(el, popoverId, event, vegaItem) {
   popover.empty();
 
   let tooltip = vegaItem.tooltip;
+  let metadata = vegaItem.datum.metadata ? JSON.parse(vegaItem.datum.metadata) : {};
 
   let table = document.createElement("table");
   let tbody = document.createElement("tbody");
 
+  //Create tooltip
   for(k in tooltip){
-    if(tooltip.hasOwnProperty(k))
-    {
+    if(tooltip.hasOwnProperty(k)){
       let tr = document.createElement("tr");
 
       let key = document.createElement("td");
@@ -68,10 +69,39 @@ function showPopover(el, popoverId, event, vegaItem) {
       value.classList.add("value");
       value.innerText = tooltip[k];
       tr.append(value);
+
       tbody.append(tr);
     }
   }
 
+  //Append metadata
+  for(k in metadata){
+    if(metadata.hasOwnProperty(k)){
+      let tr = document.createElement("tr");
+
+      let key = document.createElement("td");
+      key.classList.add("key");
+      key.innerText = metadata[k].name;
+      tr.append(key);
+
+      let value = document.createElement("td");
+      value.classList.add("value");
+
+      let tag = document.createElement(metadata[k].tag);
+      tag.innerHTML = metadata[k].innerHTML;
+      for(attr in metadata[k].attributes){
+        if(metadata[k].attributes.hasOwnProperty(attr)){
+          tag.setAttribute(attr, metadata[k].attributes[attr])
+        }
+      }
+
+      value.append(tag);
+      tr.append(value);
+      tbody.append(tr);
+    }
+  }
+
+  //Add to table
   table.append(tbody);
   popover.append(table);
 
@@ -112,7 +142,6 @@ $("#vg-tooltip-element").mouseleave(function () {
 //Override the default handler with our own, to customize the rendered html element with our requirements
 //see: https://vega.github.io/vega/docs/api/view/#view_tooltip
 function tooltipHandler(handler, event, item, value) {
-  console.log(handler, event, item, value);
   if(item && item.tooltip) {
     switch (event.vegaType) {
       case "mousemove":
@@ -347,7 +376,6 @@ function renderVega(data, elementId) {
 
 function makeChart(data) {
   const container = document.getElementById("chartsContainer");
-
   const isOpenAlert =
     data.alerts.filter(alert => {
       return alert.statusId === "SjmOpen";
