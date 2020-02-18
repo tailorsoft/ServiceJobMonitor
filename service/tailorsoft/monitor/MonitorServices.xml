@@ -41,7 +41,6 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
 
             <set field="jsonResults" from="new groovy.json.JsonSlurper().parseText(results)"/>
-            <set field="metaResults" from="jsonResults"/>
 
             <!-- TODO, switch to JsonPath: https://github.com/json-path/JsonPath -->
             <set field="pathParts" from="monitor.valuePath.split('\\.')"/>
@@ -52,18 +51,6 @@ along with this software (see the LICENSE.md file). If not, see
                 </if>
                 <set field="jsonResults" from="jsonResults[part]"/>
             </iterate>
-
-            <if condition="monitor.metadataPath?.length() > 0">
-                <set field="metaParts" from="monitor.metadataPath.split('\\.')"/>
-                <iterate list="metaParts" entry="part">
-                    <if condition="metaResults[part]">
-                        <set field="metaResults" from="metaResults[part]"/>
-                    </if>
-                </iterate>
-            </if>
-            <else>
-                <set field="metaResults" value="" />
-            </else>
 
             <if condition="!jsonResults || !jsonResults.toString().isNumber()">
                 <return error="true" message="'${jsonResults.toString()}' is not a valid result found in Job ${monitor.jobName} for Monitor ${monitor.monitorId}"/>
@@ -76,12 +63,12 @@ along with this software (see the LICENSE.md file). If not, see
 
             <!-- store in elasticsearch -->
             <service-call name="tailorsoft.monitor.MonitorServices.save#Datapoint"
-                          in-map="[date:endTime, value:doubleValue, metadata: metaResults, indexName:monitor.indexName]"/>
+                          in-map="[date:endTime, value:doubleValue, indexName:monitor.indexName]"/>
 
             <if condition="monitor.algorithmEnumId == 'ALGO_BOUNDS'">
                 <service-call
                         name="tailorsoft.monitor.MonitorServices.process#DatapointBounds"
-                        in-map="[indexName:monitor.indexName, value:doubleValue, metadata: metaResults, date:endDate, jobName:jobName, jobRunId: jobRunId, monitorId: monitor.monitorId, ]"/>
+                        in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, jobName:jobName, jobRunId: jobRunId, monitorId: monitor.monitorId, ]"/>
             </if>
         </actions>
     </service>
@@ -92,7 +79,6 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="indexName" required="true"/>
             <parameter name="date" required="true"/>
             <parameter name="value" required="true"/>
-            <parameter name="metadata" default="" />
         </in-parameters>
         <actions>
             <set field="json" from="[:]"/>
@@ -108,7 +94,6 @@ along with this software (see the LICENSE.md file). If not, see
                 json.put("@timestamp", new Date())
                 // value from the service
                 json.put("value", value)
-                json.put("metadata", metadata)
 
                 try {
                     Map createIndexResult = ec.service.sync().name("tailorsoft.monitor.MonitorServices.create#Index").parameter("indexName", indexName).call()
@@ -135,7 +120,6 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="jobRunId"/>
             <parameter name="indexName"/>
             <parameter name="value"/>
-            <parameter name="metadata" default=""/>
         </in-parameters>
         <out-parameters>
             <parameter name="value"/>
@@ -255,7 +239,6 @@ along with this software (see the LICENSE.md file). If not, see
                                         jobRunId        : jobRunId,
                                         fromDate        : new Date(),
                                         value           : value,
-                                        metadata        : metadata,
                                         statusId        : 'SjmOpen',
                                         notification    : notificationId,
                                         lastUpdatedStamp: new Date(),
@@ -397,7 +380,6 @@ along with this software (see the LICENSE.md file). If not, see
         <in-parameters>
             <parameter name="monitorId" required="true"/>
             <parameter name="pointValue" required="true"/>
-            <parameter name="metadata" default="" />
         </in-parameters>
         <actions>
             <log message="==== ${monitorId} ${value}"/>
@@ -421,12 +403,12 @@ along with this software (see the LICENSE.md file). If not, see
 
             <!-- store in elasticsearch -->
             <service-call name="tailorsoft.monitor.MonitorServices.save#Datapoint"
-                          in-map="[date: endDate, value:doubleValue, metadata:metadata, indexName:monitor.indexName]"/>
+                          in-map="[date: endDate, value:doubleValue, indexName:monitor.indexName]"/>
 
             <if condition="monitor.algorithmEnumId == 'ALGO_BOUNDS'">
                 <service-call
                         name="tailorsoft.monitor.MonitorServices.process#DatapointBounds"
-                        in-map="[indexName:monitor.indexName, value:doubleValue, metadata:metadata, date:endDate, monitorId: monitor.monitorId, ]"/>
+                        in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, monitorId: monitor.monitorId, ]"/>
             </if>
 
         </actions>
@@ -483,7 +465,7 @@ along with this software (see the LICENSE.md file). If not, see
 
                     if (!client.indexExists(indexName)) {
                         try {
-                            Map indexMapping = ["properties":["@timestamp":["type":"date"], "value":["type":"float"], "metadata":["type":"text"]]];
+                            Map indexMapping = ["properties":["@timestamp":["type":"date"], "value":["type":"float"]]];
                             client.createIndex(indexName, indexMapping, (String) null)
                             result = "INDEX_CREATED"
                         } catch (Exception e) {
