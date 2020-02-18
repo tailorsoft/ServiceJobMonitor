@@ -79,6 +79,11 @@ function showPopover(el, popoverId, event, vegaItem) {
     }
   }
 
+  if(vegaItem.datum.jobRunId){
+    let val = createTableRow("Job Run", null, tbody);
+    $(val).append(`<a href="/vapps/system/ServiceJob/JobRuns/JobRunDetail?jobRunId=${vegaItem.datum.jobRunId}">${vegaItem.datum.jobRunId}</a>`);
+  }
+
   //Add to table
   table.append(tbody);
   popover.append(table);
