@@ -20,7 +20,7 @@ along with this software (see the LICENSE.md file). If not, see
         <in-parameters>
             <parameter name="jobName" required="true"/>
             <parameter name="endTime" required="true"/>
-            <parameter name="jobName" required="true"/>
+            <parameter name="jobRunId" required="true"/>
             <parameter name="results" required="true"/>
         </in-parameters>
         <out-parameters>
@@ -68,7 +68,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="monitor.algorithmEnumId == 'ALGO_BOUNDS'">
                 <service-call
                         name="tailorsoft.monitor.MonitorServices.process#DatapointBounds"
-                        in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, jobName:jobName, jobRunId: jobRunId, monitorId: monitor.monitorId, ]"/>
+                        in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, jobName:jobName, jobRunId:jobRunId, monitorId: monitor.monitorId, ]"/>
             </if>
         </actions>
     </service>
