@@ -52,7 +52,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <set field="jsonResults" from="jsonResults[part]"/>
             </iterate>
 
-            <if condition="!jsonResults || !jsonResults.toString().isNumber()">
+            <if condition="jsonResults.toString() != '0' &amp;&amp; (!jsonResults || !jsonResults.toString().isNumber())">
                 <return error="true" message="'${jsonResults.toString()}' is not a valid result found in Job ${monitor.jobName} for Monitor ${monitor.monitorId}"/>
             </if>
 
