@@ -509,6 +509,23 @@ along with this software (see the LICENSE.md file). If not, see
         </actions>
     </service>
 
+    <service verb="get" noun="QueryFromLastJobRun" authenticate="anonymous-all" validate="false">
+        <in-parameters>
+            <parameter name="query" required="true" />
+            <parameter name="jobRunId"/>
+            <parameter name="lastRunTime"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="results" />
+        </out-parameters>
+        <actions>
+            <service-call name="tailorsoft.monitor.MonitorServices.get#QueryResults"
+                          in-map="[startDate:lastRunTime.startTime, endDate:ec.user.nowTimestamp, query:query]"
+                          out-map="results"
+            />
+        </actions>
+    </service>
+
 <!--    Validate false, as with true it filters out HTML elements such as < and > -->
     <service verb="get" noun="QueryResults" authenticate="true" validate="false">
         <in-parameters>
