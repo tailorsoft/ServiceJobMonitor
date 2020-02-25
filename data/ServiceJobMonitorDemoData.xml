@@ -1,6 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <entity-facade-xml type="demo">
+    <moqui.service.job.ServiceJob jobId="run_query" jobName="run_query"
+                                  description="Executes a SQL query"
+                                  serviceName="tailorsoft.monitor.MonitorServices.get#QueryFromLastJobRun"
+                                  cronExpression="0 */5 * ? * *" paused="N"
+                                  expireLockTime="3"
+    >
+        <parameters parameterName="query" parameterValue="SELECT ORDER_ID FROM ORDER_HEADER WHERE LAST_UPDATED_STAMP &lt; {FROM} AND LAST_UPDATE_STAMP &gt; {THRU}"/>
+    </moqui.service.job.ServiceJob>
+
+    <tailorsoft.service.job.ServiceJobMonitor
+            monitorId="run_query"
+            jobName="run_query"
+            title="SQL job"
+            valuePath="count"
+            indexName="sqlcount"
+            algorithmEnumId="ALGO_BOUNDS"
+            statusId="MonitorActive"
+    />
+
+    <tailorsoft.service.job.ServiceJobMonitorBounds
+            monitorId="run_query"
+            lower="0"
+            upper="0"
+            count="1"
+    />
+
     <!--  Temperature Example   -->
     <moqui.service.job.ServiceJob jobId="poll_temperature" jobName="poll_temperature"
                                   description="get temperature salt lake city"
