@@ -6,8 +6,8 @@
         <screen location="component://webroot/screen/webroot.xml">
             <subscreens-item name="jsmstatic" menu-include="false" location="component://ServiceJobMonitor/screen/sjmstatic.xml"/>
         </screen>
-        <screen location="component://webroot/screen/webroot/apps.xml">
-            <subscreens-item name="monitor" menu-title="Service Job Monitor" menu-index="15"
+        <screen location="component://tools/screen/System.xml">
+            <subscreens-item name="monitor" menu-title="Service Job Monitor" menu-index="13"
                              location="component://ServiceJobMonitor/screen/MonitorAdmin.xml"/>
         </screen>
     </screen-facade>
