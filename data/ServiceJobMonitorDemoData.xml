@@ -7,7 +7,7 @@
                                   cronExpression="0 */5 * ? * *" paused="N"
                                   expireLockTime="3"
     >
-        <parameters parameterName="query" parameterValue="SELECT ORDER_ID FROM ORDER_HEADER WHERE LAST_UPDATED_STAMP &lt; {FROM} AND LAST_UPDATED_STAMP &gt; {THRU}"/>
+        <parameters parameterName="query" parameterValue="SELECT ORDER_ID FROM ORDER_HEADER WHERE LAST_UPDATED_STAMP &gt; {FROM} AND LAST_UPDATED_STAMP &lt; {THRU}"/>
     </moqui.service.job.ServiceJob>
 
     <tailorsoft.service.job.ServiceJobMonitor
