@@ -14,7 +14,7 @@
             monitorId="run_query"
             jobName="run_query"
             title="SQL job"
-            valuePath="count"
+            valuePath="results.count"
             indexName="sqlcount"
             algorithmEnumId="ALGO_BOUNDS"
             statusId="MonitorActive"
