@@ -112,7 +112,44 @@ along with this software (see the LICENSE.md file). If not, see
         </actions>
     </service>
 
-    <!--  search Elasticsearch data  -->
+    <service verb="send" noun="Notification">
+        <in-parameters>
+            <parameter name="jobName"/>
+            <parameter name="monitorId"/>
+            <parameter name="jobRunId"/>
+            <parameter name="value"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="notificationId"/>
+        </out-parameters>
+        <actions>
+            <script><![CDATA[
+                Map notificationData = [
+                        id              : jobRunId,
+                        jobName         : jobName,
+                        jobRunId        : jobRunId,
+                        monitorId       : monitorId,
+                        fromDate        : new Date(),
+                        value           : value,
+                        status          : 'open',
+                        lastUpdatedStamp: new Date(),
+                        from            : 'noreply@moqui.org'
+                ]
+
+                notificationId = ec
+                        .makeNotificationMessage()
+                        .topic(monitorId)
+                        .type("danger")
+                        .title("Alert Bounds")
+                        .message(notificationData)
+                        .userGroupId("ALL_USERS")
+                        .send()
+                        .getNotificationMessageId()
+                ]]></script>
+        </actions>
+    </service>
+
+    <!--  search Elasticsearch data -->
     <service verb="process" noun="DatapointBounds" authenticate="anonymous-all">
         <in-parameters>
             <parameter name="jobName"/>
@@ -125,158 +162,47 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="value"/>
         </out-parameters>
         <actions>
-            <log message="\n ======= bounds ${indexName}, ${value}, ${jobName}, ${context} ${monitorId} "/>
             <set field="messageData" from="[:]"/>
             <entity-find-one entity-name="tailorsoft.service.job.ServiceJobMonitorBounds" value-field="monitorBounds" cache="true">
                 <field-map field-name="monitorId"/>
             </entity-find-one>
-
+            <set field="alertCount" from="monitorBounds.count" />
             <entity-find entity-name="tailorsoft.service.job.ServiceJobMonitorAlert" list="alertList" limit="1">
                 <econdition field-name="monitorId" from="monitorId"/>
                 <order-by field-name="-fromDate"/>
             </entity-find>
 
-            <log message="\n ======= entity bounds: ${monitorBounds}"/>
+            <service-call name="tailorsoft.monitor.MonitorServices.get#IndexHits"
+                          in-map="['indexName':indexName, 'searchMap': ['sort':['@timestamp':'desc'], 'size':alertCount]]"
+                          out-map="indexHits"/>
+            <set field="hits" from="indexHits.hitList" />
 
-            <script>
-                <![CDATA[
-                import org.moqui.context.ExecutionContext
-                import javax.naming.directory.SearchControls
+            <if condition="hits.size() &lt; monitorBounds.count">
+                <return />
+            </if>
 
-                sleep(1200);
-
-                ExecutionContext ec = context.ec
-
-                String sendNotification(data) {
-                    logger.info("notification ${data}")
-
-                    Map notificationData = [
-                            id              : jobRunId,
-                            jobName         : jobName,
-                            jobRunId        : jobRunId,
-                            monitorId       : monitorId,
-                            fromDate        : new Date(),
-                            value           : value,
-                            status          : 'open',
-                            lastUpdatedStamp: new Date(),
-                            from            : 'noreply@moqui.org'
-                    ]
-                    notificationId = ec
-                            .makeNotificationMessage()
-                            .topic(monitorId)
-                            .type("danger")
-                            .title("Alert Bounds")
-                            .message(notificationData)
-                            .userGroupId("ALL_USERS")
-                            .send()
-                            .getNotificationMessageId()
-
-                    return notificationId
-                }
-
-                try {
-                    int alertCount = Integer.parseInt(monitorBounds.count.toString())
-
-
-                    // hits from elasticsearch
-                    Map searchMap = ["sort":["@timestamp":"desc"], "size":alertCount]
-                    indexHits = ec.service.sync().name("tailorsoft.monitor.MonitorServices.get#IndexHits").parameters(["indexName":indexName, "searchMap":searchMap]).call()
-                    hits = indexHits.hitList
-
-                    logger.info("\n ======== ES results")
-                    logger.info(hits.toString())
-
-                    Float upperBound = Float.parseFloat(monitorBounds.upper.toString())
-                    Float lowerBound = Float.parseFloat(monitorBounds.lower.toString())
-                    int boundsCount = Integer.parseInt(monitorBounds.count.toString());
-                    int size = hits.size();
-
-
-                    if (size < boundsCount) {
-                        // too few points to evaluate
-                        return false;
-                    }
-
-                    Boolean upperBoundAllValid = true;
-                    Boolean lowerBoundAllValid = true;
-
-                    for (int i = 0; i < size; i++) {
-                        Map hit = hits[i]._source
-                        Float value = Float.parseFloat(hit.value.toString())
-
-                        if (value < upperBound) {
-                            upperBoundAllValid = false;
-                        }
-
-                        if (value > lowerBound) {
-                            lowerBoundAllValid = false;
-                        }
-                    }
-
-                    logger.info('===== upper and lower bounds')
-                    logger.info(upperBoundAllValid.toString())
-                    logger.info(lowerBoundAllValid.toString())
-
-
-                    if (upperBoundAllValid || lowerBoundAllValid) {
-                        Map hit = hits[0]._source
-                        Float value = Float.parseFloat(hit.value.toString())
-
-                        if (alertList.size() > 0 && alertList[0].statusId.toString() == 'SjmOpen') {
-                            logger.info('=== last alert still open')
-                            // @todo do nothing
-                            return false;
-                        }
-
-                        notificationId = sendNotification([monitorId: monitorId, value: value]);
-
-                        ec.service.sync()
-                                .name("create#tailorsoft.service.job.ServiceJobMonitorAlert")
-                                .parameters([
-                                        id              : jobRunId,
-                                        monitorId       : monitorId,
-                                        jobName         : jobName,
-                                        jobRunId        : jobRunId,
-                                        fromDate        : new Date(),
-                                        value           : value,
-                                        statusId        : 'SjmOpen',
-                                        notification    : notificationId,
-                                        lastUpdatedStamp: new Date(),
-                                ])
-                                .call()
-                        logger.info('==== notification sent')
-
-                    }
-
-                    if (alertList.size() > 0 && alertList[0].statusId.toString() == 'SjmOpen') {
-                        currentAlert = alertList[0];
-
-                        Boolean restoreValid = true;
-
-                        for (int i = 0; i < size; i++) {
-                            Map hit = hits[i]._source
-                            Float value = Float.parseFloat(hit.value.toString())
-
-                            logger.info("alertId: ${currentAlert.id}- ${i.toString()} - ${value.toString()}")
-
-                            if (value > upperBound || value < lowerBound) {
-                                restoreValid = false;
-                            }
-                        }
-
-                        if (restoreValid) {
-
-                            ec.service.sync()
-                                    .name("update#tailorsoft.service.job.ServiceJobMonitorAlert")
-                                    .parameters([id: currentAlert.id, statusId: 'SjmClosed', thruDate: new Date()])
-                                    .call()
-                        }
-                    }
-                } finally {
-                    // TODO close client?
-                }
-                ]]>
-            </script>
+            <set field="outOfUpperBound" from="hits.every{it._source.value.toFloat() &gt; monitorBounds.upper}" />
+            <set field="outOfLowerBound" from="hits.every{it._source.value.toFloat() &lt; monitorBounds.lower}" />
+            <set field="isLastAlertOpen" from="alertList.size() > 0 &amp;&amp; alertList[0].statusId.toString() == 'SjmOpen'"/>
+            <if condition="isLastAlertOpen" >
+                <if condition="!outOfUpperBound &amp;&amp; !outOfLowerBound" >
+                    <set field="id" from="alertList[0].id" />
+                    <entity-find-one entity-name="tailorsoft.service.job.ServiceJobMonitorAlert" value-field="alert"/>
+                    <set field="alert.statusId" value="SjmClosed" />
+                    <set field="alert.thruDate" from="new Date()" />
+                    <entity-update value-field="alert"/>
+                </if>
+                <else>
+                    <if condition="outOfLowerBound || outOfUpperBound" >
+                        <service-call name="tailorsoft.monitor.MonitorServices.send#Notification" in-map="context" />
+                        <entity-make-value entity-name="ServiceJobMonitorAlert" value-field="alert"
+                                           map="['id': jobRunId, 'monitorId': monitorId, 'jobName': jobName, 'jobRunId': jobRunId,
+                                         'fromDate': new Date(), 'value': value, 'statusId': 'SjmOpen', 'notification': notificationId,
+                                         'lastUpdatedStamp': new Date()]"/>
+                        <entity-create value-field="alert" />
+                    </if>
+                </else>
+            </if>
         </actions>
     </service>
 
@@ -461,20 +387,20 @@ along with this software (see the LICENSE.md file). If not, see
             <script>
                 <![CDATA[
 
-                    client = ec.elastic.getDefault()
+                client = ec.elastic.getDefault()
 
-                    if (!client.indexExists(indexName)) {
-                        try {
-                            Map indexMapping = ["properties":["@timestamp":["type":"date"], "value":["type":"float"]]];
-                            client.createIndex(indexName, indexMapping, (String) null)
-                            result = "INDEX_CREATED"
-                        } catch (Exception e) {
-                            logger.error("Error checking and creating ${indexName} ES index", e)
-                            result = "INDEX_NOT_CREATED"
-                        }
-                    }else{
-                        result = "INDEX_ALREADY_EXIST"
+                if (!client.indexExists(indexName)) {
+                    try {
+                        Map indexMapping = ["properties":["@timestamp":["type":"date"], "value":["type":"float"]]];
+                        client.createIndex(indexName, indexMapping, (String) null)
+                        result = "INDEX_CREATED"
+                    } catch (Exception e) {
+                        logger.error("Error checking and creating ${indexName} ES index", e)
+                        result = "INDEX_NOT_CREATED"
                     }
+                }else{
+                    result = "INDEX_ALREADY_EXIST"
+                }
                 ]]>
             </script>
         </actions>
@@ -493,17 +419,17 @@ along with this software (see the LICENSE.md file). If not, see
             <script>
                 <![CDATA[
 
-                    client = ec.elastic.getDefault()
+                client = ec.elastic.getDefault()
 
-                    if (client.indexExists(indexName)) {
-                        try {
-                            hitList = client.searchHits(indexName, searchMap)
-                        } catch (Exception e) {
-                            logger.error("Can't find hits in the index: ${indexName}", e)
-                        }
-                    }else{
-                        logger.warn("Can't find index with name: ${indexName}", e)
+                if (client.indexExists(indexName)) {
+                    try {
+                        hitList = client.searchHits(indexName, searchMap)
+                    } catch (Exception e) {
+                        logger.error("Can't find hits in the index: ${indexName}", e)
                     }
+                }else{
+                    logger.warn("Can't find index with name: ${indexName}", e)
+                }
                 ]]>
             </script>
         </actions>
@@ -526,7 +452,7 @@ along with this software (see the LICENSE.md file). If not, see
         </actions>
     </service>
 
-<!--    Validate false, as with true it filters out HTML elements such as < and > -->
+    <!--    Validate false, as with true it filters out HTML elements such as < and > -->
     <service verb="get" noun="QueryResults" authenticate="true" validate="false">
         <in-parameters>
             <parameter name="groupName" default="transactional" />
