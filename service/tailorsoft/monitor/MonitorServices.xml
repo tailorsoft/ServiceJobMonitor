@@ -61,14 +61,15 @@ along with this software (see the LICENSE.md file). If not, see
                 <return error="true" message="No double value found at path: ${monitor.valuePath} in ${results} "/>
             </if>
 
-            <!-- store in elasticsearch -->
-            <service-call name="tailorsoft.monitor.MonitorServices.save#Datapoint"
-                          in-map="[date:endTime, value:doubleValue, indexName:monitor.indexName]"/>
-
             <if condition="monitor.algorithmEnumId == 'ALGO_BOUNDS'">
                 <service-call
                         name="tailorsoft.monitor.MonitorServices.process#DatapointBounds"
-                        in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, jobName:jobName, jobRunId:jobRunId, monitorId: monitor.monitorId, ]"/>
+                        in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, jobName:jobName, jobRunId:jobRunId, monitorId: monitor.monitorId]"/>
+
+                <!-- store in elasticsearch -->
+                <service-call name="tailorsoft.monitor.MonitorServices.save#Datapoint"
+                in-map="[date:endTime, value:doubleValue, indexName:monitor.indexName]"/>
+
             </if>
         </actions>
     </service>
@@ -178,7 +179,7 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="monitorId"/>
             <parameter name="jobRunId"/>
             <parameter name="indexName"/>
-            <parameter name="value"/>
+            <parameter name="value" type="Float"/>
         </in-parameters>
         <out-parameters>
             <parameter name="value"/>
@@ -188,7 +189,7 @@ along with this software (see the LICENSE.md file). If not, see
             <entity-find-one entity-name="tailorsoft.service.job.ServiceJobMonitorBounds" value-field="monitorBounds" cache="true">
                 <field-map field-name="monitorId"/>
             </entity-find-one>
-            <set field="alertCount" from="monitorBounds.count" />
+            <set field="alertCount" from="monitorBounds.count-1" />
             <entity-find entity-name="tailorsoft.service.job.ServiceJobMonitorAlert" list="alertList" limit="1">
                 <econdition field-name="monitorId" from="monitorId"/>
                 <order-by field-name="-fromDate"/>
@@ -197,16 +198,16 @@ along with this software (see the LICENSE.md file). If not, see
             <service-call name="tailorsoft.monitor.MonitorServices.get#IndexHits"
                           in-map="['indexName':indexName, 'searchMap': ['sort':['@timestamp':'desc'], 'size':alertCount]]"
                           out-map="indexHits"/>
-            <set field="hits" from="indexHits.hitList" />
+            <set field="hits" from="indexHits.hitList.collect{it._source.value.toFloat()}" />
+            <script>hits.push(value)</script>
 
             <if condition="hits.size() &lt; monitorBounds.count">
                 <return />
             </if>
 
-            <set field="outOfUpperBound" from="hits.every{it._source.value.toFloat() &gt; monitorBounds.upper}" />
-            <set field="outOfLowerBound" from="hits.every{it._source.value.toFloat() &lt; monitorBounds.lower}" />
-            <set field="isLastAlertOpen" from="alertList.size() > 0 &amp;&amp; alertList[0].statusId.toString() == 'SjmOpen'"/>
-            <if condition="isLastAlertOpen" >
+            <set field="outOfUpperBound" from="hits.every{it &gt; monitorBounds.upper.toFloat()}" />
+            <set field="outOfLowerBound" from="hits.every{it &lt; monitorBounds.lower.toFloat()}" />
+            <if condition="alertList.size() > 0 &amp;&amp; alertList[0].statusId.toString() == 'SjmOpen'" >
                 <if condition="!outOfUpperBound &amp;&amp; !outOfLowerBound" >
                     <set field="id" from="alertList[0].id" />
                     <entity-find-one entity-name="tailorsoft.service.job.ServiceJobMonitorAlert" value-field="alert"/>
@@ -355,7 +356,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="monitor.algorithmEnumId == 'ALGO_BOUNDS'">
                 <service-call
                         name="tailorsoft.monitor.MonitorServices.process#DatapointBounds"
-                        in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, monitorId: monitor.monitorId, ]"/>
+                        in-map="[indexName:monitor.indexName, value:doubleValue, date:endDate, monitorId: monitor.monitorId]"/>
             </if>
 
         </actions>
