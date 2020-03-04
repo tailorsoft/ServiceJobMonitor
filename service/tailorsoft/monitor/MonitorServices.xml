@@ -149,6 +149,28 @@ along with this software (see the LICENSE.md file). If not, see
         </actions>
     </service>
 
+    <service verb="check" noun="InCronRange">
+        <in-parameters>
+            <parameter name="cron" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="valid" type="Boolean" />
+        </out-parameters>
+        <actions>
+            <script>
+                <![CDATA[
+                def exec = org.moqui.impl.service.ScheduledJobRunner.getExecutionTime(cron)
+                def now = java.time.ZonedDateTime.ofInstant(new Date().toInstant(), java.time.ZoneId.systemDefault())
+
+                def timeSinceLast = exec.timeFromLastExecution(now).get().toMinutes()
+                def timeToNext = exec.timeToNextExecution(now).get().toMinutes()
+
+                validTime = timeSinceLast < 60 && timeToNext < 60
+                ]]>
+            </script>
+        </actions>
+    </service>
+
     <!--  search Elasticsearch data -->
     <service verb="process" noun="DatapointBounds" authenticate="anonymous-all">
         <in-parameters>
@@ -194,12 +216,18 @@ along with this software (see the LICENSE.md file). If not, see
                 </if>
                 <else>
                     <if condition="outOfLowerBound || outOfUpperBound" >
-                        <service-call name="tailorsoft.monitor.MonitorServices.send#Notification" in-map="context" out-map="notificationId" />
-                        <log message="Created alert in monitor ${monitorId} with value ${value} from the job run id ${jobRunId} and notification ${notificationId.notificationId}" />
-                        <service-call name="create#tailorsoft.service.job.ServiceJobMonitorAlert"
-                                           in-map="['id': jobRunId, 'monitorId': monitorId, 'jobName': jobName, 'jobRunId': jobRunId,
-                                         'fromDate': new Date(), 'value': value, 'statusId': 'SjmOpen', 'notification': notificationId.notificationId,
+                        <set field="validTime" value="true" type="Boolean" />
+                        <if condition="monitorBounds.cron != null" >
+                            <service-call name="tailorsoft.monitor.MonitorServices.check#InCronRange" in-map="['cron': monitorBounds.cron]"  out-map="context" />
+                        </if>
+                        <if condition="validTime">
+                            <service-call name="tailorsoft.monitor.MonitorServices.send#Notification" in-map="context" out-map="context" />
+                            <log message="Created alert in monitor ${monitorId} with value ${value} from the job run id ${jobRunId} and notification ${notificationId}" />
+                            <service-call name="create#tailorsoft.service.job.ServiceJobMonitorAlert"
+                                          in-map="['id': jobRunId, 'monitorId': monitorId, 'jobName': jobName, 'jobRunId': jobRunId,
+                                         'fromDate': new Date(), 'value': value, 'statusId': 'SjmOpen', 'notification': notificationId,
                                          'lastUpdatedStamp': new Date()]"/>
+                        </if>
                     </if>
                 </else>
             </if>
@@ -239,9 +267,6 @@ along with this software (see the LICENSE.md file). If not, see
                 <econdition field-name="fromDate" operator="less" from="thruDateFormated"/>
             </entity-find>
 
-
-            <log message="============================== ${alertsList} ${fromDate} ${thruDate}"/>
-
             <script>
                  <![CDATA[
                 import org.moqui.context.ExecutionContext
@@ -250,10 +275,6 @@ along with this software (see the LICENSE.md file). If not, see
 
                 ExecutionContext ec = context.ec
                 client = ec.elastic.getDefault()
-
-                logger.info("=================")
-                logger.info(fromDate)
-                logger.info(thruDate)
 
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
