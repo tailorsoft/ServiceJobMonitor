@@ -194,12 +194,12 @@ along with this software (see the LICENSE.md file). If not, see
                 </if>
                 <else>
                     <if condition="outOfLowerBound || outOfUpperBound" >
-                        <service-call name="tailorsoft.monitor.MonitorServices.send#Notification" in-map="context" />
-                        <entity-make-value entity-name="ServiceJobMonitorAlert" value-field="alert"
-                                           map="['id': jobRunId, 'monitorId': monitorId, 'jobName': jobName, 'jobRunId': jobRunId,
-                                         'fromDate': new Date(), 'value': value, 'statusId': 'SjmOpen', 'notification': notificationId,
+                        <service-call name="tailorsoft.monitor.MonitorServices.send#Notification" in-map="context" out-map="notificationId" />
+                        <log message="Created alert in monitor ${monitorId} with value ${value} from the job run id ${jobRunId} and notification ${notificationId.notificationId}" />
+                        <service-call name="create#tailorsoft.service.job.ServiceJobMonitorAlert"
+                                           in-map="['id': jobRunId, 'monitorId': monitorId, 'jobName': jobName, 'jobRunId': jobRunId,
+                                         'fromDate': new Date(), 'value': value, 'statusId': 'SjmOpen', 'notification': notificationId.notificationId,
                                          'lastUpdatedStamp': new Date()]"/>
-                        <entity-create value-field="alert" />
                     </if>
                 </else>
             </if>
