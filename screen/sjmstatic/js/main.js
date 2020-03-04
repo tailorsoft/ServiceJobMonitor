@@ -226,7 +226,8 @@ function renderVega(data, elementId) {
         filled: true,
         cursor: "pointer",
         size: 80,
-        href: "/vapps/monitor/Monitor?monitorId=" + data.monitorId
+        //TODO this should resolve dynamically
+        href: "/vapps/system/monitor/Monitor?monitorId=" + data.monitorId
       },
       encoding: {
         color: {
