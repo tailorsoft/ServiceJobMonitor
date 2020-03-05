@@ -84,13 +84,15 @@ function renderVega(data, elementId) {
           strokeDash: [2, 2]
         },
         opacity: 0.1,
-        color: isOpenAlert ? "#D9534F" : "#337AB7"
+        color: isOpenAlert ? "#D9534F" : "#337AB7",
+        tooltip: null
       },
       encoding: {
+        tooltip: null,
         y: {
           field: "value",
           type: "quantitative",
-          title: "Miles per Gallon"
+          title: "Bounds"
         }
       }
     },
@@ -100,7 +102,7 @@ function renderVega(data, elementId) {
         type: "line",
         color: isOpenAlert ? "#D9534F" : "#95bad9",
         strokeWidth: 1,
-        tooltip: false
+        tooltip: null,
       },
       encoding: {
         x: {
@@ -134,12 +136,18 @@ function renderVega(data, elementId) {
       data: { values: alerts },
       mark: {
         opacity: 1,
-        type: "point",
+        type: 'point',
         filled: true,
         cursor: "pointer",
-        size: 80
+        size: 80,
+        tooltip: false
       },
       encoding: {
+        href: {field: "href", type: "nominal"},
+        shape: {
+          condition: {"test": "datum.hasLink", "value": "circle"},
+          value: "diamond"
+        },
         color: {
           field: "color",
           type: "nominal",
@@ -209,6 +217,7 @@ function renderVega(data, elementId) {
       width: el.clientWidth,
       height: 60,
       mark: {
+        tooltip: null,
         type: "line",
         color: isOpenAlert ? "#D9534F" : "#95bad9",
         strokeWidth: 1,
