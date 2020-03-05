@@ -42,16 +42,6 @@ function generateBox({ name, type = "", title = "" }) {
 
 const container = document.getElementById("chartsContainer");
 
-function mouseHandler(handler, event, item, value) {
-  if(item && event.vegaType == 'mousemove') {
-    if(item.datum && item.datum.hasLink == null && item.datum.jobRunId){
-      item.datum.hasLink = true;
-      $(item._svg).on('click', function () {
-        window.location = "/vapps/system/ServiceJob/JobRuns/JobRunDetail?jobRunId="+item.datum.jobRunId
-      })
-    }
-  }
-}
 
 function renderVega(data, elementId) {
   const isOpenAlert =
@@ -64,12 +54,19 @@ function renderVega(data, elementId) {
     if(alert.value){
       alert.value = alert.value.toFixed(2);
     }
-    //
+
+    if(alert.jobRunId){
+      alert.hasLink = true;
+      alert.href = "/vapps/system/ServiceJob/JobRuns/JobRunDetail?jobRunId="+alert.jobRunId;
+    }else{
+      alert.hasLink = false;
+      alert.href = "";
+    }
+
     return alert;
   });
 
   const el = document.getElementById(elementId);
-  console.log(data)
 
   const layer = [
     {
@@ -161,13 +158,13 @@ function renderVega(data, elementId) {
             formatType: "time",
             format: "%Y %m %d %I:%M %p"
           },
-          {
-            field: "thruDate",
-            title: "End Date",
-            type: "temporal",
-            formatType: "time",
-            format: "%Y %m %d %I:%M %p"
-          },
+          // {
+          //   field: "thruDate",
+          //   title: "End Date",
+          //   type: "temporal",
+          //   formatType: "time",
+          //   format: "%Y %m %d %I:%M %p"
+          // },
           { field: "value", title: "Value", type: "quantitative" }
         ],
         x: {
@@ -221,7 +218,7 @@ function renderVega(data, elementId) {
         type: "line",
         color: isOpenAlert ? "#D9534F" : "#95bad9",
         strokeWidth: 1,
-        tooltip: false
+        tooltip: null
       },
       selection: { brush: { type: "interval", encodings: ["x"] } },
       encoding: {
@@ -270,9 +267,9 @@ function renderVega(data, elementId) {
     }
   };
   const VeOptions = {
-    tooltip: mouseHandler,
     actions: false,
-    renderer: "svg" };
+    renderer: "svg"
+  };
 
   vegaEmbed("#" + elementId, yourVlSpec, VeOptions);
 }
