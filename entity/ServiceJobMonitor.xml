@@ -51,6 +51,7 @@
         <field name="lower" type="number-float"/>
         <field name="upper" type="number-float"/>
         <field name="count" type="number-integer"/>
+        <field name="cron" type="text-short"/>
         <relationship type="one" related="tailorsoft.service.job.ServiceJobMonitor"/>
     </entity>
 

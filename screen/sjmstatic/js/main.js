@@ -42,6 +42,17 @@ function generateBox({ name, type = "", title = "" }) {
 
 const container = document.getElementById("chartsContainer");
 
+function mouseHandler(handler, event, item, value) {
+  if(item && event.vegaType == 'mousemove') {
+    if(item.datum && item.datum.hasLink == null && item.datum.jobRunId){
+      item.datum.hasLink = true;
+      $(item._svg).on('click', function () {
+        window.location = "/vapps/system/ServiceJob/JobRuns/JobRunDetail?jobRunId="+item.datum.jobRunId
+      })
+    }
+  }
+}
+
 function renderVega(data, elementId) {
   const isOpenAlert =
     data.alerts.filter(alert => {
@@ -58,6 +69,7 @@ function renderVega(data, elementId) {
   });
 
   const el = document.getElementById(elementId);
+  console.log(data)
 
   const layer = [
     {
@@ -125,8 +137,7 @@ function renderVega(data, elementId) {
         type: "point",
         filled: true,
         cursor: "pointer",
-        size: 80,
-        href: "/vapps/monitor/Monitor?monitorId=" + data.monitorId
+        size: 80
       },
       encoding: {
         color: {
@@ -249,8 +260,12 @@ function renderVega(data, elementId) {
       }
     }
   };
+  const VeOptions = {
+    tooltip: mouseHandler,
+    actions: false,
+    renderer: "svg" };
 
-  vegaEmbed("#" + elementId, yourVlSpec, { actions: false, renderer: "svg" });
+  vegaEmbed("#" + elementId, yourVlSpec, VeOptions);
 }
 
 function makeChart(data) {
