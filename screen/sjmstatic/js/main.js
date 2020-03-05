@@ -126,7 +126,7 @@ function renderVega(data, elementId) {
         filled: true,
         cursor: "pointer",
         size: 80,
-        href: "/vapps/monitor/Monitor?monitorId=" + data.monitorId
+        href: data.jobRunId == null ? "#" : "/vapps/system/ServiceJob/JobRuns/JobRunDetail?jobRunId=" + data.jobRunId
       },
       encoding: {
         color: {
