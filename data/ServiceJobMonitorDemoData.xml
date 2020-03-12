@@ -13,7 +13,7 @@ along with this software (see the LICENSE.md file). If not, see
 <http://creativecommons.org/publicdomain/zero/1.0/>.
 -->
 <entity-facade-xml type="demo">
-    <moqui.service.job.ServiceJob jobId="run_query" jobName="run_query"
+    <moqui.service.job.ServiceJob jobName="run_query"
                                   description="Executes a SQL query"
                                   serviceName="tailorsoft.monitor.MonitorServices.get#QueryFromLastJobRun"
                                   cronExpression="0 */5 * ? * *" paused="N"
@@ -40,7 +40,7 @@ along with this software (see the LICENSE.md file). If not, see
     />
 
     <!--  Temperature Example   -->
-    <moqui.service.job.ServiceJob jobId="poll_temperature" jobName="poll_temperature"
+    <moqui.service.job.ServiceJob jobName="poll_temperature"
                                   description="get temperature salt lake city"
                                   serviceName="tailorsoft.demo.TemperatureServices.get#Temperature"
                                   cronExpression="* 0/5 * ? * * *" paused="N"
